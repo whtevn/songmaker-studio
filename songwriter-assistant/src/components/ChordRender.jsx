@@ -21,31 +21,33 @@ const ChordRender = ({ degrees }) => {
     renderer.resize(width, degrees.length * heightPerChord);
 
     // Render each degree's chord on its own staff
-    degrees.forEach((degree, index) => {
-      const yOffset = index * heightPerChord;
+    // Create a stave for the chord
+    const yOffset = heightPerChord;
+    const stave = new Stave(10, 0, width - 20);
+    stave.addClef("treble").setContext(context).draw();
+    const staveNotes = degrees.map((degree, index) => {
 
-      // Create a stave for the chord
-      const stave = new Stave(10, yOffset + 40, width - 20);
-      stave.addClef("treble").setContext(context).draw();
 
       // Flatten the chord and map it to VexFlow keys
-      const chordNotes = degree.chord
-        .flat()
-        .map((note) =>
+      const chordNotes = degree.chord.flat().map((note) =>
         `${note
-          .toLowerCase()
-          .replace(/\${FLAT}/g, "@") // Replace ${FLAT} with @
-          .replace(/\${SHARP}/g, "#")}/4` // Replace ${SHARP} with #
-       );
+          .replace(FLAT, "b") // Replace FLAT with @
+          .replace(SHARP, "#")}/4` // Replace SHARP with #
+      );
 
-      const staveNote = new StaveNote({
-        keys: chordNotes,
-        duration: "q", // Quarter note
-      });
 
-      // Format and draw the chord
-      Formatter.FormatAndDraw(context, stave, [staveNote]);
+      try {
+        return new StaveNote({
+          keys: chordNotes, // Correctly formatted keys
+          duration: "q", // Quarter note
+        });
+
+      } catch (error) {
+        console.error("Error rendering chord:", error, "Chord Notes:", chordNotes);
+      }
     });
+    // Format and draw the chords
+    Formatter.FormatAndDraw(context, stave, staveNotes);
   }, [degrees]);
 
   return <div ref={containerRef}></div>;

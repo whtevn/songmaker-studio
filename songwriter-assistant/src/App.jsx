@@ -1,18 +1,16 @@
 import React, { useState } from "react";
 import Keyboard from "./components/Keyboard";
-import ChordRender from "./components/ChordRender";
+import ScaleRender from "./components/ScaleRender";
 import scaleFinder from "./utils/scales";
+import PillSelector from "./components/PillSelector";
 
 const App = () => {
   const [selectedNotes, setSelectedNotes] = useState([]);
   const [matchingScales, setMatchingScales] = useState([]);
-  const [activeModes, setActiveModes] = useState([]); // Tracks selected modes for filtering
+  const { modes, findScalesContainingNotes, renderScale } = scaleFinder;
 
-  const {
-    modes,
-    findScalesContainingNotes,
-    renderScale,
-  } = scaleFinder
+  // Preselect Ionian and Aeolian modes
+  const [activeModes, setActiveModes] = useState(["ionian", "aeolian"]);
 
   const handleNoteClick = (note) => {
     // Toggle selection for all labels in the note object
@@ -25,26 +23,17 @@ const App = () => {
     );
   };
 
-  const handleModeToggle = (mode) => {
-    setActiveModes((prevModes) =>
-      prevModes.includes(mode)
-        ? prevModes.filter((m) => m !== mode) // Remove mode if already active
-        : [...prevModes, mode] // Add mode if not active
-    );
-  };
-
   const handleFindScales = () => {
     const scales = findScalesContainingNotes(selectedNotes, {
-      modes: activeModes.map(mode => mode.label), // Pass active modes as filter criteria
+      modes: activeModes, // Use active modes as filter criteria
     });
-    console.log(selectedNotes, activeModes, scales)
     setMatchingScales(scales);
   };
 
   const handleReset = () => {
     setSelectedNotes([]);
     setMatchingScales([]);
-    setActiveModes([]);
+    setActiveModes(["ionian", "aeolian"]); // Reset to default modes
   };
 
   return (
@@ -53,20 +42,12 @@ const App = () => {
       <Keyboard onNoteClick={handleNoteClick} selectedNotes={selectedNotes} />
 
       {/* Mode Filter Pills */}
-      <div className="flex flex-wrap gap-2 mt-4">
-        {modes.map((mode) => (
-          <button
-            key={mode.label}
-            onClick={() => handleModeToggle(mode)}
-            className={`px-3 py-1 rounded-full text-sm font-medium border ${
-              activeModes.includes(mode)
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
-          >
-            {mode.label}
-          </button>
-        ))}
+      <div className="mt-6 space-x-4">
+        <PillSelector
+          modes={modes.map((mode) => mode.label)} // Pass only the labels to the PillSelector
+          onSelectionChange={setActiveModes}
+          defaultSelected={["ionian", "aeolian"]}
+        />
       </div>
 
       {/* Control Buttons */}
@@ -93,7 +74,7 @@ const App = () => {
             {matchingScales.map((scale, index) => (
               <li key={index} className="text-gray-700">
                 {scale.root} {scale.mode}: {renderScale(scale.scale)}
-                { /* <ChordRender degrees={scale.degrees} /> */ }
+                <ScaleRender scale={{ ...scale, rendered: renderScale(scale.scale) }} />
               </li>
             ))}
           </ul>
