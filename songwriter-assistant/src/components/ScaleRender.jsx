@@ -136,9 +136,9 @@ const ScaleRender = ({ scale }) => {
     renderScale();
   }, [scale, isOpen]);
 
-  // Map degrees to their display format using `shortName`
+  // Map degrees to their display format using shortName
   const degreeDescriptions = scale.degrees
-    .map((deg) => deg.name) // `deg.name` already includes `shortName` (e.g., "C maj", "D min")
+    .map((deg) => deg.name) // deg.name already includes shortName (e.g., "C maj", "D min")
     .join(", ");
 
   return (
@@ -181,4 +181,3 @@ const ScaleRender = ({ scale }) => {
 };
 
 export default ScaleRender;
-

@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import Keyboard from "./components/Keyboard";
 import ScaleRender from "./components/ScaleRender";
+import ScalesList from "./components/ScalesList";
+import StringsRender from "./components/StringsRender";
 import scaleFinder from "./utils/scales";
 import PillSelector from "./components/PillSelector";
 
 const App = () => {
   const [selectedNotes, setSelectedNotes] = useState([]);
   const [matchingScales, setMatchingScales] = useState([]);
-  const { modes, findScalesContainingNotes, renderScale } = scaleFinder;
+  const { modes, findScalesContainingNotes, renderScale, allUsedNotes } = scaleFinder;
 
   // Preselect Ionian and Aeolian modes
   const [activeModes, setActiveModes] = useState(["ionian", "aeolian"]);
@@ -81,19 +83,21 @@ const App = () => {
       </div>
 
       {/* Matching Scales */}
-      {matchingScales.length > 0 && (
-        <div className="mt-6 w-full max-w-3xl">
-          <h2 className="text-xl font-bold">Matching Scales</h2>
-          <ul className="list-disc pl-4">
-            {matchingScales.map((scale, index) => (
-              <ScaleRender key={index} scale={{ ...scale, rendered: renderScale(scale.scale) }} />
-            ))}
-          </ul>
-        </div>
-      )}
+      <ScalesList scales={matchingScales} />
     </div>
   );
 };
+
+function assignRandomColors(array) {
+  const getRandomColor = () =>
+    `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0")}`;
+
+  return array.reduce((acc, item) => {
+    acc[item] = getRandomColor();
+    return acc;
+  }, {});
+}
+
 
 export default App;
 

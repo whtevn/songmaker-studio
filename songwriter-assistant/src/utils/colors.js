@@ -1,0 +1,10 @@
+export function assignRandomColors(array) {
+  const getRandomColor = () =>
+    `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0")}`;
+
+  return array.reduce((acc, item) => {
+    acc[item] = getRandomColor();
+    return acc;
+  }, {});
+}
+
