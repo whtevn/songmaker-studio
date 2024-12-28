@@ -67,8 +67,10 @@ const App = () => {
     <div>
       <Heading>Choose A Key</Heading>
       <Text className="mb-6">Choose the notes for your chord progression, then choose a key that includes those notes</Text>
+      <div className="flex flex-wrap justify-evenly items-center gap-4 w-full mt-6">
       <Keyboard onNoteClick={ handleNoteClick } selectedNotes={ selectedNotes } />
-      <PillSelector defaultSelection={ ["ionian", "aeolian"] } options={ modes.map((m) => m.label) } onSelectionChange={ setActiveModes } />
+        <PillSelector defaultSelection={ ["ionian", "aeolian"] } options={ modes.map((m) => m.label) } onSelectionChange={ setActiveModes }/>
+      </div>
       <Divider className="mt-6 mb-6" />
       <ScalesList scales={ matchingScales } />
     </div>
