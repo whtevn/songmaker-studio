@@ -148,11 +148,11 @@ module "cloudfront" {
   custom_error_response = [{
     error_code         = 404
     response_code      = 404
-    response_page_path = "/errors/404.html"
+    response_page_path = "/index.html"
     }, {
     error_code         = 403
     response_code      = 403
-    response_page_path = "/errors/403.html"
+    response_page_path = "/index.html"
   }]
 
   geo_restriction = {
