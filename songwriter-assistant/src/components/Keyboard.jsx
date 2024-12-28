@@ -33,7 +33,7 @@ const Keyboard = ({ onNoteClick, selectedNotes }) => {
                 width={keyWidth}
                 height={200}
                 className={`stroke-black cursor-pointer transition-colors duration-200 ${
-                  selectedNotes.includes(note.labels[0])
+                  selectedNotes.includes(note.labels)
                     ? "fill-blue-300"
                     : "fill-white hover:fill-gray-200"
                 }`}
@@ -50,7 +50,7 @@ const Keyboard = ({ onNoteClick, selectedNotes }) => {
                 width={blackKeyWidth}
                 height={120}
                 className={`cursor-pointer transition-colors duration-200 ${
-                  note.labels.some((label) => selectedNotes.includes(label))
+                  selectedNotes.includes(note.labels)
                     ? "fill-blue-500"
                     : "fill-black hover:fill-gray-700"
                 }`}

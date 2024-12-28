@@ -13,15 +13,29 @@ const App = () => {
   const [activeModes, setActiveModes] = useState(["ionian", "aeolian"]);
 
   const handleNoteClick = (note) => {
-    // Toggle selection for all labels in the note object
-    const isSelected = note.labels.some((label) => selectedNotes.includes(label));
-
-    setSelectedNotes((prev) =>
-      isSelected
-        ? prev.filter((label) => !note.labels.includes(label)) // Remove all labels
-        : [...prev, ...note.labels] // Add all labels
+  setSelectedNotes((prev) => {
+    // Check if the entire note.labels array already exists in selectedNotes
+    const isSelected = prev.some(
+      (selected) =>
+        Array.isArray(selected) &&
+        selected.length === note.labels.length &&
+        selected.every((label, index) => label === note.labels[index])
     );
-  };
+
+    // Toggle the selection of the note.labels array
+    return isSelected
+      ? prev.filter(
+          (selected) =>
+            !(
+              Array.isArray(selected) &&
+              selected.length === note.labels.length &&
+              selected.every((label, index) => label === note.labels[index])
+            )
+        ) // Remove the entire array
+      : [...prev, note.labels]; // Add the entire array
+  });
+};
+
 
   const handleFindScales = () => {
     const scales = findScalesContainingNotes(selectedNotes, {
@@ -72,10 +86,7 @@ const App = () => {
           <h2 className="text-xl font-bold">Matching Scales</h2>
           <ul className="list-disc pl-4">
             {matchingScales.map((scale, index) => (
-              <li key={index} className="text-gray-700">
-                {scale.root} {scale.mode}: {renderScale(scale.scale)}
-                <ScaleRender scale={{ ...scale, rendered: renderScale(scale.scale) }} />
-              </li>
+              <ScaleRender key={index} scale={{ ...scale, rendered: renderScale(scale.scale) }} />
             ))}
           </ul>
         </div>

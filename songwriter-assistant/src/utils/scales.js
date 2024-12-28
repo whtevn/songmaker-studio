@@ -1,26 +1,23 @@
-// Constants
-const SHARP = '♯';
-const FLAT = '♭';
+const SHARP = "♯";
+const FLAT = "♭";
 const WHOLE_STEP = 2;
 const HALF_STEP = 1;
 
-// Notes with labels
 const notes = [
-  { labels: ['C', `B${SHARP}`], natural: true },
+  { labels: ["C", `B${SHARP}`], natural: true },
   { labels: [`D${FLAT}`, `C${SHARP}`], natural: false },
-  { labels: ['D'], natural: true },
+  { labels: ["D"], natural: true },
   { labels: [`E${FLAT}`, `D${SHARP}`], natural: false },
-  { labels: ['E', `F${FLAT}`], natural: true },
-  { labels: ['F', `E${SHARP}`], natural: true },
+  { labels: ["E", `F${FLAT}`], natural: true },
+  { labels: ["F", `E${SHARP}`], natural: true },
   { labels: [`G${FLAT}`, `F${SHARP}`], natural: false },
-  { labels: ['G'], natural: true },
+  { labels: ["G"], natural: true },
   { labels: [`A${FLAT}`, `G${SHARP}`], natural: false },
-  { labels: ['A'], natural: true },
+  { labels: ["A"], natural: true },
   { labels: [`B${FLAT}`, `A${SHARP}`], natural: false },
-  { labels: ['B', `C${FLAT}`], natural: true },
+  { labels: ["B", `C${FLAT}`], natural: true },
 ];
 
-// Modes with descriptions
 const modes = [
   { label: "ionian", description: "Major scale" },
   { label: "dorian", description: "Minor scale with a raised 6th" },
@@ -32,31 +29,21 @@ const modes = [
 ];
 
 const chordProgression = [
-  "ionian",
-  "aeolian",
-  "aeolian",
-  "ionian",
-  "ionian",
-  "aeolian",
-  "locrian"
-]
-
-// Ionian formula
-const ionianFormula = [
-  WHOLE_STEP,
-  WHOLE_STEP,
-  HALF_STEP,
-  WHOLE_STEP,
-  WHOLE_STEP,
-  WHOLE_STEP,
-  HALF_STEP,
+  { mode: "ionian", type: "major", shortName: "maj" },
+  { mode: "aeolian", type: "minor", shortName: "min" },
+  { mode: "aeolian", type: "minor", shortName: "min" },
+  { mode: "ionian", type: "major", shortName: "maj" },
+  { mode: "ionian", type: "major", shortName: "maj" },
+  { mode: "aeolian", type: "minor", shortName: "min" },
+  { mode: "locrian", type: "diminished", shortName: "dim" },
 ];
 
-// Utility Functions
+const ionianFormula = [WHOLE_STEP, WHOLE_STEP, HALF_STEP, WHOLE_STEP, WHOLE_STEP, WHOLE_STEP, HALF_STEP];
+
 function findNoteByLabel(label) {
   const normalizedLabel = label.toLowerCase();
-  return notes.findIndex(note =>
-    note.labels.some(l => l.toLowerCase() === normalizedLabel)
+  return notes.findIndex((note) =>
+    note.labels.some((l) => l.toLowerCase() === normalizedLabel)
   );
 }
 
@@ -66,53 +53,39 @@ function shiftArray(startIndex, array) {
 }
 
 function generateScale(startLabel, modeLabel) {
-  // Find the starting note
   const startIndex = findNoteByLabel(startLabel);
-  if (startIndex === -1) {
-    throw new Error(`Note '${startLabel}' not found.`);
-  }
+  if (startIndex === -1) throw new Error(`Note '${startLabel}' not found.`);
 
-  // Find the mode by its label
   const modeIndex = modes.findIndex((mode) => mode.label === modeLabel);
-  if (modeIndex === -1) {
-    throw new Error(`Mode '${modeLabel}' not found.`);
-  }
+  if (modeIndex === -1) throw new Error(`Mode '${modeLabel}' not found.`);
 
-  // Shift the Ionian formula by the mode index
   const modeFormula = shiftArray(modeIndex, ionianFormula);
 
-  // Generate the scale using the mode formula
   let scale = [];
   let currentIndex = startIndex;
 
   modeFormula.forEach((step) => {
     const note = notes[currentIndex];
-    scale.push(note.labels); // Push all labels for the note (e.g., ["C♯", "D♭"])
-    currentIndex = (currentIndex + step) % notes.length; // Wrap around the chromatic scale
+    scale.push(note.labels);
+    currentIndex = (currentIndex + step) % notes.length;
   });
 
   return scale;
 }
 
-
-
-// Helper function to check if a scale is valid
 function isValidScale(scale) {
   const usedLetters = new Set();
   for (const note of scale) {
-    const letter = note[0].toUpperCase(); // Get the letter name (e.g., "A" from "A♭")
-    if (usedLetters.has(letter)) {
-      return false; // Duplicate letter found
-    }
+    const letter = note[0].toUpperCase();
+    if (usedLetters.has(letter)) return false;
     usedLetters.add(letter);
   }
-  return true; // All letters are unique
+  return true;
 }
 
-
 export function generateAllScales() {
-  return notes.map(note => {
-    const scales = modes.map(mode => ({
+  return notes.map((note) => {
+    const scales = modes.map((mode) => ({
       mode: mode.label,
       scale: generateScale(note.labels[0], mode.label),
     }));
@@ -125,49 +98,35 @@ export function generateAllScales() {
 }
 
 export function findScalesContainingNotes(givenNotes, notesWithScales, chordProgression, options = {}) {
-  // Normalize the given notes for case-insensitivity and potential arrays
   const normalizedNotes = givenNotes.map((note) =>
-    Array.isArray(note)
-      ? note.map((n) => n.toLowerCase())
-      : note.toLowerCase()
+    Array.isArray(note) ? note.map((n) => n.toLowerCase()) : note.toLowerCase()
   );
 
-  // Extract options
   const { modes: allowedModes } = options;
 
-  // Filter scales that contain all the given notes
   const matchingScales = [];
 
   notesWithScales.forEach((note) => {
     note.scales.forEach((scaleObj) => {
-      // Skip modes not in the allowedModes array (if specified)
-      if (allowedModes && !allowedModes.includes(scaleObj.mode)) {
-        return;
-      }
+      if (allowedModes && !allowedModes.includes(scaleObj.mode)) return;
 
-      // Normalize scale notes (each is now an array of possible labels)
       const scaleNotes = scaleObj.scale.map((noteLabels) =>
         noteLabels.map((label) => label.toLowerCase())
       );
 
-      // Check if all given notes match some label in the scale
       const allNotesMatch = normalizedNotes.every((givenNote) => {
         if (Array.isArray(givenNote)) {
-          // For arrays, check if at least one option matches
           return givenNote.some((noteOption) =>
             scaleNotes.some((scaleNote) => scaleNote.includes(noteOption))
           );
         }
-        // For single notes, check directly
         return scaleNotes.some((scaleNote) => scaleNote.includes(givenNote));
       });
 
       if (allNotesMatch) {
-        // Map the requested notes to their degrees in the scale
-        const degrees = normalizedNotes.map((givenNote) => {
+        let degrees = normalizedNotes.map((givenNote) => {
           let matchedNote;
           if (Array.isArray(givenNote)) {
-            // Find the first matching note in the scale for arrays
             matchedNote = givenNote.find((noteOption) =>
               scaleNotes.some((scaleNote) => scaleNote.includes(noteOption))
             );
@@ -177,19 +136,24 @@ export function findScalesContainingNotes(givenNotes, notesWithScales, chordProg
 
           const degreeIndex = scaleNotes.findIndex((scaleNote) => scaleNote.includes(matchedNote));
 
-          // Determine the corresponding chord using the chord progression
-          const chordRoot = scaleObj.scale[degreeIndex][0]; // Use the first label as the chord root
-          const chordMode = chordProgression[degreeIndex % chordProgression.length];
-          const chord = getTriad(chordRoot, chordMode, notesWithScales);
+          const chordRoot = scaleObj.scale[degreeIndex][0];
+          const progressionData = chordProgression[degreeIndex % chordProgression.length];
+          const chord = getTriad(chordRoot, progressionData.mode, notesWithScales);
 
+          const degree = degreeIndex + 1
           return {
             note: matchedNote,
-            degree: degreeIndex + 1, // Degrees are 1-based
+            degree,
             chord,
+            name: `${chordRoot} ${progressionData.shortName} (${degree})`, // E.g., "C maj" or "G min"
           };
         });
 
+        // Sort degrees to match the scale order
+        degrees = degrees.sort((a, b) => a.degree - b.degree);
+
         matchingScales.push({
+          name: `${note.labels[0]} ${scaleObj.mode}`,
           root: note.labels[0],
           mode: scaleObj.mode,
           scale: scaleObj.scale,
@@ -203,86 +167,19 @@ export function findScalesContainingNotes(givenNotes, notesWithScales, chordProg
 }
 
 
-
-
-// Example usage
-/*
-console.log(getScale("A", "aeolian", notesWithScales));
-console.log(getScale("A", "locrian", notesWithScales));
-*/
-function getScale(root, modeLabel, notesWithScales) {
-  // Find the root note object in notesWithScales
-  const rootNote = notesWithScales.find(note =>
-    note.labels.some(label => label.toLowerCase() === root.toLowerCase())
-  );
-
-  if (!rootNote) {
-    throw new Error(`Root note '${root}' not found.`);
-  }
-
-  // Find the scale object for the given mode
-  const scaleObj = rootNote.scales.find(scale => scale.mode === modeLabel);
-
-  if (!scaleObj) {
-    throw new Error(`Mode '${modeLabel}' not found for root '${root}'.`);
-  }
-
-  return scaleObj.scale;
-}
-
 function getTriad(root, modeLabel, notesWithScales) {
-  // Ensure notesWithScales is defined and valid
-  if (!Array.isArray(notesWithScales) || notesWithScales.length === 0) {
-    throw new Error("Invalid or empty 'notesWithScales' provided.");
-  }
-
-  // Find the root note object in notesWithScales
   const rootNote = notesWithScales.find((note) =>
     note.labels.some((label) => label.toLowerCase() === root.toLowerCase())
   );
 
-  if (!rootNote) {
-    throw new Error(`Root note '${root}' not found.`);
-  }
+  if (!rootNote) throw new Error(`Root note '${root}' not found.`);
 
-  // Find the scale object for the given mode
   const scaleObj = rootNote.scales.find((scale) => scale.mode === modeLabel);
+  if (!scaleObj) throw new Error(`Mode '${modeLabel}' not found for root '${root}'.`);
 
-  if (!scaleObj) {
-    throw new Error(`Mode '${modeLabel}' not found for root '${root}'.`);
-  }
-
-  // Render the scale using renderScale
   const renderedScale = renderScale(scaleObj.scale);
 
-  // Get the triad notes: 1st, 3rd, and 5th degrees
-  const triad = [renderedScale[0], renderedScale[2], renderedScale[4]];
-
-  return triad;
-}
-
-
-function getChordProgression(root, modeLabel, chordProgression, notesWithScales) {
-  // Ensure notesWithScales is valid
-  if (!Array.isArray(notesWithScales) || notesWithScales.length === 0) {
-    throw new Error("Invalid or empty 'notesWithScales' provided.");
-  }
-
-  // Get the scale for the root note in the specified mode
-  const scale = getScale(root, modeLabel, notesWithScales);
-
-  // Map each note in the scale to the chord corresponding to the mode in chordProgression
-  const progression = chordProgression.map((progressionMode, index) => {
-    const scaleNote = scale[index % scale.length]; // Wrap around scale if progression exceeds its length
-    try {
-      const triad = getTriad(scaleNote, progressionMode, notesWithScales);
-      return { root: scaleNote, mode: progressionMode, triad };
-    } catch (error) {
-      return { root: scaleNote, mode: progressionMode, error: error.message };
-    }
-  });
-
-  return progression;
+  return [renderedScale[0], renderedScale[2], renderedScale[4]];
 }
 
 function renderScale(scale) {
@@ -305,7 +202,7 @@ function renderScale(scale) {
     // If we've exhausted all options for this note, backtrack
     if (attemptIndex >= noteOptions.length) {
       if (index === 0) {
-        throw new Error(`Unable to render scale: all options exhausted for the first note`);
+        throw new Error("Unable to render scale: all options exhausted for the first note");
       }
 
       // Backtrack to the previous note
@@ -341,11 +238,7 @@ function renderScale(scale) {
   return renderedScale;
 }
 
-
-
-
-export const notesWithScales = generateAllScales(); // Generate and cache scales
-
+export const notesWithScales = generateAllScales();
 
 const backendLibrary = {
   notes,
@@ -366,3 +259,4 @@ const backendLibrary = {
 };
 
 export default backendLibrary;
+
