@@ -2,6 +2,8 @@ const SHARP = "♯";
 const FLAT = "♭";
 const WHOLE_STEP = 2;
 const HALF_STEP = 1;
+const A4_FREQUENCY = 440; // Standard pitch for A4
+const NOTES_PER_OCTAVE = 12;
 
 const notes = [
   { labels: ["C", `B${SHARP}`], natural: true },
@@ -258,6 +260,43 @@ function renderScale(scale) {
   return renderedScale;
 }
 
+/**
+ * Calculate the frequency of a note using the `notes` array.
+ * @param {string} noteWithOctave - The note in the format "C#/4" or "D/5".
+ * @param {Array} notes - The array defining note labels and their order.
+ * @returns {number} The calculated frequency in Hz.
+ */
+export const calculateFrequency = (noteWithOctave, notes) => {
+  const [rawNoteLabel, octaveStr] = noteWithOctave.split("/");
+  const noteLabel = rawNoteLabel.replace("#", SHARP).replace("b", FLAT);
+  const octave = parseInt(octaveStr, 10);
+
+  if (isNaN(octave)) {
+    throw new Error(`Invalid octave in note: ${noteWithOctave}`);
+  }
+
+  // Find the index of the note in the `notes` array
+  let semitoneIndex = -1;
+  notes.forEach((note, index) => {
+    if (note.labels.includes(noteLabel)) {
+      semitoneIndex = index;
+    }
+  });
+
+  if (semitoneIndex === -1) {
+    throw new Error(`Invalid note label: ${noteLabel}`);
+  }
+
+  // Calculate the distance from A4
+  const a4Index = notes.findIndex((note) => note.labels.includes("A"));
+  const semitonesFromA4 =
+    semitoneIndex - a4Index + (octave - 4) * NOTES_PER_OCTAVE;
+
+  // Calculate frequency using the formula
+  return A4_FREQUENCY * Math.pow(2, semitonesFromA4 / 12);
+};
+
+
 function allUsedNotes(scale) {
   // Flatten the renderedScale
   const scaleNotes = scale.rendered.flat();
@@ -272,6 +311,76 @@ function allUsedNotes(scale) {
   return allNotes;
 }
 
+function scaleToNotation(scale) {
+  const staveNotes = [];
+  let currentOctave = 4;
+  let previousNote = null;
+
+  scale.rendered.forEach((note, index) => {
+    const baseNote = note[0].toUpperCase();
+
+    // Adjust the octave of the base note using `nextInstanceOfNote`
+    const baseNoteWithOctave = previousNote
+      ? nextInstanceOfNote(`${previousNote}/${currentOctave}`, baseNote)
+      : `${baseNote}/${currentOctave}`;
+
+    const [_, octave] = baseNoteWithOctave.split("/");
+    currentOctave = parseInt(octave, 10);
+    previousNote = baseNote;
+
+    // Find the degree and corresponding chord
+    const degree = scale.degrees.find((deg) => deg.degree === index + 1);
+
+    if (degree) {
+      // Process chord notes
+      const chordNotes = degree.chord.flat().reduce((notes, chordNote) => {
+        const previousChordNote = notes.length > 0 ? notes[notes.length - 1] : baseNoteWithOctave;
+        const nextChordNote = nextInstanceOfNote(previousChordNote, chordNote.replace(FLAT, "b").replace(SHARP, "#"));
+        return [...notes, nextChordNote];
+      }, []);
+
+      staveNotes.push({
+        keys: chordNotes,
+        duration: "q",
+        label: `${note} ${degree.name.split(" ")[1]}`,
+      });
+    } else {
+      // Process single note
+      const singleNote = nextInstanceOfNote(baseNoteWithOctave, note.replace(FLAT, "b").replace(SHARP, "#"));
+      staveNotes.push({
+        keys: [singleNote],
+        duration: "q",
+        label: note,
+      });
+    }
+  });
+
+  return staveNotes;
+}
+
+
+function nextInstanceOfNote(baseNoteWithOctave, noteWithoutOctave) {
+  const baseOrder = "CDEFGAB";
+
+  // Extract base note and octave from the first argument
+  const [baseNote, baseOctave] = baseNoteWithOctave.split("/");
+  const baseNoteIndex = baseOrder.indexOf(baseNote[0]);
+
+  // Extract the base note of the second argument
+  const targetNoteIndex = baseOrder.indexOf(noteWithoutOctave[0]);
+
+  // Determine the octave of the target note
+  let targetOctave = parseInt(baseOctave, 10);
+
+  if (targetNoteIndex < baseNoteIndex) {
+    targetOctave++; // Increment octave if target note comes before base note in the scale
+  }
+
+  return `${noteWithoutOctave}/${targetOctave}`;
+}
+
+
+
 export const notesWithScales = generateAllScales();
 
 const backendLibrary = {
@@ -285,6 +394,9 @@ const backendLibrary = {
   WHOLE_STEP,
   renderScale,
   allUsedNotes,
+  scaleToNotation,
+  calculateFrequency: (noteWithOctave) =>
+    calculateFrequency(noteWithOctave, notes),
   getChordProgression: (root, modeLabel) =>
     getChordProgression(root, modeLabel, notesWithScales, chordProgression),
   getTriad: (root, modeLabel) => getTriad(root, modeLabel, notesWithScales),

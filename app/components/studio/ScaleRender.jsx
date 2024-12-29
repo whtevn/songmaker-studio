@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { Renderer, Stave, StaveNote, Formatter, Accidental, Annotation } from "vexflow";
-
 import scaleFinder from "../../utils/scales";
+
+const { scaleToNotation } = scaleFinder
 
 const ScaleRender = ({ scale }) => {
   const containerRef = useRef(null);
@@ -31,97 +32,35 @@ const ScaleRender = ({ scale }) => {
       const stave = new Stave(10, 40, containerWidth - 20);
       stave.addClef("treble").setContext(context).draw();
 
-      let currentOctave = 4;
-      let previousNote = null;
+      // Use the `scaleToNotation` function to get stave notes
+      const staveNotesData = scaleToNotation(scale);
 
-      const baseOrder = "ABCDEFG";
-      const staveNotes = [];
+      const staveNotes = staveNotesData.map(({ keys, duration, label }) => {
+        const staveNote = new StaveNote({
+          keys,
+          duration,
+        });
 
-      scale.rendered.forEach((note, index) => {
-        const baseNote = note[0].toUpperCase();
-
-        if (baseNote === "A" || baseNote === "B") {
-          currentOctave = 4;
-        } else if (previousNote) {
-          const prevIndex = baseOrder.indexOf(previousNote);
-          const currIndex = baseOrder.indexOf(baseNote);
-
-          if (previousNote === "B" && baseNote === "C") {
-            currentOctave++;
-          } else if (previousNote === "C" && baseNote === "B") {
-            currentOctave--;
-          }
-        }
-
-        previousNote = baseNote;
-
-        const degree = scale.degrees.find((deg) => deg.degree === index + 1);
-
-        if (degree) {
-          const chordNotes = degree.chord.flat().map((chordNote, chordIndex) => {
-            const chordBaseNote = chordNote[0].toUpperCase();
-            const chordNoteIndex = baseOrder.indexOf(chordBaseNote);
-
-            let chordOctave = currentOctave;
-            if (chordIndex > 0 && chordNoteIndex < baseOrder.indexOf(baseNote)) {
-              chordOctave++;
-            }
-
-            if (chordBaseNote === "A" || chordBaseNote === "B") {
-              chordOctave = 4;
-            }
-
-            return `${chordNote.replace(scaleFinder.FLAT, "b").replace(scaleFinder.SHARP, "#")}/${chordOctave}`;
-          });
-
-          const staveNote = new StaveNote({
-            keys: chordNotes,
-            duration: "q",
-          });
-
-          chordNotes.forEach((chordNote, i) => {
-            const accidental = chordNote.includes("b")
-              ? "b"
-              : chordNote.includes("#")
-              ? "#"
-              : null;
-
-            if (accidental) {
-              staveNote.addModifier(new Accidental(accidental), i);
-            }
-          });
-
-          const chordLabel = `${note} ${degree.name.split(" ")[1]}`;
-          staveNote.addModifier(
-            new Annotation(chordLabel).setVerticalJustification(Annotation.VerticalJustify.BOTTOM),
-            0
-          );
-
-          staveNotes.push(staveNote);
-        } else {
-          const singleNote = `${note.replace(scaleFinder.FLAT, "b").replace(scaleFinder.SHARP, "#")}/${currentOctave}`;
-          const staveNote = new StaveNote({
-            keys: [singleNote],
-            duration: "q",
-          });
-
-          const accidental = singleNote.includes("b")
+        keys.forEach((key, i) => {
+          const accidental = key.includes("b")
             ? "b"
-            : singleNote.includes("#")
+            : key.includes("#")
             ? "#"
             : null;
 
           if (accidental) {
-            staveNote.addModifier(new Accidental(accidental), 0);
+            staveNote.addModifier(new Accidental(accidental), i);
           }
+        });
 
+        if (label) {
           staveNote.addModifier(
-            new Annotation(note).setVerticalJustification(Annotation.VerticalJustify.BOTTOM),
+            new Annotation(label).setVerticalJustification(Annotation.VerticalJustify.BOTTOM),
             0
           );
-
-          staveNotes.push(staveNote);
         }
+
+        return staveNote;
       });
 
       Formatter.FormatAndDraw(context, stave, staveNotes);

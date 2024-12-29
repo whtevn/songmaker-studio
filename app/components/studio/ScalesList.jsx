@@ -1,8 +1,13 @@
 import React from "react";
 import ScaleRender from "./ScaleRender";
+import PlayScale from "./PlayScale";
 import StringsRender from "./StringsRender";
 import { assignRandomColors } from "../../utils/colors"; // Assuming assignRandomColors is in a utility file
 import { Heading } from '../catalyst-theme/heading'
+
+function Example() {
+  return <Button>Save changes</Button>
+}
 
 const ScalesList = ({ scales }) => {
   return (
@@ -27,6 +32,7 @@ const ScalesList = ({ scales }) => {
                 <div className="flex justify-center items-center">
                   <Heading style={{ color: "black" }}>{scale.degrees.map(d => d.degree).join(" - ") }</Heading>
                 </div>
+                <PlayScale scale={scale} />
                 <ScaleRender scale={scale} />
                 <StringsRender
                   tuning={["E", "A", "D", "G", "B", "E"]}
