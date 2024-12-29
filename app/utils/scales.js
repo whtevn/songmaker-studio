@@ -40,6 +40,34 @@ const chordProgression = [
   { mode: "locrian", type: "diminished", shortName: "dim" },
 ];
 
+const intervals = {
+  root: 0,
+  major2nd: WHOLE_STEP,
+  major3rd: WHOLE_STEP * 2 + HALF_STEP,
+  perfect4th: WHOLE_STEP * 2 + HALF_STEP * 2,
+  perfect5th: WHOLE_STEP * 4,
+  minor3rd: WHOLE_STEP + HALF_STEP,
+  diminished5th: WHOLE_STEP * 3,
+};
+
+// const chordExtensions = {
+// const intervals = {
+const chordFormulas = {
+  major: [intervals.root, intervals.major3rd, intervals.perfect5th],
+  minor: [intervals.root, intervals.minor3rd, intervals.perfect5th],
+  diminished: [intervals.root, intervals.minor3rd, intervals.diminished5th],
+  sus2: [intervals.root, intervals.major2nd, intervals.perfect5th],
+  sus4: [intervals.root, intervals.perfect4th, intervals.perfect5th],
+};
+
+const chordExtensions = {
+  "6": 10, // Major 6th
+  m7: 11, // Minor 7th
+  M7: 12, // Major 7th
+  "9": 15, // Major 9th
+};
+
+
 const ionianFormula = [WHOLE_STEP, WHOLE_STEP, HALF_STEP, WHOLE_STEP, WHOLE_STEP, WHOLE_STEP, HALF_STEP];
 
 function findNoteByLabel(label) {
@@ -320,7 +348,8 @@ function scaleToNotation(scale) {
   let currentOctave = 4;
   let previousNote = null;
 
-  scale.rendered.forEach((note, index) => {
+  const fullScale = [...scale.rendered, scale.rendered[0]]
+  fullScale.forEach((note, index) => {
     const baseNote = note[0].toUpperCase();
 
     // Adjust the octave of the base note using `nextInstanceOfNote`
@@ -333,7 +362,7 @@ function scaleToNotation(scale) {
     previousNote = baseNote;
 
     // Find the degree and corresponding chord
-    const degree = scale.degrees.find((deg) => deg.degree === index + 1);
+    const degree = scale.degrees.find((deg) => deg.degree === index%7 + 1);
 
     if (degree) {
       // Process chord notes
@@ -383,7 +412,40 @@ function nextInstanceOfNote(baseNoteWithOctave, noteWithoutOctave) {
   return `${noteWithoutOctave}/${targetOctave}`;
 }
 
+function findChord(notes, chordFormulas, extensions, root, options = { extend: [], type: "major" }) {
+  const { extend, type } = options;
 
+  // Find the index of the root note in the notes array
+  const rootIndex = notes.findIndex((note) =>
+    note.labels.some((label) => label.toLowerCase() === root.toLowerCase())
+  );
+
+  if (rootIndex === -1) {
+    throw new Error(`Root note '${root}' not found in the notes array.`);
+  }
+
+  // Get the base chord formula based on the chord type
+  const baseFormula = chordFormulas[type]?.map((degree) => degree - 1); // Convert to 0-based indexing
+  if (!baseFormula) {
+    throw new Error(`Invalid chord type '${type}'. Valid types are: ${Object.keys(chordFormulas).join(", ")}`);
+  }
+
+  // Calculate the full chord formula (including extensions)
+  const fullFormula = [
+    ...baseFormula,
+    ...extend
+      .map((ext) => extensions[ext] - 1) // Convert to 0-based indexing
+      .filter((val) => val !== undefined),
+  ];
+
+  // Resolve the notes for the chord
+  const chordNotes = fullFormula.map((interval) => {
+    const noteIndex = (rootIndex + interval) % notes.length; // Wrap around the chromatic scale
+    return notes[noteIndex].labels[0]; // Use the first label by default
+  });
+
+  return chordNotes;
+}
 
 export const notesWithScales = generateAllScales();
 
@@ -399,6 +461,11 @@ const backendLibrary = {
   renderScale,
   allUsedNotes,
   scaleToNotation,
+  chordExtensions,
+  intervals,
+  chordFormulas,
+  findChord: (root, options = { extend: [], type: "major" }) =>
+    findChord(notes, chordFormulas, chordExtensions, root, options = { extend: [], type: "major" }),
   calculateFrequency: (noteWithOctave) =>
     calculateFrequency(noteWithOctave, notes),
   getChordProgression: (root, modeLabel) =>
