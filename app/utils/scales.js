@@ -129,10 +129,14 @@ function mapNoteToDegree(note, scaleNotes, scaleObj, chordProgression, notesWith
     matchedNote = note;
   }
 
+  const modeIndex = modes.findIndex((mode) => mode.label === scaleObj.mode);
+  if (modeIndex === -1) throw new Error(`Mode '${scaleObj.mode}' not found.`);
+  const shiftedProgression = shiftArray(modeIndex, chordProgression);
+
   const degreeIndex = scaleNotes.findIndex((scaleNote) => scaleNote.includes(matchedNote));
 
   const chordRoot = scaleObj.scale[degreeIndex][0];
-  const progressionData = chordProgression[degreeIndex % chordProgression.length];
+  const progressionData = shiftedProgression[degreeIndex % chordProgression.length];
   const chord = getTriad(chordRoot, progressionData.mode, notesWithScales);
 
   const degree = degreeIndex + 1;
