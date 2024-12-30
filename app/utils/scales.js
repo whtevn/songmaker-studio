@@ -43,15 +43,14 @@ const chordProgression = [
 const intervals = {
   root: 0,
   major2nd: WHOLE_STEP,
-  major3rd: WHOLE_STEP * 2 + HALF_STEP,
-  perfect4th: WHOLE_STEP * 2 + HALF_STEP * 2,
-  perfect5th: WHOLE_STEP * 4,
+  major3rd: WHOLE_STEP * 2,
+  perfect4th: WHOLE_STEP * 2 + HALF_STEP,
+  perfect5th: WHOLE_STEP * 3 + HALF_STEP,
   minor3rd: WHOLE_STEP + HALF_STEP,
   diminished5th: WHOLE_STEP * 3,
+  diminished7th: WHOLE_STEP * 4 + HALF_STEP,
 };
 
-// const chordExtensions = {
-// const intervals = {
 const chordFormulas = {
   major: [intervals.root, intervals.major3rd, intervals.perfect5th],
   minor: [intervals.root, intervals.minor3rd, intervals.perfect5th],
@@ -60,13 +59,12 @@ const chordFormulas = {
   sus4: [intervals.root, intervals.perfect4th, intervals.perfect5th],
 };
 
-const chordExtensions = {
-  "6": 10, // Major 6th
-  m7: 11, // Minor 7th
-  M7: 12, // Major 7th
-  "9": 15, // Major 9th
-};
-
+const chordExtensions = [
+  { id: "6", semitones: 10, label: "Major 6th" },
+  { id: "m7", semitones: 11, label: "Minor 7th" },
+  { id: "M7", semitones: 12, label: "Major 7th" },
+  { id: "9", semitones: 15, label: "Major 9th" },
+];
 
 const ionianFormula = [WHOLE_STEP, WHOLE_STEP, HALF_STEP, WHOLE_STEP, WHOLE_STEP, WHOLE_STEP, HALF_STEP];
 
@@ -412,7 +410,68 @@ function nextInstanceOfNote(baseNoteWithOctave, noteWithoutOctave) {
   return `${noteWithoutOctave}/${targetOctave}`;
 }
 
-function findChord(notes, chordFormulas, extensions, root, options = { extend: [], type: "major" }) {
+function identifyChord(notes, chordFormulas, chordExtensions, chordNotes) {
+  // Helper to find the index of a note in the chromatic scale
+  const findNoteIndex = (note) => {
+    for (let i = 0; i < notes.length; i++) {
+      if (notes[i].labels.includes(note)) {
+        return i;
+      }
+    }
+    throw new Error(`Note ${note} not found in notes array.`);
+  };
+
+  // Normalize the input notes to their indices
+  const normalizedIndices = chordNotes.map(findNoteIndex);
+
+  // Sort indices in ascending order for comparison
+  const sortedIndices = normalizedIndices.sort((a, b) => a - b);
+
+  // Calculate intervals (semitone differences) from the root
+  const calculateIntervals = (indices) => {
+    const root = indices[0];
+    return indices.map((note) => (note - root + 12) % 12);
+  };
+
+  // Cycle through all possible inversions
+  for (let i = 0; i < sortedIndices.length; i++) {
+    const rotatedIndices = [
+      ...sortedIndices.slice(i),
+      ...sortedIndices.slice(0, i).map((note) => note + 12), // Wrap around
+    ].sort((a, b) => a - b);
+
+    const intervals = calculateIntervals(rotatedIndices);
+
+    // Check against chord formulas
+    for (const [chordType, formula] of Object.entries(chordFormulas)) {
+      if (formula.every((interval) => intervals.includes(interval))) {
+        // Find matched chordExtensions
+        const matchedExtensions = chordExtensions
+          .filter(({ semitones }) => intervals.includes(semitones))
+          .map(({ id, label }) => ({ extension: id, label }));
+
+        // Return the identified chord with the rotated root
+        return {
+          root: notes[rotatedIndices[0] % 12].labels[0], // Get root note label
+          type: chordType,
+          chordExtensions: matchedExtensions,
+          intervals,
+        };
+      }
+    }
+  }
+
+  // If no match is found
+  return {
+    type: "unknown",
+    chordExtensions: [],
+    intervals: calculateIntervals(sortedIndices),
+  };
+}
+
+
+
+function generateChord(notes, chordFormulas, chordExtensions, root, options = { extend: [], type: "major" }) {
   const { extend, type } = options;
 
   // Find the index of the root note in the notes array
@@ -430,13 +489,17 @@ function findChord(notes, chordFormulas, extensions, root, options = { extend: [
     throw new Error(`Invalid chord type '${type}'. Valid types are: ${Object.keys(chordFormulas).join(", ")}`);
   }
 
-  // Calculate the full chord formula (including extensions)
+  // Calculate the full chord formula (including chordExtensions)
   const fullFormula = [
     ...baseFormula,
     ...extend
-      .map((ext) => extensions[ext] - 1) // Convert to 0-based indexing
+      .map((ext) => {
+        const extension = chordExtensions.find(({ id }) => id === ext);
+        return extension ? extension.semitones : undefined;
+      })
       .filter((val) => val !== undefined),
   ];
+
 
   // Resolve the notes for the chord
   const chordNotes = fullFormula.map((interval) => {
@@ -464,8 +527,10 @@ const backendLibrary = {
   chordExtensions,
   intervals,
   chordFormulas,
-  findChord: (root, options = { extend: [], type: "major" }) =>
-    findChord(notes, chordFormulas, chordExtensions, root, options = { extend: [], type: "major" }),
+  identifyChord: (chordnNotes) =>
+    identifyChord(notes, chordFormulas, chordExtensions, chordNotes),
+  generateChord: (root, options = { extend: [], type: "major" }) =>
+    generateChord(notes, chordFormulas, chordExtensions, root, options = { extend: [], type: "major" }),
   calculateFrequency: (noteWithOctave) =>
     calculateFrequency(noteWithOctave, notes),
   getChordProgression: (root, modeLabel) =>
