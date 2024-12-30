@@ -1,31 +1,18 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
+import useStore from "~/utils/store"; // Adjust the path as needed
 import ScaleRender from "~/components/studio/ScaleRender";
 import PlayScale from "~/components/studio/PlayScale";
-import { assignRandomColors } from "~/utils/colors";
 import { Heading } from "~/components/catalyst-theme/heading";
 import { Button } from "~/components/catalyst-theme/button";
 import { Divider } from "~/components/catalyst-theme/divider";
 
 const ScalesList = ({ scales }) => {
-  const [selectedScale, setSelectedScale] = useState(null);
-  const chosenScaleRef = useRef(null);
-
-  // Scroll to the chosen scale when it changes
-  useEffect(() => {
-    if (selectedScale && chosenScaleRef.current) {
-      chosenScaleRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [selectedScale]);
-
-  const handleChooseScale = (scale) => {
-    setSelectedScale(scale); // Trigger the state change
-  };
+  const { selectedScale, setSelectedScale, clearSelectedScale } = useStore();
 
   return (
     <div className="list-disc pl-4">
-      {/* Render the chosen scale */}
       {selectedScale && (
-        <div ref={chosenScaleRef}>
+        <>
           <Heading style={{ marginBottom: "8px" }}>Chosen Scale</Heading>
           <Heading style={{ marginBottom: "8px" }}>{selectedScale.name}</Heading>
           <div
@@ -50,20 +37,18 @@ const ScalesList = ({ scales }) => {
             <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
               <Button
                 onClick={() => {
-                  setSelectedScale(null);
+                  clearSelectedScale();
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
               >
                 Choose Another Scale
               </Button>
-                            <Button onClick={() => setSelectedScale(selectedScale)}>Start Song</Button>
-                          </div>
-                        </div>
+            </div>
+          </div>
           <Divider className="mb-6" />
-        </div>
+        </>
       )}
 
-      {/* Render the list of scales */}
       {scales.map((scale, index) => (
         <div key={index} style={{ marginBottom: "16px" }}>
           <Heading style={{ marginBottom: "8px" }}>{scale.name}</Heading>
@@ -86,7 +71,7 @@ const ScalesList = ({ scales }) => {
               <ScaleRender scale={scale} />
             </div>
             <div className="flex justify-center mt-4">
-              <Button onClick={() => handleChooseScale(scale)}>Choose This Scale</Button>
+              <Button onClick={() => setSelectedScale(scale)}>Choose This Scale</Button>
             </div>
           </div>
         </div>
