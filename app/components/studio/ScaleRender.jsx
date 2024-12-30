@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Renderer, Stave, StaveNote, Formatter, Voice, Accidental, Annotation } from "vexflow";
-import scaleFinder from "../../utils/scales";
+import scaleFinder from "~/utils/scales";
 
 const { scaleToNotation } = scaleFinder;
 

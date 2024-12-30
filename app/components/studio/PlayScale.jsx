@@ -1,6 +1,6 @@
 import React from "react";
-import ScaleFinder from "../../utils/scales";
-import { Button } from '../catalyst-theme/button'
+import ScaleFinder from "~/utils/scales";
+import { Button } from '~/components/catalyst-theme/button'
 
 const { scaleToNotation, calculateFrequency } = ScaleFinder;
 

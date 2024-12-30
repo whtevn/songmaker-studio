@@ -10,5 +10,10 @@ export default defineConfig({
       plugins: [tailwindcss, autoprefixer],
     },
   },
+  resolve: {
+    alias: {
+      '~': '/app'
+    }
+  },
   plugins: [reactRouter(), tsconfigPaths()],
 });

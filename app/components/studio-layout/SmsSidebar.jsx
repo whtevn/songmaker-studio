@@ -1,6 +1,6 @@
-import { Link } from '../catalyst-theme/link'
-import { Sidebar, SidebarBody, SidebarItem, SidebarSection } from '../catalyst-theme/sidebar'
-import Logo from './SmsLogo'
+import { Link } from '~/components/catalyst-theme/link'
+import { Sidebar, SidebarBody, SidebarItem, SidebarSection } from '~/components/catalyst-theme/sidebar'
+import Logo from '~/components/studio-layout/SmsLogo'
 
 function SmsSidebar() {
   return (

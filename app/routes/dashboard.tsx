@@ -1,6 +1,6 @@
 import type { Route } from "./+types/home";
-import { Dashboard } from "../pages/dashboard";
-import Page from '../components/studio-layout/page';
+import { Dashboard } from "~/pages/dashboard";
+import Page from '~/components/studio-layout/page';
 
 export function meta({}: Route.MetaArgs) {
   return [

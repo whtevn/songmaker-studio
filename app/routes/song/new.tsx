@@ -1,6 +1,6 @@
 import type { Route } from "./+types/home";
-import SongWizard from "../../pages/songWizard";
-import Page from '../../components/studio-layout/page';
+import SongWizard from "~/pages/songWizard";
+import Page from '~/components/studio-layout/page';
 
 export function meta({}: Route.MetaArgs) {
   return [

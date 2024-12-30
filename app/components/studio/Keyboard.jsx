@@ -1,5 +1,5 @@
 import React from "react";
-import scaleFinder from "../../utils/scales";
+import scaleFinder from "~/utils/scales";
 
 const { notes } = scaleFinder;
 

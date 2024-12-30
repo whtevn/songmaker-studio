@@ -1,6 +1,6 @@
-import { Navbar } from '../../components/catalyst-theme/navbar'
-import { SidebarLayout } from '../../components/catalyst-theme/sidebar-layout'
-import SmsSidebar from '../../components/studio-layout/SmsSidebar'
+import { Navbar } from '~/components/catalyst-theme/navbar'
+import { SidebarLayout } from '~/components/catalyst-theme/sidebar-layout'
+import SmsSidebar from '~/components/studio-layout/SmsSidebar'
 
 export function Page({ children }: { children: React.ReactNode }) {
   return (

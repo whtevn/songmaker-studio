@@ -1,11 +1,11 @@
-import scaleFinder from "../../utils/scales";
+import scaleFinder from "~/utils/scales";
 import React, { useState, useCallback, useEffect } from "react";
-import Keyboard from "./Keyboard";
-import PillSelector from "../studio-layout/PillSelector";
-import ScalesList from "../studio/ScalesList";
-import { Divider } from '../catalyst-theme/divider'
-import { Heading } from '../catalyst-theme/heading'
-import { Text } from '../catalyst-theme/text'
+import Keyboard from "~/components/studio/Keyboard";
+import PillSelector from "~/components/studio-layout/PillSelector";
+import ScalesList from "~/components/studio/ScalesList";
+import { Divider } from '~/components/catalyst-theme/divider'
+import { Heading } from '~/components/catalyst-theme/heading'
+import { Text } from '~/components/catalyst-theme/text'
 
 const App = () => {
   const [selectedNotes, setSelectedNotes] = useState([]);

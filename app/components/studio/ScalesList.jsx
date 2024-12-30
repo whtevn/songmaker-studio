@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import ScaleRender from "./ScaleRender";
-import PlayScale from "./PlayScale";
-import StringsRender from "./StringsRender";
-import { assignRandomColors } from "../../utils/colors"; // Assuming assignRandomColors is in a utility file
-import { Heading } from "../catalyst-theme/heading";
-import { Button } from "../catalyst-theme/button";
-import { Divider } from "../catalyst-theme/divider";
+import ScaleRender from "~/components/studio/ScaleRender";
+import PlayScale from "~/components/studio/PlayScale";
+import StringsRender from "~/components/studio/StringsRender";
+import { assignRandomColors } from "~/utils/colors"; // Assuming assignRandomColors is in a utility file
+import { Heading } from "~/components/catalyst-theme/heading";
+import { Button } from "~/components/catalyst-theme/button";
+import { Divider } from "~/components/catalyst-theme/divider";
 
 const ScalesList = ({ scales, chordFormulas, extensions }) => {
   const [selectedScale, setSelectedScale] = useState(null);

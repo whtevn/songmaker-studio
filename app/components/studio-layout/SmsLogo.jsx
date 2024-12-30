@@ -1,4 +1,4 @@
-import { Heading } from '../catalyst-theme/heading'
+import { Heading } from '~/components/catalyst-theme/heading'
 function Logo() {
   return (
     <Heading>

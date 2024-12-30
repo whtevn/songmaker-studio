@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Badge } from "../catalyst-theme/badge";
+import { Badge } from "~/components/catalyst-theme/badge";
 
 const PillSelector = ({ options, onSelectionChange, defaultSelection }) => {
   const [selectedPills, setSelectedPills] = useState(defaultSelection);
