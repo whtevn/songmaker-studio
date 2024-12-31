@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '~/utils/supabaseClient';
-import DefaultIcon from '~/components/studio-layout/DefaultIcon';
+import DefaultIcon from '~/components/studio-layout/defaultIcon';
 import {
   ArrowRightStartOnRectangleIcon,
   Cog8ToothIcon,
