@@ -1,24 +1,10 @@
+// stores/useSongStore.js
 import { create } from 'zustand';
 
-import create from "zustand";
-
-const useAlbumStore = create((set) => ({
-}));
-
 const useSongStore = create((set) => ({
-}));
-
-
-const useStore = create((set) => ({
   selectedScale: null,
   setSelectedScale: (scale) => set({ selectedScale: scale }),
   clearSelectedScale: () => set({ selectedScale: null }),
-  album: { title: "", songIds: [] },
-  setAlbum: (album) => set({ album }),
-  addSongToAlbum: (songId) =>
-    set((state) => ({
-      album: { ...state.album, songIds: [...state.album.songIds, songId] },
-    })),
   song: {
     tempo: 120,
     root: "C",
@@ -41,5 +27,5 @@ const useStore = create((set) => ({
     })),
 }));
 
-export default useStore;
+export default useSongStore;
 

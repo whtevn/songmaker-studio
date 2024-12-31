@@ -1,5 +1,5 @@
 import React from "react";
-import useStore from "~/utils/store"; // Adjust the path as needed
+import useStore from "~/stores/useSongStore"; // Adjust the path as needed
 import ScaleRender from "~/components/studio/ScaleRender";
 import PlayScale from "~/components/studio/PlayScale";
 import { Heading } from "~/components/catalyst-theme/heading";
@@ -8,6 +8,9 @@ import { Divider } from "~/components/catalyst-theme/divider";
 
 const ScalesList = ({ scales }) => {
   const { selectedScale, setSelectedScale, clearSelectedScale } = useStore();
+
+  const handleStartSong = () => {
+  }
 
   return (
     <div className="list-disc pl-4">
@@ -42,6 +45,10 @@ const ScalesList = ({ scales }) => {
                 }}
               >
                 Choose Another Scale
+              </Button>
+              <Button onClick={ handleStartSong }
+              >
+                Start Song
               </Button>
             </div>
           </div>

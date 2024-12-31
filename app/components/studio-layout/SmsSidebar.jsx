@@ -1,6 +1,10 @@
 import { Link } from '~/components/catalyst-theme/link'
-import { Sidebar, SidebarBody, SidebarItem, SidebarSection } from '~/components/catalyst-theme/sidebar'
+import { Sidebar, SidebarFooter, SidebarBody, SidebarItem, SidebarSection } from '~/components/catalyst-theme/sidebar'
 import Logo from '~/components/studio-layout/SmsLogo'
+import AccountDropdown from '~/components/studio-layout/AccountDropdown'
+import {
+  UserIcon,
+} from '@heroicons/react/16/solid';
 
 function SmsSidebar() {
   return (
@@ -17,6 +21,13 @@ function SmsSidebar() {
           <SidebarItem href="/lyrics/new">Write Lyrics</SidebarItem>
         </SidebarSection>
       </SidebarBody>
+      <SidebarFooter>
+        <AccountDropdown onClick={() => setIsSignInDialogOpen(true)} as={SidebarItem}>
+          <SidebarItem>
+            <UserIcon /> Sign In
+          </SidebarItem>
+        </AccountDropdown>
+      </SidebarFooter>
     </Sidebar>
   )
 }
