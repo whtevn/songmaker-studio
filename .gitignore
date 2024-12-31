@@ -5,5 +5,7 @@
 /.react-router/
 /build/
 .terraform
+.env*
 
 tfout
+supabase

@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
+    "@heroicons/react": "^2.2.0",
     "@react-router/node": "^7.1.1",
     "@react-router/serve": "^7.1.1",
+    "@supabase/supabase-js": "^2.47.10",
     "clsx": "^2.1.1",
     "framer-motion": "^11.15.0",
     "heroicons": "^2.2.0",
