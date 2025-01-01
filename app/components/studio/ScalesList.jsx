@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import useStore from "~/stores/useSongStore"; // Adjust the path as needed
 import ScaleRender from "~/components/studio/ScaleRender";
 import PlayScale from "~/components/studio/PlayScale";
@@ -8,14 +8,23 @@ import { Divider } from "~/components/catalyst-theme/divider";
 
 const ScalesList = ({ scales }) => {
   const { selectedScale, setSelectedScale, clearSelectedScale } = useStore();
+  const chosenScaleRef = useRef(null);
+
+  const handleChooseScale = (scale) => {
+    setSelectedScale(scale);
+    if (chosenScaleRef.current) {
+      chosenScaleRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   const handleStartSong = () => {
-  }
+    // Add your start song logic here
+  };
 
   return (
     <div className="list-disc pl-4">
       {selectedScale && (
-        <>
+        <div ref={chosenScaleRef}>
           <Heading style={{ marginBottom: "8px" }}>Chosen Scale</Heading>
           <Heading style={{ marginBottom: "8px" }}>{selectedScale.name}</Heading>
           <div
@@ -46,14 +55,11 @@ const ScalesList = ({ scales }) => {
               >
                 Choose Another Scale
               </Button>
-              <Button onClick={ handleStartSong }
-              >
-                Start Song
-              </Button>
+              <Button onClick={handleStartSong}>Start Song</Button>
             </div>
           </div>
           <Divider className="mb-6" />
-        </>
+        </div>
       )}
 
       {scales.map((scale, index) => (
@@ -78,7 +84,7 @@ const ScalesList = ({ scales }) => {
               <ScaleRender scale={scale} />
             </div>
             <div className="flex justify-center mt-4">
-              <Button onClick={() => setSelectedScale(scale)}>Choose This Scale</Button>
+              <Button onClick={() => handleChooseScale(scale)}>Choose This Scale</Button>
             </div>
           </div>
         </div>
