@@ -1,8 +1,8 @@
-import KeyFinder from "~/components/studio/keyFinder";
+import SongDefinition from "~/components/studio-layout/SongDefinition";
 
 export function SongWizard({ children }: { children: React.ReactNode }) {
   return (
-    <KeyFinder />
+    <SongDefinition />
   );
 }
 
