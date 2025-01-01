@@ -11,25 +11,25 @@ import { Button } from "~/components/catalyst-theme/button";
 import { supabase } from "~/utils/supabaseClient";
 import { useModal } from '~/context/ModalContext';
 
-const SignInDialog = ({ isOpen, onClose }) => {
+export const SignUpDialog = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const { openModal } = useModal();
 
-  const handleSignIn = async () => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const handleSignUp = async () => {
+    const { error } = await supabase.auth.signUp({ email, password });
 
     if (error) {
       setError(error.message);
     } else {
-      onClose(); // Close the dialog on successful sign-in
+      onClose(); // Close the dialog on successful sign-up
     }
   };
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
-      <DialogTitle>Sign In</DialogTitle>
+      <DialogTitle>Sign Up</DialogTitle>
       <DialogBody>
         {error && <p className="text-red-500">{error}</p>}
         <Field>
@@ -50,21 +50,17 @@ const SignInDialog = ({ isOpen, onClose }) => {
             placeholder="Enter your password"
           />
         </Field>
-        <p className="mt-4 text-sm text-blue-500 cursor-pointer" onClick={ () => openModal('forgotPassword') }>
-          Forgot Password?
-        </p>
-        <p className="mt-4 text-sm text-blue-500 cursor-pointer" onClick={ () => openModal('signUp') }>
-          Sign Up
+        <p className="mt-4 text-sm text-blue-500 cursor-pointer" onClick={ () => openModal('signIn') }>
+          Already have an account?
         </p>
       </DialogBody>
       <DialogActions>
         <Button onClick={onClose} plain>
           Cancel
         </Button>
-        <Button onClick={handleSignIn}>Sign In</Button>
+        <Button onClick={handleSignUp}>Sign Up</Button>
       </DialogActions>
     </Dialog>
   );
 };
-
-export default SignInDialog
+export default SignUpDialog

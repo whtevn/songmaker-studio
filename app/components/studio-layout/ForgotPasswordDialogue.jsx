@@ -9,29 +9,28 @@ import { Field, Label } from "~/components/catalyst-theme/fieldset";
 import { Input } from "~/components/catalyst-theme/input";
 import { Button } from "~/components/catalyst-theme/button";
 import { supabase } from "~/utils/supabaseClient";
-import { useModal } from '~/context/ModalContext';
 
-const SignInDialog = ({ isOpen, onClose }) => {
+const ForgotPasswordDialog = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
-  const { openModal } = useModal();
+  const [success, setSuccess] = useState(null);
 
-  const handleSignIn = async () => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const handleForgotPassword = async () => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
 
     if (error) {
       setError(error.message);
     } else {
-      onClose(); // Close the dialog on successful sign-in
+      setSuccess("Password reset email sent!");
     }
   };
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
-      <DialogTitle>Sign In</DialogTitle>
+      <DialogTitle>Forgot Password</DialogTitle>
       <DialogBody>
         {error && <p className="text-red-500">{error}</p>}
+        {success && <p className="text-green-500">{success}</p>}
         <Field>
           <Label>Email</Label>
           <Input
@@ -41,30 +40,15 @@ const SignInDialog = ({ isOpen, onClose }) => {
             placeholder="Enter your email"
           />
         </Field>
-        <Field className="mt-4">
-          <Label>Password</Label>
-          <Input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
-          />
-        </Field>
-        <p className="mt-4 text-sm text-blue-500 cursor-pointer" onClick={ () => openModal('forgotPassword') }>
-          Forgot Password?
-        </p>
-        <p className="mt-4 text-sm text-blue-500 cursor-pointer" onClick={ () => openModal('signUp') }>
-          Sign Up
-        </p>
       </DialogBody>
       <DialogActions>
         <Button onClick={onClose} plain>
           Cancel
         </Button>
-        <Button onClick={handleSignIn}>Sign In</Button>
+        <Button onClick={handleForgotPassword}>Send Reset Email</Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default SignInDialog
+export default ForgotPasswordDialog
