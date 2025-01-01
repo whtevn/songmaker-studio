@@ -1,12 +1,15 @@
 import { Link } from '~/components/catalyst-theme/link'
-import { Sidebar, SidebarFooter, SidebarBody, SidebarItem, SidebarSection } from '~/components/catalyst-theme/sidebar'
+import { Sidebar, SidebarFooter, SidebarBody, SidebarSection, SidebarItem } from '~/components/catalyst-theme/sidebar'
 import Logo from '~/components/studio-layout/SmsLogo'
 import AccountDropdown from '~/components/studio-layout/AccountDropdown'
 import {
   UserIcon,
 } from '@heroicons/react/16/solid';
+import { useLocation } from "react-router";
+
 
 function SmsSidebar() {
+  const location = useLocation();
   return (
     <Sidebar>
       <SidebarBody>
@@ -17,8 +20,8 @@ function SmsSidebar() {
         </div>
         <SidebarSection>
           <SidebarItem href="/">Dashboard</SidebarItem>
-          <SidebarItem href="/song/new">Create Song</SidebarItem>
-          <SidebarItem href="/lyrics/new">Write Lyrics</SidebarItem>
+          <SidebarItem href={ location.pathname === "/song/new" ? null :"/song/new"}>Create Song</SidebarItem>
+          <SidebarItem href={ location.pathname === "/lyrics/new" ? null :"/lyrics/new"}>Write Lyrics</SidebarItem>
         </SidebarSection>
       </SidebarBody>
       <SidebarFooter>
