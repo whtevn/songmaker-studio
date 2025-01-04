@@ -25,6 +25,15 @@ const chordExtensions = [
 
 const predefinedSections = ["Intro", "Verse", "Chorus", "Bridge", "Outro"];
 
+const HeaderButton = ()=>{
+  return (
+    <Button href="/song/chart">
+      Start Chart
+    </Button>
+  )
+}
+
+
 const SongSectionEditor = ({ expand }) => {
   const songStore = useSongInProgress();
   const { sections, setSections } = songStore;
@@ -71,14 +80,16 @@ const SongSectionEditor = ({ expand }) => {
 
   return (
     <SummarizableSection
-      title="Song Section Layout"
+      title={"Song Section Layout"}
       renderSummary={renderSummary}
       expandProp={expand}
+      headerButton={ HeaderButton }
     >
       <SongTimeline store={songStore} />
     </SummarizableSection>
   );
 };
+
 
 export default SongSectionEditor;
 
