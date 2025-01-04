@@ -47,6 +47,13 @@ const useSongInProgress = create((set) => ({
 
     return { sections: updatedSections };
   }),
+  updateSection: (section) => set((state) => {
+    const updatedSections = state.sections.map((s) =>
+      s.id === section.id ? { ...s, ...section } : s
+    );
+
+    return { ...state, sections: updatedSections };
+  }),
 
   setSections: (newSections) => set({ sections: newSections.map(purifySection) }),
 

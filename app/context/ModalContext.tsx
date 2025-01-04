@@ -21,7 +21,7 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <ModalContext.Provider value={{ activeModal, openModal, closeModal }}>
+    <ModalContext.Provider value={{ activeModal, openModal, closeModal, activeModalOptions }}>
       {children}
     </ModalContext.Provider>
   );

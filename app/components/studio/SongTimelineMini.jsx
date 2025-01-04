@@ -37,7 +37,7 @@ const TimelineSection = ({ section, onDrop }) => {
   }));
 
   return (
-    <div ref={drop} className="flex flex-row justify-start relative">
+    <div ref={drop} className="flex flex-row justify-start relative cursor-pointer" onClick={()=>openModal("showSectionDetails", section)}>
       <div
         className={`relative p-2 flex-grow-0 text-center text-${section.color}-700 bg-${section.color}-200 mx-0 shadow-md border border-${section.color}-700 rounded-md ${
           isOver ? "py-6 border-6" : "border-2"
@@ -49,7 +49,7 @@ const TimelineSection = ({ section, onDrop }) => {
         {/* Badge for sections with lyrics */}
         {section.lyrics && (
           <span className={`absolute bottom-8 bg-${section.color}-500 text-white rounded-full p-1`}>
-            <CheckCircleIcon className="h-4 w-4" onClick={()=>console.log("section:", section)} />
+            <CheckCircleIcon className="h-4 w-4" />
           </span>
         )}
       </div>

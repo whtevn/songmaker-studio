@@ -9,7 +9,8 @@ import { useModal } from '~/context/ModalContext';
 
 
 export function Page({ children }: { children: React.ReactNode }) {
-  const { activeModal, closeModal } = useModal();
+  const modal = useModal();
+  const { activeModal, closeModal, activeModalOptions } = modal
 
   return (
       <SidebarLayout
@@ -22,7 +23,7 @@ export function Page({ children }: { children: React.ReactNode }) {
         {activeModal === 'signIn' && <SignInDialog isOpen onClose={closeModal} />}
         {activeModal === 'signUp' && <SignUpDialog isOpen onClose={closeModal} />}
         {activeModal === 'forgotPassword' && <ForgotPasswordDialog isOpen onClose={closeModal} />}
-        {activeModal === 'showSectionDetails' && <SectionDetailsDialog isOpen onClose={closeModal} />}
+        {activeModal === 'showSectionDetails' && <SectionDetailsDialog isOpen onClose={closeModal} section={activeModalOptions} />}
         {/* Add other modals as needed */}
       </SidebarLayout>
   );
