@@ -219,6 +219,8 @@ export function findScalesContainingNotes(givenNotes, notesWithScales, chordProg
 }
 
 
+
+
 function getTriad(root, modeLabel, notesWithScales) {
   const rootNote = notesWithScales.find((note) =>
     note.labels.some((label) => label.toLowerCase() === root.toLowerCase())
@@ -527,6 +529,7 @@ const backendLibrary = {
   chordExtensions,
   intervals,
   chordFormulas,
+  generateScale,
   identifyChord: (chordnNotes) =>
     identifyChord(notes, chordFormulas, chordExtensions, chordNotes),
   generateChord: (root, options = { extend: [], type: "major" }) =>

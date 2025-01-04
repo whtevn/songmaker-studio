@@ -9,6 +9,8 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    "@atlaskit/css-reset": "^6.11.2",
+    "@atlaskit/tokens": "^2.5.0",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "@react-router/node": "^7.1.1",
@@ -21,6 +23,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router": "^7.1.1",
+    "sortablejs": "^1.15.6",
     "vexflow": "^4.2.5",
     "zustand": "^5.0.2"
   },

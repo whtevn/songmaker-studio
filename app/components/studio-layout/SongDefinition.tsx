@@ -36,12 +36,9 @@ const CreateSong = ( {expand} ) => {
     <>
       <p><strong>Title:</strong> {title || "Untitled"}</p>
       <p><strong>Tempo:</strong> {tempo} BPM</p>
-      <p>
-        <strong>Duration:</strong> {Math.floor(duration / 60)} min {duration % 60} sec
-      </p>
       <p><strong>Time Signature:</strong> {timeSignature}</p>
-      <p><strong>Measuers:</strong> {calculateMeasures(duration, tempo, timeSignature)}</p>
       <p><strong>Key:</strong> {key.root} {key.mode}</p>
+      { /* <ScaleRender /> */ }
     </>
   );
 
@@ -65,23 +62,6 @@ const CreateSong = ( {expand} ) => {
         <TapTempo tempo={tempo} setTempo={setTempo} />
       </div>
 
-      <div className="mt-4">
-        <label className="block text-sm font-medium mb-2">Duration</label>
-        <div className="flex gap-2 items-center">
-          <Input
-            type="number"
-            placeholder="Minutes"
-            value={Math.floor(duration / 60)}
-            onChange={(e) => handleDurationChange(parseInt(e.target.value, 10), duration % 60)}
-          />
-          <Input
-            type="number"
-            placeholder="Seconds"
-            value={duration % 60}
-            onChange={(e) => handleDurationChange(Math.floor(duration / 60), parseInt(e.target.value, 10))}
-          />
-        </div>
-      </div>
 
       <div className="mt-4">
         <label className="block text-sm font-medium mb-2">Time Signature</label>

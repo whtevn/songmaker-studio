@@ -32,9 +32,9 @@ const MinimizableSection = ({ title, children }) => {
 export function SongWizard({ children }: { children: React.ReactNode }) {
   return (
     <div>
-      <SongDefinition expand={true} />
+      <SongDefinition expand={false} />
+      <SongSectionEditor expand={true} />
       <LyricWriter expand={false} />
-      <SongSectionEditor expand={false} />
     </div>
   );
 }
