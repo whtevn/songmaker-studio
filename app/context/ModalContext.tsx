@@ -3,19 +3,22 @@ import React, { createContext, useContext, useState } from 'react';
 
 type ModalType = 'signIn' | 'anotherModal' | null;
 
-interface ModalContextProps {
-  activeModal: ModalType;
-  openModal: (modal: ModalType) => void;
-  closeModal: () => void;
-}
 
-const ModalContext = createContext<ModalContextProps | undefined>(undefined);
+const ModalContext = createContext(undefined);
 
 export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
   const [activeModal, setActiveModal] = useState<ModalType>(null);
+  const [activeModalOptions, setActiveModalOptions] = useState<ModalType>(null);
 
-  const openModal = (modal: ModalType) => setActiveModal(modal);
-  const closeModal = () => setActiveModal(null);
+  const openModal = (modal, options={}) => {
+    setActiveModal(modal);
+    setActiveModalOptions(options);
+  }
+
+  const closeModal = () => {
+    setActiveModal(null);
+    setActiveModalOptions(null);
+  }
 
   return (
     <ModalContext.Provider value={{ activeModal, openModal, closeModal }}>

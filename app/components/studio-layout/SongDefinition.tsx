@@ -94,7 +94,7 @@ const CreateSong = ( {expand} ) => {
             <DropdownButton>{key.root}</DropdownButton>
             <DropdownMenu>
               {["C", "D", "E", "F", "G", "A", "B"].map((root) => (
-                <DropdownItem key={root} onClick={() => setKey((prev) => ({ ...prev, root }))}>
+                <DropdownItem key={root} onClick={() => setKey({ root })}>
                   {root}
                 </DropdownItem>
               ))}
@@ -104,7 +104,7 @@ const CreateSong = ( {expand} ) => {
             <DropdownButton>{key.mode}</DropdownButton>
             <DropdownMenu>
               {["Ionian", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Aeolian", "Locrian"].map((mode) => (
-                <DropdownItem key={mode} onClick={() => setKey((prev) => ({ ...prev, mode }))}>
+                <DropdownItem key={mode} onClick={() => setKey({ mode })}>
                   {mode}
                 </DropdownItem>
               ))}

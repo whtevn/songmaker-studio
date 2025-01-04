@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import SummarizableSection from "~/components/studio-layout/SummarizableSection";
 import SongTimeline from "~/components/studio/SongTimeline";
+import TimelineLyricAssemble from "~/components/studio/TimelineLyricAssemble";
+import LyricDisplay from "~/components/studio-layout/LyricDisplay";
 import { Input } from "~/components/catalyst-theme/input";
 import { Button } from "~/components/catalyst-theme/button";
 import { DropdownMenu, DropdownItem } from "~/components/catalyst-theme/dropdown";
@@ -64,7 +66,7 @@ const SongSectionEditor = ({ expand }) => {
       return <p>No sections defined yet.</p>;
     }
 
-    return <SongTimeline store={ songStore } showSummary={true} />
+    return <TimelineLyricAssemble store={ songStore } />
   };
 
   return (

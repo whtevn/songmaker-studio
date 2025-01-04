@@ -40,7 +40,14 @@ const useSongInProgress = create((set) => ({
   setDuration: (duration) => set(() => ({ duration })),
   setTempo: (tempo) => set(() => ({ tempo })),
   setTimeSignature: (timeSignature) => set(() => ({ timeSignature })),
-  setKey: (key) => set(() => ({ key })),
+  setKey: (key) => set((state) => ({ key: { ...state.key, ...key } })), 
+  applyLyrics: (n, lyrics) => set((state) => {
+    const updatedSections = [...state.sections];
+    updatedSections[n] = { ...updatedSections[n], lyrics };
+
+    return { sections: updatedSections };
+  }),
+
   setSections: (newSections) => set({ sections: newSections.map(purifySection) }),
 
   resetSong: () =>
