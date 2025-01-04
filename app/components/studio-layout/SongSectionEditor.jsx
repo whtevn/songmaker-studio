@@ -80,10 +80,12 @@ const SongSectionEditor = ({ expand }) => {
 
   return (
     <SummarizableSection
-      title={"Song Section Layout"}
       renderSummary={renderSummary}
       expandProp={expand}
       headerButton={ HeaderButton }
+      showText="adjust layout"
+      hideText="assign lyrics"
+      allowContinue={false}
     >
       <SongTimeline store={songStore} />
     </SummarizableSection>

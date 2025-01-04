@@ -37,6 +37,7 @@ const CreateLyrics = ({ expand }) => {
       title="Lyrics"
       renderSummary={renderSummary}
       expandProp={expand}
+      allowContinue={false}
     >
       <Textarea
         value={lyrics}
