@@ -23,14 +23,15 @@ const LyricSection = ({ section }) => {
   }));
 
   return (
-    <div
-      ref={drag}
-      className={`border p-4 rounded-md shadow-md bg-gray-100 w-auto min-w-[200px] max-w-[300px] ${
-        isDragging ? "opacity-50" : "opacity-100"
-      }`}
-    >
-      <p className="whitespace-pre-wrap">{section}</p>
-    </div>
+    section &&
+      <div
+        ref={drag}
+        className={`border p-4 rounded-md w-auto min-w-[200px] max-w-[300px] ${
+          isDragging ? "opacity-50" : "opacity-100"
+        }`}
+      >
+        <p className="whitespace-pre-wrap">{section.split("\n")[0]}...</p>
+      </div>
   );
 };
 

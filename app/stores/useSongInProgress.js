@@ -13,7 +13,7 @@ function purifySection(section){
   return { ...section, id: (id || generateUUID()), measures: (measures || 4) }
 }
 
-const useSongInProgress = create((set) => ({
+const useSongInProgress = create((set, get) => ({
   title: "",
   tempo: 120, // Default tempo
   duration: 260, // Time in seconds
@@ -56,6 +56,23 @@ const useSongInProgress = create((set) => ({
   }),
 
   setSections: (newSections) => set({ sections: newSections.map(purifySection) }),
+  getSongDuration: () => {
+    const { sections, tempo, timeSignature } = get();
+
+    // Parse beats per measure from the timeSignature
+    const [beatsPerMeasure] = timeSignature.split("/").map(Number);
+
+    // Total measures in all sections
+    const totalMeasures = sections.reduce(
+      (sum, section) => sum + (parseInt(section.measures) || 0),
+      0
+    );
+
+    // Calculate the duration in seconds
+    const durationInSeconds = (totalMeasures * beatsPerMeasure) / tempo * 60;
+
+    return durationInSeconds;
+  },
 
   resetSong: () =>
     set(() => ({
