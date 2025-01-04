@@ -1,5 +1,5 @@
 import type { Route } from "./+types/home";
-import KeyFinder from "~/pages/KeyFinder";
+import KeyFinder from "~/pages/keyFinder";
 import Page from '~/components/studio-layout/page';
 
 export function meta({}: Route.MetaArgs) {
