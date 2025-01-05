@@ -121,6 +121,7 @@ const SongTimeline = ({ store, showSummary }) => {
       <Divider className="m-4" />
       <SortableCards
         onCardClick={updateSelectedCards}
+        store={store}
         cards={sections}
         setCards={setSections}
         inputLocation={inputLocation}

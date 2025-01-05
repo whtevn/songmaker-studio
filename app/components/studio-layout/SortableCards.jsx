@@ -1,28 +1,56 @@
 import React, { useState, useCallback } from "react";
 import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { ChevronRightIcon } from "@heroicons/react/16/solid";
+import { CheckCircleIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
 
 const ItemType = {
   CARD: "CARD",
+  LYRIC: "LYRIC",
 };
 
-const DraggableCard = ({ card, index, moveCard, setInputLocation, inputLocation, onClick }) => {
+const DraggableCard = ({
+  card,
+  index,
+  moveCard,
+  setInputLocation,
+  inputLocation,
+  onClick,
+  onApplyLyrics,
+}) => {
   const ref = React.useRef(null);
 
   const [, drop] = useDrop({
-    accept: ItemType.CARD,
-    hover(item) {
+    accept: [ItemType.LYRIC, ItemType.CARD],
+    hover(item, monitor) {
       if (!ref.current) return;
+      console.log({ hover: item })
 
+      const dropType = monitor.getItemType();
       const dragIndex = item.index;
       const hoverIndex = index;
 
-      if (dragIndex === hoverIndex) return;
+      if (dropType === ItemType.CARD) {
+        // Handle card reordering
+        if (dragIndex === hoverIndex) return;
 
-      moveCard(dragIndex, hoverIndex);
-      item.index = hoverIndex;
+        moveCard(dragIndex, hoverIndex);
+        item.index = hoverIndex;
+      }
+
     },
+    drop(item, monitor){
+      if (!ref.current) return;
+      console.log({ drop: item })
+      const dropType = monitor.getItemType();
+      const hoverIndex = index;
+      if (dropType === ItemType.LYRIC) {
+        // Handle lyrics application
+        console.log("hovering", hoverIndex, item)
+        if (monitor.isOver({ shallow: true })) {
+          onApplyLyrics(hoverIndex, item.lyrics);
+        }
+      }
+    }
   });
 
   const [{ isDragging }, drag] = useDrag({
@@ -38,8 +66,9 @@ const DraggableCard = ({ card, index, moveCard, setInputLocation, inputLocation,
   return (
     <div
       ref={ref}
-      onClick={onClick}
-      className={`flex flex-row items-center ${isDragging ? "opacity-50" : "opacity-100"} transition-transform duration-300 ease-in-out`}
+      className={`flex flex-row items-center ${
+        isDragging ? "opacity-50" : "opacity-100"
+      } transition-transform duration-300 ease-in-out`}
     >
       {/* Chevron */}
       {index > 0 && (
@@ -55,25 +84,47 @@ const DraggableCard = ({ card, index, moveCard, setInputLocation, inputLocation,
 
       {/* Card */}
       <div
-        className={`flex-grow-0 text-center text-${card.color}-700 bg-${card.color}-200 rounded-md p-4 m-2 shadow-md cursor-pointer`}
-        data-id={card.id}
+        className="relative"
+        onClick={onClick}
       >
-        {card.type}
+        <div
+          className={`flex-grow-0 text-center text-${card.color}-700 bg-${card.color}-200 rounded-md p-4 m-2 shadow-md cursor-pointer`}
+          data-id={card.id}
+        >
+          <p>{card.type}</p>
+        </div>
+        {card.lyrics && (
+          <span
+            className={`absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-${card.color}-500 text-white rounded-full p-1`}
+          >
+            <CheckCircleIcon className="h-4 w-4" />
+          </span>
+        )}
       </div>
     </div>
+
   );
 };
 
-const StateDiagram = ({ cards, setCards, inputLocation, setInputLocation, onCardClick }) => {
-
-  const moveCard = useCallback((fromIndex, toIndex) => {
-    setCards((prevCards) => {
-      const updatedCards = [...prevCards];
-      const [movedCard] = updatedCards.splice(fromIndex, 1);
-      updatedCards.splice(toIndex, 0, movedCard);
-      return updatedCards;
-    });
-  }, [setCards]);
+const StateDiagram = ({
+  onApplyLyrics,
+  cards,
+  setCards,
+  inputLocation,
+  setInputLocation,
+  onCardClick,
+}) => {
+  const moveCard = useCallback(
+    (fromIndex, toIndex) => {
+      setCards((prevCards) => {
+        const updatedCards = [...prevCards];
+        const [movedCard] = updatedCards.splice(fromIndex, 1);
+        updatedCards.splice(toIndex, 0, movedCard);
+        return updatedCards;
+      });
+    },
+    [setCards]
+  );
 
   return (
     <div className="flex flex-wrap justify-start items-center p-4 gap-4">
@@ -85,21 +136,30 @@ const StateDiagram = ({ cards, setCards, inputLocation, setInputLocation, onCard
           moveCard={moveCard}
           setInputLocation={setInputLocation}
           inputLocation={inputLocation}
-          onClick={()=>onCardClick(card)}
+          onClick={() => onCardClick(card)}
+          onApplyLyrics={onApplyLyrics}
         />
       ))}
     </div>
   );
 };
 
-const StateDiagramWrapper = ({ cards, setCards, inputLocation, setInputLocation, onCardClick }) => (
+const StateDiagramWrapper = ({
+  store,
+  cards,
+  setCards,
+  inputLocation,
+  setInputLocation,
+  onCardClick,
+}) => (
   <DndProvider backend={HTML5Backend}>
     <StateDiagram
-        cards={cards}
-        setCards={setCards}
-        inputLocation={inputLocation}
-        setInputLocation={setInputLocation}
-        onCardClick={onCardClick}
+      cards={cards}
+      setCards={setCards}
+      inputLocation={inputLocation}
+      setInputLocation={setInputLocation}
+      onCardClick={onCardClick}
+      onApplyLyrics={store.applyLyrics}
     />
   </DndProvider>
 );
