@@ -1,122 +1,108 @@
-import React, { useEffect, useRef } from "react";
-import { ChevronRightIcon } from '@heroicons/react/16/solid';
-import Sortable from "sortablejs";
+import React, { useState, useCallback } from "react";
+import { useDrag, useDrop, DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { ChevronRightIcon } from "@heroicons/react/16/solid";
 
-const StateDiagram = ({ cards, setCards, selectedInputLocation, setSelectedInputLocation, showSummary }) => {
-  const containerRef = useRef(null);
-  const [selectedStates, setSelectedStates] = React.useState([]);
+const ItemType = {
+  CARD: "CARD",
+};
 
-  useEffect(() => {
-    const sortable = new Sortable(containerRef.current, {
-      animation: 150,
-      handle: ".sortable-handle",
-      onEnd: (evt) => {
-        const reorderedCards = [...cards];
-        const [movedCard] = reorderedCards.splice(evt.oldIndex, 1);
-        reorderedCards.splice(evt.newIndex, 0, movedCard);
-        setCards(reorderedCards);
-      },
-    });
+const DraggableCard = ({ card, index, moveCard, setInputLocation, inputLocation, onClick }) => {
+  const ref = React.useRef(null);
 
-    return () => sortable.destroy();
-  }, [cards, setCards]);
+  const [, drop] = useDrop({
+    accept: ItemType.CARD,
+    hover(item) {
+      if (!ref.current) return;
 
-  const handleSelectState = (id) => {
-    if(showSummary) return
-    const updatedSelectedStates = selectedStates.includes(id)
-      ? selectedStates.filter((stateId) => stateId !== id)
-      : [...selectedStates, id];
+      const dragIndex = item.index;
+      const hoverIndex = index;
 
-    setSelectedStates(updatedSelectedStates);
-  };
+      if (dragIndex === hoverIndex) return;
 
-  const handleSelectChevron = (index) => {
-    setSelectedInputLocation(selectedInputLocation === index ? null : index);
-  };
+      moveCard(dragIndex, hoverIndex);
+      item.index = hoverIndex;
+    },
+  });
 
-  const handleCopy = () => {
-    const copiedCards = cards.filter((card) => selectedStates.includes(card.id));
-    const newCards = copiedCards.map((card) => ({
-      ...card,
-      id: `${card.id}-copy-${Date.now()}`,
-    }));
+  const [{ isDragging }, drag] = useDrag({
+    type: ItemType.CARD,
+    item: { index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
 
-    if (selectedInputLocation !== null) {
-      const insertionIndex = selectedInputLocation + 1;
-      const updatedCards = [
-        ...cards.slice(0, insertionIndex),
-        ...newCards,
-        ...cards.slice(insertionIndex),
-      ];
-      setCards(updatedCards);
-    } else {
-      setCards([...cards, ...newCards]);
-    }
-
-    setSelectedStates([]);
-    setSelectedInputLocation(null);
-  };
-
-  const handleDelete = () => {
-    const updatedCards = cards.filter(
-      (card, index) => !selectedStates.includes(card.id) && index !== selectedInputLocation
-    );
-    setCards(updatedCards);
-    setSelectedStates([]);
-    setSelectedInputLocation(null);
-  };
+  drag(drop(ref));
 
   return (
-    <>
-
-      <div ref={containerRef} className={`flex flex-wrap justify-start items-center p-4 ${showSummary ? "" : "gap-4" }`}>
-        {cards.map((card, index) => (
-          <React.Fragment key={card.id}>
-            {/* State Card and Chevron */}
-            <span className={`flex flex-row justify-start ${showSummary ? "" : "sortable-handle"}`}>
-
-              {/* Chevron */}
-              {(index > 0 && !showSummary) && (
-                <div
-                  className={`flex items-center cursor-pointer mr-2 ${
-                    selectedInputLocation === index ? "text-blue-500" : "text-gray-500"
-                  }`}
-                  onClick={() => handleSelectChevron(index)}
-                >
-                  <ChevronRightIcon className="h-6 w-6" />
-                </div>
-              )}
-
-              {/* State Card */}
-              <div
-                className={`flex-grow-0 text-center ${
-                  selectedStates.includes(card.id) ? `border border-4 bg-${card.color}-500 border-${card.color}-100 text-${card.color}-100` : `text-${card.color}-700 bg-${card.color}-200 `
-                } ${
-                  showSummary ? "p-2 m-x-0" : "rounded-md p-4 m-2 shadow-md cursor-pointer"
-                }`}
-                data-id={card.id}
-                onClick={() => handleSelectState(card.id)}
-              >
-                {card.type}
-              </div>
-            </span>
-          </React.Fragment>
-
-        ))}
-      </div>
-      {(selectedStates.length > 0) && (
-        <div className="p-2 flex gap-4 justify-end">
-          <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleCopy}>
-            Copy
-          </button>
-          <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={handleDelete}>
-            Delete
-          </button>
+    <div
+      ref={ref}
+      onClick={onClick}
+      className={`flex flex-row items-center ${isDragging ? "opacity-50" : "opacity-100"} transition-transform duration-300 ease-in-out`}
+    >
+      {/* Chevron */}
+      {index > 0 && (
+        <div
+          className={`flex items-center cursor-pointer mr-2 ${
+            inputLocation === index ? "text-blue-500" : "text-gray-500"
+          }`}
+          onClick={() => setInputLocation(index)}
+        >
+          <ChevronRightIcon className="h-6 w-6" />
         </div>
       )}
-    </>
+
+      {/* Card */}
+      <div
+        className={`flex-grow-0 text-center text-${card.color}-700 bg-${card.color}-200 rounded-md p-4 m-2 shadow-md cursor-pointer`}
+        data-id={card.id}
+      >
+        {card.type}
+      </div>
+    </div>
   );
 };
 
-export default StateDiagram;
+const StateDiagram = ({ cards, setCards, inputLocation, setInputLocation, onCardClick }) => {
+
+  const moveCard = useCallback((fromIndex, toIndex) => {
+    setCards((prevCards) => {
+      const updatedCards = [...prevCards];
+      const [movedCard] = updatedCards.splice(fromIndex, 1);
+      updatedCards.splice(toIndex, 0, movedCard);
+      return updatedCards;
+    });
+  }, [setCards]);
+
+  return (
+    <div className="flex flex-wrap justify-start items-center p-4 gap-4">
+      {cards.map((card, index) => (
+        <DraggableCard
+          key={card.id}
+          card={card}
+          index={index}
+          moveCard={moveCard}
+          setInputLocation={setInputLocation}
+          inputLocation={inputLocation}
+          onClick={()=>onCardClick(card)}
+        />
+      ))}
+    </div>
+  );
+};
+
+const StateDiagramWrapper = ({ cards, setCards, inputLocation, setInputLocation, onCardClick }) => (
+  <DndProvider backend={HTML5Backend}>
+    <StateDiagram
+        cards={cards}
+        setCards={setCards}
+        inputLocation={inputLocation}
+        setInputLocation={setInputLocation}
+        onCardClick={onCardClick}
+    />
+  </DndProvider>
+);
+
+export default StateDiagramWrapper;
 

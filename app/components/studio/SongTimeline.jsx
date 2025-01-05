@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~
 import { ChevronDownIcon } from '@heroicons/react/16/solid';
 import { Field, Fieldset, Label } from "~/components/catalyst-theme/fieldset";
 import { Input } from "~/components/catalyst-theme/input";
+import { useModal } from '~/context/ModalContext';
 
 
 const SongTimeline = ({ store, showSummary }) => {
@@ -24,6 +25,8 @@ const SongTimeline = ({ store, showSummary }) => {
     { type: "Interlude", color: "blue" },
     { type: "Outro", color: "violet" },
   ];
+
+  const { openModal } = useModal();
 
 
   const handleNameChange = (index, newName) => {
@@ -103,12 +106,12 @@ const SongTimeline = ({ store, showSummary }) => {
     0
   );
 
-  const updateSelectedCards = () => {}
+  const updateSelectedCards = (section) => {
+    openModal("showSectionDetails", section)
+  }
 
   return (
     <>
-      { !showSummary && (
-      <>
       <div className="flex justify-evenly flex-wrap">
         { sectionOptions.map((option, index) => 
           <Badge key={index} onClick={()=>handleAddSection(option)} color={option.color} className="m-2 cursor-pointer">{ option.type }</Badge>
@@ -116,14 +119,12 @@ const SongTimeline = ({ store, showSummary }) => {
         }
       </div>
       <Divider className="m-4" />
-      </>
-      )}
       <SortableCards
         onCardClick={updateSelectedCards}
         cards={sections}
         setCards={setSections}
-        selectedInputLocation={inputLocation}
-        setSelectedInputLocation={setInputLocation}
+        inputLocation={inputLocation}
+        setInputLocation={setInputLocation}
         showSummary={showSummary}
       />
     </>

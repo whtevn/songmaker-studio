@@ -55,7 +55,13 @@ const useSongInProgress = create((set, get) => ({
     return { ...state, sections: updatedSections };
   }),
 
-  setSections: (newSections) => set({ sections: newSections.map(purifySection) }),
+  setSections: (newSectionsOrUpdater) => set((state) => {
+    const newSections =
+      typeof newSectionsOrUpdater === "function"
+        ? newSectionsOrUpdater(state.sections)
+        : newSectionsOrUpdater;
+    return { sections: newSections.map(purifySection) };
+  }),
   getSongDuration: () => {
     const { sections, tempo, timeSignature } = get();
 

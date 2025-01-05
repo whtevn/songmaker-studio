@@ -7,6 +7,9 @@ import { Input } from "~/components/catalyst-theme/input";
 import { Button } from "~/components/catalyst-theme/button";
 import { DropdownMenu, DropdownItem } from "~/components/catalyst-theme/dropdown";
 import useSongInProgress from "~/stores/useSongInProgress";
+import { HTML5Backend } from 'react-dnd-html5-backend'
+import { DndProvider } from 'react-dnd'
+
 
 const chordFormulas = {
   major: ["root", "major3rd", "perfect5th"],
@@ -87,7 +90,10 @@ const SongSectionEditor = ({ expand }) => {
       hideText="assign lyrics"
       allowContinue={false}
     >
-      <SongTimeline store={songStore} />
+      <DndProvider backend={HTML5Backend}>
+        <SongTimeline store={songStore} />
+        <LyricDisplay text={songStore.lyrics} />
+      </DndProvider>
     </SummarizableSection>
   );
 };
