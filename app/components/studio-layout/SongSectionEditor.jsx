@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import SummarizableSection from "~/components/studio-layout/SummarizableSection";
 import SongTimeline from "~/components/studio/SongTimeline";
-import TimelineLyricAssemble from "~/components/studio/TimelineLyricAssemble";
 import LyricDisplay from "~/components/studio-layout/LyricDisplay";
 import { Input } from "~/components/catalyst-theme/input";
 import { Button } from "~/components/catalyst-theme/button";
 import { DropdownMenu, DropdownItem } from "~/components/catalyst-theme/dropdown";
 import useSongInProgress from "~/stores/useSongInProgress";
-import { HTML5Backend } from 'react-dnd-html5-backend'
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { TouchBackend } from "react-dnd-touch-backend";
+import { isMobile } from "react-device-detect";
 import { DndProvider } from 'react-dnd'
 
 
@@ -74,27 +75,17 @@ const SongSectionEditor = ({ expand }) => {
   };
 
   const renderSummary = () => {
-    if (!sections || sections.length === 0) {
-      return <p>No sections defined yet.</p>;
-    }
-
-    return <TimelineLyricAssemble store={ songStore } />
+    return <></>
   };
 
   return (
-    <SummarizableSection
-      renderSummary={renderSummary}
-      expandProp={expand}
-      headerButton={ HeaderButton }
-      showText="adjust layout"
-      hideText="assign lyrics"
-      allowContinue={false}
-    >
-      <DndProvider backend={HTML5Backend}>
+      <DndProvider
+        backend={isMobile ? TouchBackend : HTML5Backend}
+        options={{ enableMouseEvents: true }} // For better compatibility
+      >
         <SongTimeline store={songStore} />
         <LyricDisplay text={songStore.lyrics} />
       </DndProvider>
-    </SummarizableSection>
   );
 };
 

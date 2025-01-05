@@ -1,8 +1,5 @@
 import React, { useState, useCallback } from "react";
 import { useDrag, useDrop, DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { TouchBackend } from "react-dnd-touch-backend";
-import { isMobile } from "react-device-detect";
 import { CheckCircleIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
 
 const ItemType = {
@@ -151,10 +148,6 @@ const StateDiagramWrapper = ({
   setInputLocation,
   onCardClick,
 }) => (
-  <DndProvider
-    backend={isMobile ? TouchBackend : HTML5Backend}
-    options={{ enableMouseEvents: true }} // For better compatibility
-  >
     <StateDiagram
       cards={cards}
       setCards={setCards}
@@ -163,7 +156,6 @@ const StateDiagramWrapper = ({
       onCardClick={onCardClick}
       onApplyLyrics={store.applyLyrics}
     />
-  </DndProvider>
 );
 
 export default StateDiagramWrapper;
