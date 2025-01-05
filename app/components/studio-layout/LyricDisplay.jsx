@@ -14,8 +14,6 @@ const LyricDisplay = ({ text }) => {
 };
 
 const LyricSection = ({ lyrics }) => {
-  console.log({ lyrics });
-
   const [{ isDragging }, dragRef] = useDrag(
     () => ({
       type: "LYRIC",

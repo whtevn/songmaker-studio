@@ -1,6 +1,8 @@
 import React, { useState, useCallback } from "react";
 import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { TouchBackend } from "react-dnd-touch-backend";
+import { isMobile } from "react-device-detect";
 import { CheckCircleIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
 
 const ItemType = {
@@ -23,7 +25,6 @@ const DraggableCard = ({
     accept: [ItemType.LYRIC, ItemType.CARD],
     hover(item, monitor) {
       if (!ref.current) return;
-      console.log({ hover: item })
 
       const dropType = monitor.getItemType();
       const dragIndex = item.index;
@@ -40,12 +41,10 @@ const DraggableCard = ({
     },
     drop(item, monitor){
       if (!ref.current) return;
-      console.log({ drop: item })
       const dropType = monitor.getItemType();
       const hoverIndex = index;
       if (dropType === ItemType.LYRIC) {
         // Handle lyrics application
-        console.log("hovering", hoverIndex, item)
         if (monitor.isOver({ shallow: true })) {
           onApplyLyrics(hoverIndex, item.lyrics);
         }
@@ -152,7 +151,10 @@ const StateDiagramWrapper = ({
   setInputLocation,
   onCardClick,
 }) => (
-  <DndProvider backend={HTML5Backend}>
+  <DndProvider
+    backend={isMobile ? TouchBackend : HTML5Backend}
+    options={{ enableMouseEvents: true }} // For better compatibility
+  >
     <StateDiagram
       cards={cards}
       setCards={setCards}
