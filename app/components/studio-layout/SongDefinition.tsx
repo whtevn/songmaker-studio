@@ -1,118 +1,174 @@
-import React from "react";
-import SummarizableSection from "~/components/studio-layout/SummarizableSection";
+import React, { useState } from "react";
 import { Input } from "~/components/catalyst-theme/input";
+import { Button } from "~/components/catalyst-theme/button";
+import { Heading } from "~/components/catalyst-theme/heading";
 import TapTempo from "~/components/studio/TapTempo";
 import { Dropdown, DropdownMenu, DropdownButton, DropdownItem } from "~/components/catalyst-theme/dropdown";
 import useSongInProgress from "~/stores/useSongInProgress";
+import { PencilSquareIcon, XMarkIcon, CheckIcon} from "@heroicons/react/16/solid";
+import ScaleFinder from "~/utils/scales";
 
-const CreateSong = ( {expand} ) => {
+const CreateSong = ({ nameOnly = false }) => {
   const {
     title,
     tempo,
-    duration,
     timeSignature,
     key,
     setTitle,
     setTempo,
-    setDuration,
     setTimeSignature,
     setKey,
   } = useSongInProgress();
 
-  const handleDurationChange = (minutes, seconds) => {
-    const totalSeconds = minutes * 60 + seconds;
-    setDuration(totalSeconds);
+  const { notes, modes } = ScaleFinder;
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempState, setTempState] = useState({ title, key, timeSignature, tempo });
+
+  const handleSave = () => {
+    setTitle(tempState.title);
+    setKey(tempState.key);
+    setTimeSignature(tempState.timeSignature);
+    setTempo(tempState.tempo);
+    setIsEditing(false);
   };
 
-  const calculateMeasures = (duration, tempo, timeSignature) => {
-    const [beatsPerMeasure, beatUnit] = timeSignature.split("/").map(Number);
-    const secondsPerBeat = 60 / tempo;
-    const totalBeats = duration / secondsPerBeat;
-    const measures = totalBeats / beatsPerMeasure;
-    return Math.floor(measures);
+  const handleCancel = () => {
+    setTempState({ title, key, timeSignature, tempo });
+    setIsEditing(false);
   };
-
-  const renderSummary = () => (
-    <>
-      <p><strong>Title:</strong> {title || "Untitled"}</p>
-      <p><strong>Tempo:</strong> {tempo} BPM</p>
-      <p><strong>Time Signature:</strong> {timeSignature}</p>
-      <p><strong>Key:</strong> {key.root} {key.mode}</p>
-      { /* <ScaleRender /> */ }
-    </>
-  );
 
   return (
-    <SummarizableSection
-      title="Song Setup"
-      renderSummary={renderSummary}
-      expandProp={expand}
-    >
-      <div className="mt-4">
-        <label className="block text-sm font-medium mb-2">Title</label>
-        <Input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter song title"
-        />
-      </div>
+    <>
+      <Heading className="my-2 flex flex-row gap-2 items-center">
+        {!isEditing ? (
+          <>
+            <span>{title || "Untitled"}</span>
+            <Button plain onClick={() => setIsEditing(true)}>
+              <PencilSquareIcon className="h-6 w-6" />
+            </Button>
+          </>
+        ) : (
+          <>
+            <Input
+              value={tempState.title}
+              onChange={(e) => setTempState({ ...tempState, title: e.target.value })}
+              placeholder="Enter title"
+            />
+            <Button plain onClick={handleCancel}>
+              <XMarkIcon className="h-6 w-6" />
+            </Button>
+            { nameOnly &&
+              <Button plain onClick={handleSave}>
+                <CheckIcon className="h-6 w-6" />
+              </Button>
+            } 
+          </>
+        )}
+      </Heading>
 
-      <div className="mt-4">
-        <label className="block text-sm font-medium mb-2">Tempo</label>
-        <TapTempo tempo={tempo} setTempo={setTempo} />
-      </div>
+      {/* Render additional fields only when nameOnly is false */}
+      {!nameOnly && (
+        <>
+          <div className="flex flex-col sm:flex-row justify-between mx-8">
+            <div className="flex flex-row sm:flex-col gap-2">
+              <strong>Key:</strong>
+              {!isEditing ? (
+                <div>{key.root} {key.mode}</div>
+              ) : (
+                <>
+                  <Dropdown>
+                    <DropdownButton>{tempState.key.root || "Root"}</DropdownButton>
+                    <DropdownMenu>
+                      {notes.map((note) => (
+                        <DropdownItem
+                          key={note.labels[0]}
+                          onClick={() => setTempState({ ...tempState, key: { ...tempState.key, root: note.labels[0] } })}
+                        >
+                          {note.labels[0]}
+                        </DropdownItem>
+                      ))}
+                    </DropdownMenu>
+                  </Dropdown>
+                  <Dropdown>
+                    <DropdownButton>{tempState.key.mode || "Mode"}</DropdownButton>
+                    <DropdownMenu>
+                      {modes.map((mode) => (
+                        <DropdownItem
+                          key={mode.label}
+                          onClick={() => setTempState({ ...tempState, key: { ...tempState.key, mode: mode.label } })}
+                        >
+                          {mode.label}
+                        </DropdownItem>
+                      ))}
+                    </DropdownMenu>
+                  </Dropdown>
+                </>
+              )}
+            </div>
 
+            <div className="flex flex-row sm:flex-col gap-2">
+              <strong>Time Signature:</strong>
+              {!isEditing ? (
+                <div>{timeSignature}</div>
+              ) : (
+                <div className="flex gap-2">
+                  <Input
+                    type="number"
+                    value={tempState.timeSignature.split("/")[0]}
+                    onChange={(e) =>
+                      setTempState({
+                        ...tempState,
+                        timeSignature: `${e.target.value}/${tempState.timeSignature.split("/")[1]}`,
+                      })
+                    }
+                    className="w-16"
+                  />
+                  <Dropdown>
+                    <DropdownButton>{tempState.timeSignature.split("/")[1]}</DropdownButton>
+                    <DropdownMenu>
+                      {["2", "4", "8"].map((value) => (
+                        <DropdownItem
+                          key={value}
+                          onClick={() =>
+                            setTempState({
+                              ...tempState,
+                              timeSignature: `${tempState.timeSignature.split("/")[0]}/${value}`,
+                            })
+                          }
+                        >
+                          {value}
+                        </DropdownItem>
+                      ))}
+                    </DropdownMenu>
+                  </Dropdown>
+                </div>
+              )}
+            </div>
 
-      <div className="mt-4">
-        <label className="block text-sm font-medium mb-2">Time Signature</label>
-        <div className="flex gap-2 items-center">
-          <Input
-            type="number"
-            value={timeSignature.split("/")[0]}
-            onChange={(e) => setTimeSignature(`${e.target.value}/${timeSignature.split("/")[1]}`)}
-          />
-          <Dropdown>
-            <DropdownButton>{timeSignature.split("/")[1]}</DropdownButton>
-            <DropdownMenu>
-              {["2", "4", "8"].map((option) => (
-                <DropdownItem
-                  key={option}
-                  onClick={() => setTimeSignature(`${timeSignature.split("/")[0]}/${option}`)}
-                >
-                  {option}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </Dropdown>
-        </div>
-      </div>
+            <div className="flex flex-row sm:flex-col gap-2">
+              <strong>Tempo:</strong>
+              {!isEditing ? (
+                <>{tempo} BPM</>
+              ) : (
+                <TapTempo tempo={tempState.tempo} setTempo={(value) => setTempState({ ...tempState, tempo: value })} />
+              )}
+            </div>
+          </div>
 
-      <div className="mt-4">
-        <label className="block text-sm font-medium mb-2">Key</label>
-        <div className="flex gap-4">
-          <Dropdown>
-            <DropdownButton>{key.root}</DropdownButton>
-            <DropdownMenu>
-              {["C", "D", "E", "F", "G", "A", "B"].map((root) => (
-                <DropdownItem key={root} onClick={() => setKey({ root })}>
-                  {root}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </Dropdown>
-          <Dropdown>
-            <DropdownButton>{key.mode}</DropdownButton>
-            <DropdownMenu>
-              {["Ionian", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Aeolian", "Locrian"].map((mode) => (
-                <DropdownItem key={mode} onClick={() => setKey({ mode })}>
-                  {mode}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </Dropdown>
-        </div>
-      </div>
-    </SummarizableSection>
+          {isEditing && (
+            <div className="flex gap-2 justify-end mt-4">
+              <Button onClick={handleSave} className="bg-green-500 text-white">
+                Save
+              </Button>
+              <Button onClick={handleCancel} className="bg-gray-500 text-white">
+                Cancel
+              </Button>
+            </div>
+          )}
+        </>
+      )}
+    </>
   );
 };
 

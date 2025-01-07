@@ -190,32 +190,32 @@ export function findScalesContainingNotes(givenNotes, notesWithScales, chordProg
       );
 
       if (notesMatchScale(normalizedNotes, scaleNotes)) {
-        let degrees = normalizedNotes.map((givenNote) =>
-          mapNoteToDegree(givenNote, scaleNotes, scaleObj, chordProgression, notesWithScales)
-        );
-
-        // Sort degrees to match the scale order
-        degrees = degrees.sort((a, b) => a.degree - b.degree);
-        const scale = {
-          name: `${note.labels[0]} ${scaleObj.mode}`,
-          root: note.labels[0],
-          mode: scaleObj.mode,
-          scale: scaleObj.scale,
-          degrees,
-        }
-        const rendered = renderScale(scaleObj.scale)
-        const allNotes = allUsedNotes({...scale, rendered})
-
-        matchingScales.push({
-          ...scale,
-          rendered,
-          allNotes,
-        });
+        matchingScales.push(normalizeScaleData(note, scaleObj, normalizedNotes, scaleNotes, givenNotes, notesWithScales, chordProgression, options));
       }
     });
   });
 
   return matchingScales;
+}
+
+function normalizeScaleData(note, scaleObj, normalizedNotes, scaleNotes, givenNotes, notesWithScales, chordProgression, options = {}){
+  let degrees = normalizedNotes.map((givenNote) =>
+    mapNoteToDegree(givenNote, scaleNotes, scaleObj, chordProgression, notesWithScales)
+  );
+
+  // Sort degrees to match the scale order
+  degrees = degrees.sort((a, b) => a.degree - b.degree);
+  const scale = {
+    name: `${note.labels[0]} ${scaleObj.mode}`,
+    root: note.labels[0],
+    mode: scaleObj.mode,
+    scale: scaleObj.scale,
+    degrees,
+  }
+  const rendered = renderScale(scaleObj.scale)
+  const allNotes = allUsedNotes({...scale, rendered})
+  return { ...scale, rendered, allNotes }
+
 }
 
 

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import ScaleFinder from '~/utils/scales'
 
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -78,6 +79,9 @@ const useSongInProgress = create((set, get) => ({
     const durationInSeconds = (totalMeasures * beatsPerMeasure) / tempo * 60;
 
     return durationInSeconds;
+  },
+  getSelectedScale: () => {
+    const { key } = get();
   },
 
   resetSong: () =>

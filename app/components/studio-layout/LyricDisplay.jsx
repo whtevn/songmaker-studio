@@ -29,11 +29,11 @@ const LyricSection = ({ lyrics }) => {
     lyrics && (
       <div
         ref={dragRef} // Attach dragRef to the draggable element
-        className={`border p-4 rounded-md w-auto min-w-[200px] max-w-[300px] cursor-grab ${
+        className={`flex flex-row flex-wrap border p-4 rounded-md w-auto cursor-grab ${
           isDragging ? "opacity-50" : "opacity-100"
         }`}
       >
-        <p className="whitespace-pre-wrap">{lyrics.split("\n")[0]}...</p>
+        <p className="whitespace-pre-wrap line-clamp-1 truncate hover:text-clip text-ellipsis grow">{lyrics}</p>
       </div>
     )
   );
