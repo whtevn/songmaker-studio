@@ -123,7 +123,7 @@ const StateDiagram = ({
   );
 
   return (
-    <div className="flex flex-wrap justify-start items-center p-4 gap-4">
+    <div className="flex flex-wrap justify-start items-center gap-4">
       {cards.map((card, index) => (
         <DraggableCard
           key={card.id}

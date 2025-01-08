@@ -2,6 +2,7 @@ import React from "react";
 import { Heading } from "~/components/catalyst-theme/heading";
 import Keyboard from "~/components/studio/Keyboard";
 import ScaleRender from "~/components/studio/ScaleRender";
+import SongDefinition from "~/components/studio-layout/SongDefinition";
 
 const SongChartBuilder = ({ store }) => {
   const { sections } = store;
@@ -10,6 +11,7 @@ const SongChartBuilder = ({ store }) => {
   console.log(store)
   return (
     <>
+      <SongDefinition />
       <ScaleRender scale={selectedScale} />
       <Keyboard onNoteClick={ ()=>{} } selectedNotes={ [] } />
       <div className="p-4">
