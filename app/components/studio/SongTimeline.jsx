@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import PillSelector from "~/components/studio-layout/PillSelector";
 import SortableCards from "~/components/studio-layout/SortableCards";
+import { Heading } from "~/components/catalyst-theme/heading";
 import { Badge } from "~/components/catalyst-theme/badge";
 import { Divider } from "~/components/catalyst-theme/divider";
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '~/components/catalyst-theme/dropdown';
@@ -111,24 +112,27 @@ const SongTimeline = ({ store, showSummary }) => {
   }
 
   return (
-    <>
-      <div className="flex justify-evenly flex-wrap">
+    <div className="rounded-md bg-black border border-gray-700">
+      <div className="p-4 mt-2 flex flex-col">
+        <div className="flex justify-evenly flex-wrap border-b-4 border-gray-900 pb-4" >
         { sectionOptions.map((option, index) => 
-          <Badge key={index} onClick={()=>handleAddSection(option)} color={option.color} className="m-2 cursor-pointer">{ option.type }</Badge>
+          <Badge key={index} onClick={()=>handleAddSection(option)} color={option.color} className="p-8 m-2 cursor-pointer">{ option.type }</Badge>
         )
         }
+        </div>
       </div>
-      <Divider className="m-4" />
-      <SortableCards
-        onCardClick={updateSelectedCards}
-        store={store}
-        cards={sections}
-        setCards={setSections}
-        inputLocation={inputLocation}
-        setInputLocation={setInputLocation}
-        showSummary={showSummary}
-      />
-    </>
+      <div className="p-4 flex flex-col">
+        <SortableCards
+          onCardClick={updateSelectedCards}
+          store={store}
+          cards={sections}
+          setCards={setSections}
+          inputLocation={inputLocation}
+          setInputLocation={setInputLocation}
+          showSummary={showSummary}
+        />
+      </div>
+    </div>
   );
 };
 

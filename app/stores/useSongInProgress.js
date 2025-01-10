@@ -22,6 +22,13 @@ const useSongInProgress = create((set, get) => ({
   timeSignature: "4/4", // Default time signature
   key: { root: "C", mode: "Ionian" }, // Default key
   lyrics: "",
+  lyricVersions: [],
+  addLyricVersion: (lyrics) => {
+    const timestamp = Date.now();
+    return set((state) => ({
+      lyricVersions: [...state.lyricVersions, {lyrics, timestamp}],
+    }))
+  },
   sections: [
     {
       id: generateUUID(),

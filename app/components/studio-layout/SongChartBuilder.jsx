@@ -4,6 +4,7 @@ import Keyboard from "~/components/studio/Keyboard";
 import ScaleRender from "~/components/studio/ScaleRender";
 import SongDefinition from "~/components/studio-layout/SongDefinition";
 
+
 const SongChartBuilder = ({ store }) => {
   const { sections } = store;
 
