@@ -77,7 +77,7 @@ const CreateLyrics = ({ headerRef, store }) => {
       <div className={`bg-gray-700 border border-gray-600 rounded-lg fixed bottom-10 right-16 lg:right-24 ${
         lyricWriterOptionsOpen ? 'p-4 w-1/3' : '' 
       }`}>
-        <button className={`p-4 text-gray-300 ${lyricWriterOptionsOpen ? "absolute right-0 top-0" : "" }`} onClick={lyricWriterOptionsOpen ? ()=>setLyricWriterOptionsOpen(false) : handleAddVersion} disabled={!lyrics}>
+        <button className={`p-4 text-gray-300 ${lyricWriterOptionsOpen ? "absolute right-0 top-0" : "" }`} onClick={lyricWriterOptionsOpen ? ()=>setLyricWriterOptionsOpen(false) : handleAddVersion} >
           { lyricWriterOptionsOpen  
             ? <XMarkIcon className='h-4 w-4 text-lg' />
             : <CameraIcon className='h-4 w-4 text-lg' />
