@@ -13,9 +13,9 @@ import { PencilSquareIcon, XMarkIcon, CheckIcon, BoltIcon } from "@heroicons/rea
 export function SongWizard() {
   const store = useSongInProgress();
   const tabs = [
-    { id: "lyrics", label: "Write Lyrics" },
-    { id: "sections", label: "Layout Song" },
-    { id: "music", label: "Build Music" },
+    { id: "lyrics", label: "Lyrics" },
+    { id: "sections", label: "Structure" },
+    { id: "music", label: "Phrasing" },
   ];
   const [activeTab, setActiveTab] = useState(tabs[0].id);
 

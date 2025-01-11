@@ -25,10 +25,32 @@ const useSongInProgress = create((set, get) => ({
   lyricVersions: [],
   addLyricVersion: (lyrics) => {
     const timestamp = Date.now();
-    return set((state) => ({
-      lyricVersions: [...state.lyricVersions, {lyrics, timestamp}],
-    }))
+    const id = generateUUID();
+    return set((state) => {
+      const versionNumber = state.lyricVersions.length+1
+      const name = `Version #${versionNumber}`
+      return {
+        lyricVersions: [...state.lyricVersions, {id, lyrics, timestamp, versionNumber, name}],
+      }
+    })
   },
+  setLyricVersion: (updatedVersion) => {
+    set((state) => {
+      const updatedVersions = state.lyricVersions.map((version) =>
+        version.id === updatedVersion.id ? updatedVersion : version
+      );
+
+      return {
+        lyricVersions: updatedVersions,
+      };
+    });
+  },
+  deleteLyricVersion: (id) => {
+    set((state) => ({
+      lyricVersions: state.lyricVersions.filter((version) => version.id !== id),
+    }));
+  },
+
   sections: [
     {
       id: generateUUID(),

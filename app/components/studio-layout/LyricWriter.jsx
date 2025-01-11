@@ -8,21 +8,21 @@ import VersionSelector from '~/components/studio-layout/versionSelector'
 import Toast from "~/components/studio-layout/Toast";
 
 const CreateLyrics = ({ headerRef, store }) => {
-  const { lyrics, setLyrics, lyricVersions, addLyricVersion } = store;
+  const { lyrics, setLyrics, lyricVersions, addLyricVersion, setLyricVersion} = store;
   const [showToast, setShowToast] = useState(false)
   const [textareaRows, setTextareaRows] = useState(5); // Initial row count
   const [lyricWriterOptionsOpen, setLyricWriterOptionsOpen] = useState(false); 
   const containerRef = useRef(null);
 
+  const findVersion = (lyricVersions, lyrics) => {
+    return lyricVersions.find((version) => version.lyrics.trim() === lyrics.trim()) || false;
+  };
   const handleAddVersion = () => {
-    console.log(lyricVersions, lyrics)
-    const doesVersionExist = lyricVersions.some((version) => version.lyrics === lyrics);
-    console.log(doesVersionExist)
-
-    if (lyrics && !doesVersionExist) {
+    const foundVersion = findVersion(lyricVersions, lyrics)
+    if (lyrics && !foundVersion) {
       addLyricVersion(lyrics); 
     }
-    setShowToast(true)
+    setShowToast(foundVersion || true)
   };
 
   const onViewSnapshotsClick = () => {
@@ -75,7 +75,7 @@ const CreateLyrics = ({ headerRef, store }) => {
         />
       </main>
       <div className={`bg-gray-700 border border-gray-600 rounded-lg fixed bottom-10 right-16 lg:right-24 ${
-        lyricWriterOptionsOpen ? 'p-4 w-1/3' : '' 
+        lyricWriterOptionsOpen ? 'p-4 w-1/2' : '' 
       }`}>
         <button className={`p-4 text-gray-300 ${lyricWriterOptionsOpen ? "absolute right-0 top-0" : "" }`} onClick={lyricWriterOptionsOpen ? ()=>setLyricWriterOptionsOpen(false) : handleAddVersion} >
           { lyricWriterOptionsOpen  
@@ -84,7 +84,7 @@ const CreateLyrics = ({ headerRef, store }) => {
           }
         </button>
         { lyricWriterOptionsOpen && 
-            <VersionSelector addVersion={addLyricVersion} versions={lyricVersions} lyrics={lyrics} setLyrics={setLyrics} />
+          <VersionSelector store={store}/>
         }
       </div>
       <Toast show={showToast} setShow={setShowToast} wait={5} viewSnapshots={onViewSnapshotsClick} version={lyricVersions.length} />

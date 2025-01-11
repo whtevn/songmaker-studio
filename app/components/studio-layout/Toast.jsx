@@ -42,8 +42,8 @@ export default function Example({ show, setShow, viewSnapshots, version, wait = 
                   <div className="ml-3 w-0 flex-1 pt-0.5">
                     <p className="text-sm font-medium text-gray-300">
                     { version > 0 
-                      ? `Snapshot #${version} Saved`
-                      : "Add some lyrics to save a version"
+                        ? `Snapshot ${(show && show.name) ? `'${show.name}' already captured` : `#${version} Saved`}`
+                      : "Write some lyrics to save a version"
                     }
                     </p>
                   </div>
