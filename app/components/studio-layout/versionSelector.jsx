@@ -17,8 +17,8 @@ import {
 
 const ITEMS_PER_PAGE = 3;
 
-const VersionSelector = ({ store }) => {
-  const { addVersion, lyricVersions, lyrics, setLyrics, setLyricVersion, deleteLyricVersion } = store;
+const VersionSelector = ({ lyricVersions, store }) => {
+  const { addVersion, lyrics, setLyrics, setLyricVersion, deleteLyricVersion } = store;
 
   const [currentPage, setCurrentPage] = useState(0);
   const [editingIndex, setEditingIndex] = useState(null);

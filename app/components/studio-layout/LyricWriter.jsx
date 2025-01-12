@@ -17,7 +17,8 @@ Tap the camera icon below after writing some lyrics to save your progress or rev
 
 
 const CreateLyrics = ({ headerRef, store }) => {
-  const { lyrics, setLyrics, lyricVersions, addLyricVersion, setLyricVersion} = store;
+  const { lyrics, setLyrics, getSortedLyricVersions, addLyricVersion, setLyricVersion} = store;
+  const lyricVersions = getSortedLyricVersions()
   const [showToast, setShowToast] = useState(false)
   const [textareaRows, setTextareaRows] = useState(5); // Initial row count
   const [lyricWriterOptionsOpen, setLyricWriterOptionsOpen] = useState(false); 
@@ -92,7 +93,7 @@ const CreateLyrics = ({ headerRef, store }) => {
           <div className="fixed bottom-0 left-0 w-full bg-gray-700 border border-gray-600 
              sm:w-auto sm:right-24 sm:bottom-12 sm:left-auto sm:rounded-md sm:shadow-lg">
             <div className="overflow-y-auto">
-              <VersionSelector store={store} />
+              <VersionSelector lyricVersions={lyricVersions} store={store} />
             </div>
           </div>
 

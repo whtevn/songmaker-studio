@@ -36,6 +36,9 @@ const useSongInProgress = create((set, get) => ({
       }
     })
   },
+  getSortedLyricVersions: (sortBy = 'timestamp') => {
+    return get().lyricVersions.slice().sort((a, b) => b[sortBy] - a[sortBy]);
+  },
   setLyricVersion: (updatedVersion) => {
     set((state) => {
       const updatedVersions = state.lyricVersions.map((version) =>
