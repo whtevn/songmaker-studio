@@ -99,12 +99,16 @@ const VersionSelector = ({ lyricVersions, store }) => {
                     className={`text-sm flex items-center justify-between w-full p-2 rounded-md ${
                       confirmDeleteIndex === globalIndex ? "bg-slate-600" : ""
                     }`}
+                    onClick={() => {
+                      if (!confirmDeleteIndex && editingIndex === null) {
+                        setLyrics(version.lyrics);
+                      }
+                    }}
                   >
                     <div className="max-w-[200px] flex-shrink-0 items-center flex flex-row gap-2">
                       {lyrics === version.lyrics && <StarIcon className="h-4 w-4 text-yellow-500" />}
                       <span
                         className="truncate overflow-hidden text-ellipsis cursor-pointer text-small"
-                        onClick={() => setLyrics(version.lyrics)}
                       >
                         {version.name}
                       </span>
