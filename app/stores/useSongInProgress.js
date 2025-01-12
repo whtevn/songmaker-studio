@@ -23,14 +23,16 @@ const useSongInProgress = create((set, get) => ({
   key: { root: "C", mode: "Ionian" }, // Default key
   lyrics: "",
   lyricVersions: [],
+  lyricVersionTally: 0,
   addLyricVersion: (lyrics) => {
     const timestamp = Date.now();
     const id = generateUUID();
     return set((state) => {
-      const versionNumber = state.lyricVersions.length+1
-      const name = `Version #${versionNumber}`
+      const lyricVersionTally = state.lyricVersionTally+1
+      const name = `Version #${lyricVersionTally}`
       return {
-        lyricVersions: [...state.lyricVersions, {id, lyrics, timestamp, versionNumber, name}],
+        lyricVersionTally,
+        lyricVersions: [...state.lyricVersions, {id, lyrics, timestamp, versionNumber: lyricVersionTally, name}],
       }
     })
   },

@@ -7,11 +7,21 @@ import { Listbox, ListboxLabel, ListboxOption } from '~/components/catalyst-them
 import VersionSelector from '~/components/studio-layout/versionSelector'
 import Toast from "~/components/studio-layout/Toast";
 
+const placeholderText = `Tap here to write your lyrics 
+
+Use empty lines to separate sections
+
+You will arrange these lyrics into song sections in the Structure tab above
+
+Tap the camera icon below after writing some lyrics to save your progress or revisit a saved version`
+
+
 const CreateLyrics = ({ headerRef, store }) => {
   const { lyrics, setLyrics, lyricVersions, addLyricVersion, setLyricVersion} = store;
   const [showToast, setShowToast] = useState(false)
   const [textareaRows, setTextareaRows] = useState(5); // Initial row count
   const [lyricWriterOptionsOpen, setLyricWriterOptionsOpen] = useState(false); 
+  const [isFocused, setIsFocused] = useState(false); 
   const containerRef = useRef(null);
 
   const findVersion = (lyricVersions, lyrics) => {
@@ -44,6 +54,8 @@ const CreateLyrics = ({ headerRef, store }) => {
   };
 
   const handleFocus = () => {
+    setIsFocused(true)
+    setLyricWriterOptionsOpen(false)
     if (headerRef.current) {
       headerRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -69,25 +81,29 @@ const CreateLyrics = ({ headerRef, store }) => {
           value={lyrics}
           onChange={(e) => setLyrics(e.target.value)}
           onFocus={handleFocus}
-          placeholder="Write your lyrics here..."
+          onBlur={()=>setIsFocused(false)}
+          placeholder={isFocused ? '' : placeholderText}
           className="w-full resize-none"
           rows={textareaRows} // Dynamically calculated rows
         />
       </main>
-      <div className={`bg-gray-700 border border-gray-600 rounded-lg fixed bottom-10 right-16 lg:right-24 ${
-        lyricWriterOptionsOpen ? 'p-4 w-1/2' : '' 
-      }`}>
-        <button className={`p-4 text-gray-300 ${lyricWriterOptionsOpen ? "absolute right-0 top-0" : "" }`} onClick={lyricWriterOptionsOpen ? ()=>setLyricWriterOptionsOpen(false) : handleAddVersion} >
-          { lyricWriterOptionsOpen  
-            ? <XMarkIcon className='h-4 w-4 text-lg' />
-            : <CameraIcon className='h-4 w-4 text-lg' />
-          }
-        </button>
-        { lyricWriterOptionsOpen && 
-          <VersionSelector store={store}/>
-        }
-      </div>
-      <Toast show={showToast} setShow={setShowToast} wait={5} viewSnapshots={onViewSnapshotsClick} version={lyricVersions.length} />
+      { lyricWriterOptionsOpen
+        ?
+          <div className="fixed bottom-0 left-0 w-full bg-gray-700 border border-gray-600 
+             sm:w-auto sm:right-24 sm:bottom-12 sm:left-auto sm:rounded-md sm:shadow-lg">
+            <div className="overflow-y-auto">
+              <VersionSelector store={store} />
+            </div>
+          </div>
+
+        : 
+          <div className="bg-gray-700 border border-gray-600 rounded-lg fixed bottom-10 right-16 lg:right-24 p-2">
+            <button className="text-gray-300" onClick={handleAddVersion} >
+              <CameraIcon className='h-4 w-4 text-lg' />
+            </button>
+          </div>
+      }
+      <Toast show={showToast} setShow={setShowToast} wait={5} viewSnapshots={onViewSnapshotsClick} version={store.lyricVersionTally} />
     </div>
   );
 };
