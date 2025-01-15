@@ -55,6 +55,10 @@ const useSongInProgress = create((set, get) => ({
       lyricVersions: state.lyricVersions.filter((version) => version.id !== id),
     }));
   },
+  getLyricVersion: (id) => {
+    return get().lyricVersions.find((version) => version.id === id);
+  },
+
 
   sections: [
     {

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Fieldset, Field } from "~/components/catalyst-theme/fieldset";
-import { Input } from "~/components/catalyst-theme/input";
 import { Button } from "~/components/catalyst-theme/button";
 import {
   Pagination,
@@ -18,11 +17,18 @@ import {
 const ITEMS_PER_PAGE = 3;
 
 const VersionSelector = ({ lyricVersions, store }) => {
-  const { addVersion, lyrics, setLyrics, setLyricVersion, deleteLyricVersion } = store;
+  const {
+    addVersion,
+    lyrics,
+    setLyrics,
+    setLyricVersion,
+    getLyricVersion,
+    deleteLyricVersion,
+  } = store;
 
   const [currentPage, setCurrentPage] = useState(0);
-  const [editingIndex, setEditingIndex] = useState(null);
-  const [confirmDeleteIndex, setConfirmDeleteIndex] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [tempVersionName, setTempVersionName] = useState("");
 
   const paginatedVersions = lyricVersions.slice(
@@ -34,26 +40,26 @@ const VersionSelector = ({ lyricVersions, store }) => {
     addVersion(lyrics);
   };
 
-  const handleEdit = (index) => {
-    setEditingIndex(index);
-    setTempVersionName(lyricVersions[index].name);
+  const handleEdit = (id) => {
+    setEditingId(id);
+    const version = getLyricVersion(id);
+    setTempVersionName(version?.name || "");
   };
 
-  const handleSave = (index) => {
-    const updatedVersion = { ...lyricVersions[index], name: tempVersionName };
-    setLyricVersion(updatedVersion);
-    setEditingIndex(null);
+  const handleSave = (id) => {
+    setLyricVersion({ id, name: tempVersionName });
+    setEditingId(null);
     setTempVersionName("");
   };
 
   const handleCancel = () => {
-    setEditingIndex(null);
+    setEditingId(null);
     setTempVersionName("");
   };
 
   const handleDelete = (id) => {
     deleteLyricVersion(id);
-    setConfirmDeleteIndex(null);
+    setConfirmDeleteId(null);
   };
 
   const handleGotoNext = () => {
@@ -72,102 +78,122 @@ const VersionSelector = ({ lyricVersions, store }) => {
     <>
       <Fieldset>
         <Field>
-          {paginatedVersions.map((version, index) => {
-            const globalIndex = currentPage * ITEMS_PER_PAGE + index;
-
-            return (
-              <div key={version.id} className="flex items-center border-b border-slate-600">
-                {editingIndex === globalIndex ? (
-                  <div className="p-2 flex items-center justify-between w-full">
-                    <Field className="w-full mr-2">
-                      <Input
-                        value={tempVersionName}
-                        onChange={(e) => setTempVersionName(e.target.value)}
-                      />
-                    </Field>
-                    <div className="flex items-center gap-2">
-                      <Button onClick={() => handleSave(globalIndex)} className="cursor-pointer">
-                        <CheckIcon className="h-5 w-5" />
-                      </Button>
-                      <Button onClick={handleCancel} className="cursor-pointer">
-                        <XMarkIcon className="h-5 w-5" />
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    className={`text-sm flex items-center justify-between w-full p-2 rounded-md ${
-                      confirmDeleteIndex === globalIndex ? "bg-slate-600" : ""
-                    }`}
-                    onClick={() => {
-                      if (!confirmDeleteIndex && editingIndex === null) {
-                        setLyrics(version.lyrics);
-                      }
-                    }}
-                  >
-                    <div className="max-w-[200px] flex-shrink-0 items-center flex flex-row gap-2">
-                      {lyrics === version.lyrics && <StarIcon className="h-4 w-4 text-yellow-500" />}
-                      <span
-                        className="truncate overflow-hidden text-ellipsis cursor-pointer text-small"
-                      >
-                        {version.name}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {confirmDeleteIndex !== globalIndex && (
-                        <Button plain onClick={() => handleEdit(globalIndex)} className="cursor-pointer">
-                          <PencilSquareIcon className="h-4 w-4 text-gray-500" />
-                        </Button>
-                      )}
-                      {confirmDeleteIndex === globalIndex ? (
-                        <div className="flex items-center gap-2">
-                          <Button
-                            color="blue"
-                            onClick={() => setConfirmDeleteIndex(null)}
-                            className="cursor-pointer"
-                          >
-                            <XMarkIcon className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            color="red"
-                            onClick={() => handleDelete(version.id)}
-                            className="cursor-pointer"
-                          >
-                            <TrashIcon className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button
-                          plain
-                          onClick={() => setConfirmDeleteIndex(globalIndex)}
-                          className="cursor-pointer"
-                        >
-                          <TrashIcon className="h-4 w-4 text-red-500" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {paginatedVersions.map((version) => (
+            <VersionItem
+              key={version.id}
+              version={version}
+              editingId={editingId}
+              confirmDeleteId={confirmDeleteId}
+              store={store}
+              tempVersionName={tempVersionName}
+              setTempVersionName={setTempVersionName}
+              handleEdit={handleEdit}
+              handleSave={handleSave}
+              handleCancel={handleCancel}
+              handleDelete={handleDelete}
+              setConfirmDeleteId={setConfirmDeleteId}
+            />
+          ))}
         </Field>
       </Fieldset>
 
       {lyricVersions.length > ITEMS_PER_PAGE && (
         <Pagination className="mt-4 flex justify-center">
-          <PaginationPrevious onClick={handleGotoPrevious} disabled={currentPage === 0}>
+          <PaginationPrevious
+            onClick={handleGotoPrevious}
+            disabled={currentPage === 0}
+          >
             Previous
           </PaginationPrevious>
           <PaginationNext
             onClick={handleGotoNext}
+            disabled={(currentPage + 1) * ITEMS_PER_PAGE >= lyricVersions.length}
           >
             Next
           </PaginationNext>
         </Pagination>
       )}
     </>
+  );
+};
+
+const VersionItem = ({
+  version,
+  editingId,
+  confirmDeleteId,
+  store,
+  tempVersionName,
+  setTempVersionName,
+  handleEdit,
+  handleSave,
+  handleCancel,
+  handleDelete,
+  setConfirmDeleteId,
+}) => {
+  const { lyrics, setLyrics } = store;
+  const isEditing = editingId === version.id;
+  const isConfirmingDelete = confirmDeleteId === version.id;
+  const isCurrent = lyrics === version.lyrics;
+
+  return (
+    <div className="flex items-center border-b border-slate-600">
+      <div
+        className={`flex items-center justify-between w-full gap-2 p-2 ${
+          isConfirmingDelete ? "bg-slate-600" : ""
+        }`}
+       >
+        <div
+          className="flex-grow flex items-center gap-2 cursor-pointer min-w-[200px]"
+          onClick={() => !isEditing && !isConfirmingDelete && setLyrics(version.lyrics)}
+        >
+          <div className="w-4 h-4 flex items-center justify-center">
+            {isCurrent && <StarIcon className="h-4 w-4 text-yellow-500" />}
+          </div>
+          {!isEditing ? (
+            <span className="truncate p-1">{version.name}</span>
+          ) : (
+            <input
+              value={tempVersionName}
+              onChange={(e) => setTempVersionName(e.target.value)}
+              className="bg-gray-700 border border-slate-500 rounded-md p-1 text-white"
+            />
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {isEditing ? (
+            <>
+              <Button onClick={handleCancel}>
+                <XMarkIcon className="h-4 w-4" />
+              </Button>
+              <Button onClick={() => handleSave(version.id)} color="blue">
+                <CheckIcon className="h-4 w-4" />
+              </Button>
+            </>
+          ) : isConfirmingDelete ? (
+            <>
+              <Button onClick={() => setConfirmDeleteId(null)} color="blue">
+                <XMarkIcon className="h-4 w-4" />
+              </Button>
+              <Button onClick={() => handleDelete(version.id)} color="red">
+                <TrashIcon className="h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button plain onClick={() => handleEdit(version.id)}>
+                <PencilSquareIcon className="h-4 w-4" />
+              </Button>
+              <Button
+                plain
+                onClick={() => setConfirmDeleteId(version.id)}
+              >
+                <TrashIcon className="h-4 w-4" />
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

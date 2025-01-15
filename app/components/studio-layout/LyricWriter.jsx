@@ -56,6 +56,7 @@ const CreateLyrics = ({ headerRef, store }) => {
 
   const handleFocus = () => {
     setIsFocused(true)
+    setShowToast(false)
     setLyricWriterOptionsOpen(false)
     if (headerRef.current) {
       headerRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
