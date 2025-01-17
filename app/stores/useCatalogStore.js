@@ -54,14 +54,16 @@ const useStore = create((set, get) => ({
         { ...fragment, localId: nanoid() },
       ],
     })),
-  updateLyricFragment: (id, updatedFragment) =>
-    set((state) => ({
+  updateLyricFragment: (updatedFragment) => {
+    const id = updatedFragment.id || updatedFragment.localId
+    return set((state) => ({
       lyricFragments: state.lyricFragments.map((fragment) =>
         fragment.id === id || fragment.localId === id
           ? { ...fragment, ...updatedFragment }
           : fragment
       ),
-    })),
+    }))
+  },
   deleteLyricFragment: (id) =>
     set((state) => ({
       lyricFragments: state.lyricFragments.filter(

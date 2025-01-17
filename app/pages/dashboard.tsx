@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "~/components/catalyst-theme/table";
 import DashboardSection from "~/components/studio-layout/dashboardSection";
@@ -10,8 +10,9 @@ import catalogStore from "~/stores/useCatalogStore";
 
 export function Dashboard() {
   const navigate = useNavigate();
+  const [currentLyricFragment, setCurrentLyricFragment] = useState(null);
   const { openModal, activeModal, closeModal } = useModal();
-  const { songs, albums, lyricFragments, addSong, addAlbum, addLyricFragment } = catalogStore();
+  const { songs, albums, lyricFragments, addSong, addAlbum, addLyricFragment, updateLyricFragment } = catalogStore();
 
   const handleCreateSong = (newSong) => {
     console.log({ newSong })
@@ -20,14 +21,19 @@ export function Dashboard() {
   };
 
   const handleCreateAlbum = (newAlbum) => {
-console.log("album")
     addAlbum(newAlbum);
     closeModal();
   };
 
   const handleCreateLyricFragment = (newFragment) => {
-console.log("lyric")
+console.log({ newFragment })
     addLyricFragment(newFragment);
+    closeModal();
+  };
+
+  const handleUpdateLyricFragment = (updatedFragment) => {
+console.log({ updatedFragment })
+    updateLyricFragment(updatedFragment);
     closeModal();
   };
 
@@ -89,21 +95,37 @@ console.log("lyric")
 
       </DashboardSection>
       {/* Lyric Bank Section */}
-      <DashboardSection title="Lyric Bank" onAdd={() => openModal("newLyricFragment")}>
+      <DashboardSection title="Lyric Bank" onAdd={() => {
+        setCurrentLyricFragment(null)
+        openModal("newLyricFragment")
+      }}>
         <Table>
           <TableHead>
             <TableRow>
               <TableHeader>Lines</TableHeader>
+              <TableHeader className="w-[120px]"></TableHeader> {/* Adjust header width */}
             </TableRow>
           </TableHead>
           <TableBody>
             {lyricFragments.map((fragment) => (
               <TableRow key={fragment.localId || fragment.id}>
                 <TableCell className="font-medium pre-wrap">{fragment.lines}</TableCell>
+                <TableCell className="text-right">
+                  <button
+                    className="text-blue-500 hover:underline text-sm"
+                    onClick={() => {
+setCurrentLyricFragment(fragment)
+openModal("newLyricFragment")
+                    }} // Replace with your edit handler
+                  >
+                    Edit
+                  </button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+
       </DashboardSection>
 
 
@@ -115,7 +137,7 @@ console.log("lyric")
         <NewAlbumDialog isOpen onClose={closeModal} onSave={handleCreateAlbum} />
       )}
       {activeModal === "newLyricFragment" && (
-        <NewLyricFragmentDialog isOpen onClose={closeModal} onSave={handleCreateLyricFragment} />
+        <NewLyricFragmentDialog isOpen onClose={closeModal} onSave={currentLyricFragment ? handleUpdateLyricFragment : handleCreateLyricFragment} lyric={currentLyricFragment} />
       )}
     </div>
   );

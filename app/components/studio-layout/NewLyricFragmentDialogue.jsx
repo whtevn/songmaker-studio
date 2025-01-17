@@ -10,8 +10,9 @@ import { Textarea } from "~/components/catalyst-theme/textarea";
 import { Button } from "~/components/catalyst-theme/button";
 import useCatalogStore from "~/stores/useCatalogStore";
 
-const NewSongDialog = ({ isOpen, onClose, onSave }) => {
-  const [lines, setLines] = useState("");
+const NewSongDialog = ({ isOpen, onClose, onSave, lyric }) => {
+  console.log(lyric)
+  const [lines, setLines] = useState(lyric ? lyric.lines : "");
   const [error, setError] = useState(null);
 
   const handleSave = () => {
@@ -21,6 +22,8 @@ const NewSongDialog = ({ isOpen, onClose, onSave }) => {
     }
 
     onSave({
+      id: lyric?.id,
+      localId: lyric?.localId,
       lines
     });
 
