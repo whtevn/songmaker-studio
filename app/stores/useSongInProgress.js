@@ -24,6 +24,9 @@ const useSongInProgress = create((set, get) => ({
   lyrics: "",
   lyricVersions: [],
   lyricVersionTally: 0,
+  selectedScale: null,
+  setSelectedScale: (scale) => set({ selectedScale: scale }),
+  clearSelectedScale: () => set({ selectedScale: null }),
   addLyricVersion: (lyrics) => {
     const timestamp = Date.now();
     const id = generateUUID();

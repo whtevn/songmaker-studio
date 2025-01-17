@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import useStore from "~/stores/useSongStore"; // Adjust the path as needed
+import useStore from "~/stores/useSongInProgress"; // Adjust the path as needed
 import ScaleRender from "~/components/studio/ScaleRender";
 import PlayScale from "~/components/studio/PlayScale";
 import { Heading } from "~/components/catalyst-theme/heading";
@@ -11,6 +11,7 @@ const ScalesList = ({ scales }) => {
   const chosenScaleRef = useRef(null);
 
   const handleChooseScale = (scale) => {
+    console.log(scale)
     setSelectedScale(scale);
     if (chosenScaleRef.current) {
       chosenScaleRef.current.scrollIntoView({ behavior: "smooth", block: "start" });

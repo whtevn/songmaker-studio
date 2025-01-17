@@ -1,6 +1,6 @@
 import Navbar  from '~/components/studio-layout/navbar'
-import { SidebarLayout } from '~/components/catalyst-theme/sidebar-layout'
-import SmsSidebar from '~/components/studio-layout/SmsSidebar'
+import { StackedLayout } from '~/components/catalyst-theme/stacked-layout'
+import Sidebar from '~/components/studio-layout/SmsSidebar'
 import SignInDialog from '~/components/studio-layout/SignInDialogue';
 import SignUpDialog from '~/components/studio-layout/SignUpDialogue';
 import ForgotPasswordDialog from '~/components/studio-layout/ForgotPasswordDialogue';
@@ -13,9 +13,9 @@ export function Page({ children }: { children: React.ReactNode }) {
   const { activeModal, closeModal, activeModalOptions } = modal
 
   return (
-      <SidebarLayout
-        sidebar={<SmsSidebar />}
+      <StackedLayout
         navbar={<Navbar />}
+        sidebar={<Sidebar />}
       >
         {children}
 
@@ -25,7 +25,7 @@ export function Page({ children }: { children: React.ReactNode }) {
         {activeModal === 'forgotPassword' && <ForgotPasswordDialog isOpen onClose={closeModal} />}
         {activeModal === 'showSectionDetails' && <SectionDetailsDialog isOpen onClose={closeModal} section={activeModalOptions} />}
         {/* Add other modals as needed */}
-      </SidebarLayout>
+      </StackedLayout>
   );
 }
 

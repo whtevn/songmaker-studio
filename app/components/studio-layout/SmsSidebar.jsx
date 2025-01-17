@@ -19,10 +19,9 @@ function SmsSidebar() {
           </Link>
         </div>
         <SidebarSection>
-          { /* <SidebarItem current={ location.pathname === "/" } href="/">Dashboard</SidebarItem> */ }
-          <SidebarItem current={ location.pathname === "/key/find" } href="/key/find">Find a Key</SidebarItem>
+          <SidebarItem current={ location.pathname === "/" } href="/">Dashboard</SidebarItem>
           <SidebarItem current={ location.pathname === "/song/layout" } href="/song/layout">Write a Song</SidebarItem>
-          { <SidebarItem current={ location.pathname === "/lyrics/new" } href="/lyrics/new">Lyric Bank</SidebarItem> }
+          <SidebarItem current={ location.pathname === "/key/find" } href="/key/find">Find a Key</SidebarItem>
         </SidebarSection>
       </SidebarBody>
       <SidebarFooter>
