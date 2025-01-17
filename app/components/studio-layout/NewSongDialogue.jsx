@@ -14,15 +14,13 @@ import DragAndDropUploader from "~/components/studio-layout/DragAndDropUploader"
 
 const songStatuses = ["Writing", "Recording", "Recorded", "Released"];
 
-const NewSongDialog = ({ isOpen, onClose, onSave, albums }) => {
-  const [image, setImage] = useState(null);
-  const [title, setTitle] = useState("");
-  const [status, setStatus] = useState(songStatuses[0]); // Default to first status
-  const [selectedAlbum, setSelectedAlbum] = useState("none");
+const NewSongDialog = ({ isOpen, onClose, onSave, albums, song }) => {
+  const [image, setImage] = useState(song?.image);
+  const [title, setTitle] = useState(song?.title || "");
+  const [status, setStatus] = useState(song?.status || songStatuses[0]); // Default to first status
+  const [selectedAlbum, setSelectedAlbum] = useState(song?.album || "none");
   const [customAlbumName, setCustomAlbumName] = useState("");
   const [error, setError] = useState(null);
-
-  const { addAlbum } = useCatalogStore();
 
   const handleSave = () => {
     if (!title.trim()) {

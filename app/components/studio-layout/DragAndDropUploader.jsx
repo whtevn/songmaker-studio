@@ -2,9 +2,9 @@ import React, { useState, useRef } from "react";
 import { XMarkIcon } from "@heroicons/react/16/solid";
 import { Input } from "~/components/catalyst-theme/input";
 
-const DragAndDropUploader = ({ onFileChange, acceptedFileTypes = "image/*" }) => {
-  const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState(null);
+const DragAndDropUploader = ({ onFileChange, acceptedFileTypes = "image/*", defaultFile }) => {
+  const [file, setFile] = useState(defaultFile);
+  const [preview, setPreview] = useState(defaultFile);
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {

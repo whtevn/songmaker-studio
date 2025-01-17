@@ -11,14 +11,16 @@ const useStore = create((set, get) => ({
     set((state) => ({
       songs: [...state.songs, { ...song, localId: nanoid() }],
     })),
-  updateSong: (id, updatedSong) =>
-    set((state) => ({
+  updateSong: (updatedSong) => {
+    const id = updatedAlbum.id || updatedAlbum.localId
+    return set((state) => ({
       songs: state.songs.map((song) =>
         song.id === id || song.localId === id
           ? { ...song, ...updatedSong }
           : song
       ),
-    })),
+    }))
+  },
   deleteSong: (id) =>
     set((state) => ({
       songs: state.songs.filter(
@@ -31,14 +33,16 @@ const useStore = create((set, get) => ({
     set((state) => ({
       albums: [...state.albums, { ...album, localId: nanoid() }],
     })),
-  updateAlbum: (id, updatedAlbum) =>
-    set((state) => ({
+  updateAlbum: (updatedAlbum) => {
+    const id = updatedAlbum.id || updatedAlbum.localId
+    return set((state) => ({
       albums: state.albums.map((album) =>
         album.id === id || album.localId === id
           ? { ...album, ...updatedAlbum }
           : album
       ),
-    })),
+    }))
+  },
   deleteAlbum: (id) =>
     set((state) => ({
       albums: state.albums.filter(

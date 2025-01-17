@@ -12,10 +12,10 @@ import DragAndDropUploader from "~/components/studio-layout/DragAndDropUploader"
 
 const albumStatuses = ["Writing", "Recording", "Recorded", "Released"];
 
-const NewAlbumDialog = ({ isOpen, onClose, onSave }) => {
-  const [title, setTitle] = useState("");
-  const [status, setStatus] = useState(albumStatuses[0]);
-  const [image, setImage] = useState(null);
+const NewAlbumDialog = ({ isOpen, onClose, onSave, album }) => {
+  const [title, setTitle] = useState(album?.title || "");
+  const [status, setStatus] = useState(album?.status || albumStatuses[0]);
+  const [image, setImage] = useState(album?.image);
   const [error, setError] = useState(null);
 
   const handleSave = () => {
@@ -63,7 +63,7 @@ const NewAlbumDialog = ({ isOpen, onClose, onSave }) => {
           </Field>
           <Field className="w-full">
             <Label>Album Image</Label>
-            <DragAndDropUploader onFileChange={setImage} />
+            <DragAndDropUploader defaultFile={image} onFileChange={setImage} />
           </Field>
         </Fieldset>
       </DialogBody>
