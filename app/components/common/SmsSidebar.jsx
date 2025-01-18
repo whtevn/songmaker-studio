@@ -1,6 +1,5 @@
 import { Link } from '~/components/catalyst-theme/link'
 import { Sidebar, SidebarFooter, SidebarBody, SidebarSection, SidebarItem } from '~/components/catalyst-theme/sidebar'
-import Logo from '~/components/common/SmsLogo'
 import AccountDropdown from '~/components/common/AccountDropdown'
 import {
   UserIcon,
@@ -13,11 +12,6 @@ function SmsSidebar() {
   return (
     <Sidebar>
       <SidebarBody>
-        <div className="mb-2 flex">
-          <Link href="#" aria-label="Home">
-            <Logo />
-          </Link>
-        </div>
         <SidebarSection>
           <SidebarItem current={ location.pathname === "/" } href="/">Dashboard</SidebarItem>
           <SidebarItem current={ location.pathname === "/song/layout" } href="/song/layout">Write a Song</SidebarItem>

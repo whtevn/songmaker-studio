@@ -15,9 +15,6 @@ export default function SmsNavbar() {
   return (
     <>
       <Navbar>
-        <Link href="/" aria-label="Home" className="w-auto">
-          <Logo />
-        </Link>
         <NavbarSection className="invisible collapse md:visible">
           <NavbarItem current={ location.pathname === "/" } href="/">Catalog</NavbarItem>
           <NavbarItem current={ location.pathname === "/song/layout" } href="/song/layout">Write</NavbarItem>
