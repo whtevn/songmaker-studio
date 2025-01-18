@@ -5,7 +5,7 @@ import { BoltIcon, CameraIcon, XMarkIcon } from "@heroicons/react/16/solid";
 import { Fieldset, Field, Label } from '~/components/catalyst-theme/fieldset'
 import { Listbox, ListboxLabel, ListboxOption } from '~/components/catalyst-theme/listbox'
 import VersionSelector from '~/components/studio-layout/versionSelector'
-import Toast from "~/components/studio-layout/Toast";
+import Toast from "~/components/common/Toast";
 
 const placeholderText = `Tap here to write your lyrics 
 

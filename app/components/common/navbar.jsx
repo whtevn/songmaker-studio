@@ -3,9 +3,8 @@ import { Link } from '~/components/catalyst-theme/link'
 import { Avatar } from '~/components/catalyst-theme/avatar'
 import { Dropdown, DropdownDivider, DropdownItem, DropdownLabel, DropdownMenu, DropdownButton } from '~/components/catalyst-theme/dropdown'
 import { Navbar, NavbarItem, NavbarSection, NavbarSpacer } from '~/components/catalyst-theme/navbar'
-import Logo from '~/components/studio-layout/SmsLogo';
-import AccountDropdown from '~/components/studio-layout/AccountDropdown';
-import SignInDialog from '~/components/studio-layout/SignInDialogue';
+import Logo from '~/components/common/SmsLogo';
+import AccountDropdown from '~/components/common/AccountDropdown';
 import {
   UserIcon,
 } from '@heroicons/react/16/solid';

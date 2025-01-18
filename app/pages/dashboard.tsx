@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "~/components/catalyst-theme/table";
-import DashboardSection from "~/components/studio-layout/dashboardSection";
-import NewSongDialog from "~/components/studio-layout/NewSongDialogue";
-import NewAlbumDialog from "~/components/studio-layout/NewAlbumDialogue";
-import NewLyricFragmentDialog from "~/components/studio-layout/NewLyricFragmentDialogue";
+import DashboardSection from "~/components/common/cardSection";
+import NewSongDialog from "~/components/studio-layout/Dashboard/SongDialog";
+import NewAlbumDialog from "~/components/studio-layout/Dashboard/AlbumDialog";
+import NewLyricFragmentDialog from "~/components/studio-layout/Dashboard/SongPromptDialog";
 import { useModal } from "~/context/ModalContext";
 import catalogStore from "~/stores/useCatalogStore";
 import { PlusCircleIcon } from '@heroicons/react/16/solid';

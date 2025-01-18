@@ -10,7 +10,7 @@ import { Button } from "~/components/catalyst-theme/button";
 import { Dropdown, DropdownButton, DropdownMenu, DropdownItem } from "~/components/catalyst-theme/dropdown";
 import { XMarkIcon } from "@heroicons/react/16/solid";
 import useCatalogStore from "~/stores/useCatalogStore";
-import DragAndDropUploader from "~/components/studio-layout/DragAndDropUploader";
+import DragAndDropUploader from "~/components/common/DragAndDropUploader";
 
 const songStatuses = ["Writing", "Recording", "Recorded", "Released"];
 

@@ -8,7 +8,7 @@ import { Fieldset, Field, Label } from "~/components/catalyst-theme/fieldset";
 import { Input } from "~/components/catalyst-theme/input";
 import { Button } from "~/components/catalyst-theme/button";
 import { Dropdown, DropdownButton, DropdownMenu, DropdownItem } from "~/components/catalyst-theme/dropdown";
-import DragAndDropUploader from "~/components/studio-layout/DragAndDropUploader";
+import DragAndDropUploader from "~/components/common/DragAndDropUploader";
 
 const albumStatuses = ["Writing", "Recording", "Recorded", "Released"];
 

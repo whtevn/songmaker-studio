@@ -1,7 +1,7 @@
 import scaleFinder from "~/utils/scales";
 import React, { useState, useCallback, useEffect } from "react";
 import Keyboard from "~/components/studio/Keyboard";
-import PillSelector from "~/components/studio-layout/PillSelector";
+import PillSelector from "~/components/common/PillSelector";
 import ScalesList from "~/components/studio/ScalesList";
 import { Divider } from '~/components/catalyst-theme/divider'
 import { Heading } from '~/components/catalyst-theme/heading'

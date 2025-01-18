@@ -1,16 +1,19 @@
 import React, { useState, useRef } from "react";
-import SongSectionEditor from "~/components/studio-layout/SongSectionEditor";
+import SongSectionEditor from "~/components/studio-layout/SongWizard/SongSectionEditor";
 import SongChartBuilder from "~/components/studio-layout/SongChartBuilder";
-import LyricWriter from "~/components/studio-layout/LyricWriter";
-import Toast from "~/components/studio-layout/Toast";
+import LyricWriter from "~/components/studio-layout/SongWizard/LyricWriter";
 import useSongInProgress from "~/stores/useSongInProgress";
 import { Button } from "~/components/catalyst-theme/button";
 import { Heading } from "~/components/catalyst-theme/heading";
 import { Input } from "~/components/catalyst-theme/input";
 import { PencilSquareIcon, XMarkIcon, CheckIcon, BoltIcon } from "@heroicons/react/16/solid";
+import SectionDetailsDialog from '~/components/studio-layout/SectionDetailsDialogue';
+import { useModal } from '~/context/ModalContext';
 
 
 export function SongWizard() {
+  const modal = useModal();
+  const { activeModal, closeModal, activeModalOptions } = modal
   const store = useSongInProgress();
   const tabs = [
     { id: "lyrics", label: "Lyrics" },
@@ -99,6 +102,7 @@ export function SongWizard() {
        activeTab === "music" &&
         <SongChartBuilder store={ store } />
       }
+      {activeModal === 'showSectionDetails' && <SectionDetailsDialog isOpen onClose={closeModal} section={activeModalOptions} />}
   </>
   );
 }

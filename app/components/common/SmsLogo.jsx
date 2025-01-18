@@ -1,5 +1,5 @@
 import { Heading } from '~/components/catalyst-theme/heading'
-import LogoIcon from '~/components/studio-layout/LogoIcon'
+import LogoIcon from '~/components/common/LogoIcon'
 function Logo() {
   return (
     <div className="flex items-center flex-row gap-2">

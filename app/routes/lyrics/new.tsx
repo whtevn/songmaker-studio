@@ -1,6 +1,6 @@
 import type { Route } from "./+types/home";
 import LyricWizard from "~/pages/lyricWizard";
-import Page from '~/components/studio-layout/page';
+import Page from '~/components/common/page';
 
 export function meta({}: Route.MetaArgs) {
   return [

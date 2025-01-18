@@ -1,7 +1,7 @@
 import { Link } from '~/components/catalyst-theme/link'
 import { Sidebar, SidebarFooter, SidebarBody, SidebarSection, SidebarItem } from '~/components/catalyst-theme/sidebar'
-import Logo from '~/components/studio-layout/SmsLogo'
-import AccountDropdown from '~/components/studio-layout/AccountDropdown'
+import Logo from '~/components/common/SmsLogo'
+import AccountDropdown from '~/components/common/AccountDropdown'
 import {
   UserIcon,
 } from '@heroicons/react/16/solid';

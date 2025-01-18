@@ -1,10 +1,9 @@
-import Navbar  from '~/components/studio-layout/navbar'
+import Navbar  from '~/components/common/navbar'
 import { StackedLayout } from '~/components/catalyst-theme/stacked-layout'
-import Sidebar from '~/components/studio-layout/SmsSidebar'
-import SignInDialog from '~/components/studio-layout/SignInDialogue';
-import SignUpDialog from '~/components/studio-layout/SignUpDialogue';
-import ForgotPasswordDialog from '~/components/studio-layout/ForgotPasswordDialogue';
-import SectionDetailsDialog from '~/components/studio-layout/SectionDetailsDialogue';
+import Sidebar from '~/components/common/SmsSidebar'
+import SignInDialog from '~/components/common/SignInDialog';
+import SignUpDialog from '~/components/common/SignUpDialog';
+import ForgotPasswordDialog from '~/components/common/ForgotPasswordDialog';
 import { useModal } from '~/context/ModalContext';
 
 
@@ -23,7 +22,6 @@ export function Page({ children }: { children: React.ReactNode }) {
         {activeModal === 'signIn' && <SignInDialog isOpen onClose={closeModal} />}
         {activeModal === 'signUp' && <SignUpDialog isOpen onClose={closeModal} />}
         {activeModal === 'forgotPassword' && <ForgotPasswordDialog isOpen onClose={closeModal} />}
-        {activeModal === 'showSectionDetails' && <SectionDetailsDialog isOpen onClose={closeModal} section={activeModalOptions} />}
         {/* Add other modals as needed */}
       </StackedLayout>
   );

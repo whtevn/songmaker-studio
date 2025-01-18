@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import PillSelector from "~/components/studio-layout/PillSelector";
-import SortableCards from "~/components/studio-layout/SortableCards";
+import PillSelector from "~/components/common/PillSelector";
+import SortableCards from "~/components/common/SortableCards";
 import { Heading } from "~/components/catalyst-theme/heading";
 import { Badge } from "~/components/catalyst-theme/badge";
 import { Divider } from "~/components/catalyst-theme/divider";

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import SummarizableSection from "~/components/studio-layout/SummarizableSection";
+import SummarizableSection from "~/components/common/SummarizableSection";
 import SongTimeline from "~/components/studio/SongTimeline";
-import LyricDisplay from "~/components/studio-layout/LyricDisplay";
+import LyricDisplay from "~/components/studio-layout/SongWizard/LyricDisplay";
 import { Input } from "~/components/catalyst-theme/input";
 import { Button } from "~/components/catalyst-theme/button";
 import { DropdownMenu, DropdownItem } from "~/components/catalyst-theme/dropdown";
