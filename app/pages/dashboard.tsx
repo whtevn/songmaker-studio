@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "~/components/catalyst-theme/table";
 import DashboardSection from "~/components/common/cardSection";
-import SongPromptSection from "~/components/studio-layout/Dashboard/SongPromptSection";
+import SongPromptSection from "~/components/studio-layout/Dashboard/songPromptSection";
 import KeyFinderSection from "~/components/studio-layout/Dashboard/KeyFinderSection";
 import AlbumSection from "~/components/studio-layout/Dashboard/AlbumSection";
 import NewSongDialog from "~/components/studio-layout/Dashboard/SongDialog";
