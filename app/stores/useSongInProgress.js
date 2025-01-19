@@ -1,17 +1,11 @@
 import { create } from 'zustand';
 import ScaleFinder from '~/utils/scales'
+import { nanoid } from "nanoid";
 
-function generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
 
 function purifySection(section){
   const { id, measures } = section;
-  return { ...section, id: (id || generateUUID()), measures: (measures || 4) }
+  return { ...section, id: (id || nanoid()), measures: (measures || 4) }
 }
 
 const useSongInProgress = create((set, get) => ({
@@ -29,7 +23,7 @@ const useSongInProgress = create((set, get) => ({
   clearSelectedScale: () => set({ selectedScale: null }),
   addLyricVersion: (lyrics) => {
     const timestamp = Date.now();
-    const id = generateUUID();
+    const id = nanoid();
     return set((state) => {
       const lyricVersionTally = state.lyricVersionTally+1
       const name = `Version #${lyricVersionTally}`
@@ -65,13 +59,13 @@ const useSongInProgress = create((set, get) => ({
 
   sections: [
     {
-      id: generateUUID(),
+      id: nanoid(),
       type: "Intro",
       measures: 16,
       color: "pink",
     },
     {
-      id: generateUUID(),
+      id: nanoid(),
       type: "Outro",
       measures: 16, 
       color: "violet",
