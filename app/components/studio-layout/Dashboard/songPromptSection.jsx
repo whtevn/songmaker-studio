@@ -1,36 +1,32 @@
 import DashboardSection from "~/components/common/cardSection";
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "~/components/catalyst-theme/table";
+import { Text } from "~/components/catalyst-theme/text";
 import { PlusCircleIcon } from '@heroicons/react/16/solid';
 
 export default function SongPromptSection({onEdit, onAdd, prompts}){
   return (
-    <DashboardSection>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableHeader className="flex flex-row items-center gap-2 cursor-pointer" onClick={onAdd}>
-                <PlusCircleIcon className="h-4 w-4 cursor-pointer"  /><span>Song Prompts</span>
-              </TableHeader> 
-              <TableHeader className="w-[120px]"></TableHeader> 
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {prompts.map((fragment) => (
-              <TableRow key={fragment.localId || fragment.id}>
-                <TableCell className="font-medium pre-wrap">{fragment.lines}</TableCell>
-                <TableCell className="text-right">
-                  <button
-                    className="text-blue-500 hover:underline text-sm"
-                    onClick={onEdit} 
-                  >
-                    Edit
-                  </button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-
+    <DashboardSection
+      title="Song Prompts"
+      onAction={onAdd}
+      actionButton={<PlusCircleIcon className="h-4 w-4" />}
+    >
+      {prompts.length > 0
+        ? prompts.map((fragment) => (
+          <div className="flex flex-row items-center gap-2" key={fragment.localId || fragment.id}>
+            <Text>{fragment.lines}</Text>
+            <button
+              className="text-blue-500 hover:underline text-sm"
+              onClick={onEdit} 
+            >
+              Edit
+            </button>
+          </div>
+        ))
+        : <Text>
+            Add a song prompt here. If you have an idea for a song, or an idea for an idea for a song,
+            jot it down here and get to it later. 
+        </Text>
+      }
       </DashboardSection>
   )
 }

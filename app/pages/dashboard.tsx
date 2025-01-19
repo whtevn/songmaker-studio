@@ -59,9 +59,6 @@ export function Dashboard() {
         {/* Albums Section */}
         <AlbumSection
           store={store}
-          onUpdate={(album) => {
-            handleUpdateAlbum(album)
-          }}
           onAdd={() => {
             setCurrentAlbum(null)
             openModal("newAlbum")

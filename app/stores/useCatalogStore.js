@@ -1,28 +1,39 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
 
+export const WRITING = "writing"
+export const RECORDING = "recording"
+export const RECORDED = "recorded"
+export const RELEASED = "released"
+export const STATUS_SET = [
+  WRITING,
+  RECORDING,
+  RECORDED,
+  RELEASED
+]
+export const newSong = (song={}) => {
+  return ({
+    title: "Untitled Song",
+    status: WRITING,
+    ...song,
+    localId: nanoid(),
+  })
+}
 const defaultSongId = nanoid();
 const defaultAlbumId = nanoid();
 const useStore = create((set, get) => ({
-  songs: [
-    {
-      localId: defaultSongId,
-      title: "Untitled Song"
-    }
-  ],
+  songs: [ ],
   albums: [{
     localId: defaultAlbumId,
     title: "Untitled Album",
-    songs: [
-      { order: 0, songId: defaultSongId }
-    ]
+    songs: [ ]
   }],
   lyricFragments: [],
 
   // Songs CRUD
   addSong: (song) =>
     set((state) => ({
-      songs: [...state.songs, { ...song, localId: nanoid() }],
+      songs: [...state.songs, { localId: nanoid(), ...song }],
     })),
   updateSong: (updatedSong) => {
     const id = updatedAlbum.id || updatedAlbum.localId
@@ -55,6 +66,27 @@ const useStore = create((set, get) => ({
           : album
       ),
     }))
+  },
+  addSongToAlbum: ({ song, album }) => {
+    const state = get();
+
+    // Get current songs in the album or initialize as an empty array
+    const currentAlbum = state.albums.find((a) => a.id === album.id || a.localId === album.localId);
+    if (!currentAlbum) {
+      console.error("Album not found");
+      return;
+    }
+
+    const updatedSongs = [
+      ...(currentAlbum.songs || []), // Ensure songs array exists
+      { songId: song.id || song.localId, order: (currentAlbum.songs?.length || 0) }, // Add new song
+    ];
+
+    // Update the album with the new songs array
+    state.updateAlbum({
+      ...currentAlbum,
+      songs: updatedSongs,
+    });
   },
   deleteAlbum: (id) =>
     set((state) => ({
