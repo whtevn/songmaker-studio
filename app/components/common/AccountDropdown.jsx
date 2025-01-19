@@ -8,12 +8,10 @@ import {
 } from '@heroicons/react/16/solid';
 import { Dropdown, DropdownDivider, DropdownItem, DropdownLabel, DropdownMenu, DropdownButton } from '~/components/catalyst-theme/dropdown'
 import { Avatar } from '~/components/catalyst-theme/avatar'
-import { useModal } from '~/context/ModalContext';
 
 
 export default function AccountDropdown({ children }) {
   const [session, setSession] = useState(null);
-  const { openModal } = useModal();
 
 
   useEffect(() => {
@@ -65,9 +63,9 @@ export default function AccountDropdown({ children }) {
           </DropdownMenu>
         </Dropdown>
       ) : (
-        <nav onClick={() => openModal('signIn')}>
+        <>
           { children }
-        </nav>
+        </>
       )}
     </nav>
   );

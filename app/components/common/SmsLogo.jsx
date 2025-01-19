@@ -1,6 +1,6 @@
 import { Heading } from '~/components/catalyst-theme/heading'
 import LogoIcon from '~/components/common/LogoIcon'
-function Logo() {
+function Logo({ className }) {
   return (
     <div className="flex items-center flex-row gap-2">
       <LogoIcon className="h-4 w-4"/>

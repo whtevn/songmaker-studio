@@ -20,7 +20,7 @@ const PillSelector = ({ options, onSelectionChange, defaultSelection }) => {
   }, [selectedPills, onSelectionChange]);
 
   return (
-    <div>
+    <div className="flex justify-evenly flex-wrap">
       {options.map((pillLabel) => (
         <button
           key={pillLabel}

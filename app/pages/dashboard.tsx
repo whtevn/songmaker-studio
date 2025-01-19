@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "~/components/catalyst-theme/table";
 import DashboardSection from "~/components/common/cardSection";
 import SongPromptSection from "~/components/studio-layout/Dashboard/SongPromptSection";
+import KeyFinderSection from "~/components/studio-layout/Dashboard/KeyFinderSection";
 import AlbumSection from "~/components/studio-layout/Dashboard/AlbumSection";
 import NewSongDialog from "~/components/studio-layout/Dashboard/SongDialog";
 import NewAlbumDialog from "~/components/studio-layout/Dashboard/AlbumDialog";
@@ -17,7 +18,8 @@ export function Dashboard() {
   const [currentAlbum, setCurrentAlbum] = useState(null);
   const [currentLyricFragment, setCurrentLyricFragment] = useState(null);
   const { openModal, activeModal, closeModal } = useModal();
-  const { songs, albums, lyricFragments, addSong, updateSong, addAlbum, updateAlbum, addLyricFragment, updateLyricFragment } = catalogStore();
+  const store =  catalogStore();
+  const { songs, albums, lyricFragments, addSong, updateSong, addAlbum, updateAlbum, addLyricFragment, updateLyricFragment } =store;
 
   const handleCreateSong = (newSong) => {
     addSong(newSong);
@@ -51,37 +53,40 @@ export function Dashboard() {
   };
 
   return (
-    <div className="space-y-2">
+    <>
+      <div className="space-y-2">
 
-      {/* Albums Section */}
-      <AlbumSection
-        albums={albums}
-        onEdit={() => {
-          setCurrentAlbum(album)
-          openModal("newAlbum")
-        }}
-        onAdd={() => {
-          setCurrentAlbum(null)
-          openModal("newAlbum")
-        }}
-      />
-      {/* Lyric Bank Section */}
-      <SongPromptSection
-        prompts={lyricFragments}
-        onEdit={() => {
-          setCurrentLyricFragment(fragment)
-          openModal("newLyricFragment")
-        }}
-        onAdd={() => {
-          setCurrentLyricFragment(null)
-          openModal("newLyricFragment")
-        }}
-      />
+        {/* Albums Section */}
+        <AlbumSection
+          store={store}
+          onUpdate={(album) => {
+            handleUpdateAlbum(album)
+          }}
+          onAdd={() => {
+            setCurrentAlbum(null)
+            openModal("newAlbum")
+          }}
+        />
+        {/* Lyric Bank Section */}
+        <SongPromptSection
+          prompts={lyricFragments}
+          onEdit={() => {
+            setCurrentLyricFragment(fragment)
+            openModal("newLyricFragment")
+          }}
+          onAdd={() => {
+            setCurrentLyricFragment(null)
+            openModal("newLyricFragment")
+          }}
+        />
+        <KeyFinderSection />
 
 
+
+      </div>
       {/* Modals */}
       {activeModal === "newSong" && (
-        <NewSongDialog isOpen onClose={closeModal} onSave={currentSong ? handleUpdateSong : handleCreateSong} albums={[]} song={currentSong} />
+        <NewSongDialog isOpen onClose={closeModal} onSave={currentSong ? handleUpdateSong : handleCreateSong} albums={albums} song={currentSong} />
       )}
       {activeModal === "newAlbum" && (
         <NewAlbumDialog isOpen onClose={closeModal} onSave={currentAlbum ? handleUpdateAlbum : handleCreateAlbum } album={currentAlbum} />
@@ -89,7 +94,7 @@ export function Dashboard() {
       {activeModal === "newLyricFragment" && (
         <NewLyricFragmentDialog isOpen onClose={closeModal} onSave={currentLyricFragment ? handleUpdateLyricFragment : handleCreateLyricFragment} lyric={currentLyricFragment} />
       )}
-    </div>
+    </>
   );
 }
 

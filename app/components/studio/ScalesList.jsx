@@ -11,7 +11,6 @@ const ScalesList = ({ scales }) => {
   const chosenScaleRef = useRef(null);
 
   const handleChooseScale = (scale) => {
-    console.log(scale)
     setSelectedScale(scale);
     if (chosenScaleRef.current) {
       chosenScaleRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -23,8 +22,8 @@ const ScalesList = ({ scales }) => {
   };
 
   return (
-    <div className="list-disc pl-4">
-      {selectedScale && (
+    <div className="list-disc">
+      {selectedScale ? (
         <div ref={chosenScaleRef}>
           <Heading style={{ marginBottom: "8px" }}>Chosen Scale</Heading>
           <Heading style={{ marginBottom: "8px" }}>{selectedScale.name}</Heading>
@@ -61,9 +60,9 @@ const ScalesList = ({ scales }) => {
           </div>
           <Divider className="mb-6" />
         </div>
-      )}
+      )
 
-      {scales.map((scale, index) => (
+      : scales.map((scale, index) => (
         <div key={index} style={{ marginBottom: "16px" }}>
           <Heading style={{ marginBottom: "8px" }}>{scale.name}</Heading>
           <div

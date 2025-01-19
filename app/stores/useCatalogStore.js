@@ -1,9 +1,22 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
 
+const defaultSongId = nanoid();
+const defaultAlbumId = nanoid();
 const useStore = create((set, get) => ({
-  songs: [],
-  albums: [],
+  songs: [
+    {
+      localId: defaultSongId,
+      title: "Untitled Song"
+    }
+  ],
+  albums: [{
+    localId: defaultAlbumId,
+    title: "Untitled Album",
+    songs: [
+      { order: 0, songId: defaultSongId }
+    ]
+  }],
   lyricFragments: [],
 
   // Songs CRUD
@@ -49,6 +62,14 @@ const useStore = create((set, get) => ({
         (album) => album.id !== id && album.localId !== id
       ),
     })),
+  getAlbumSongs: (albumId) => {
+    const album = get().albums.find((a) => a.localId === albumId);
+    if (!album) return [];
+
+    return album.songs.map(({ songId }) => {
+      return get().songs.find((song) => song.localId === songId);
+    }).filter(Boolean); // Filter out null references
+  },
 
   // Lyric Fragments CRUD
   addLyricFragment: (fragment) =>
