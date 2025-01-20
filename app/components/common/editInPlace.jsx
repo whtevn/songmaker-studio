@@ -42,12 +42,12 @@ const EditInPlace = ({ children, value, onSave }) => {
           />
         </div>
       ) : (
-        <div className="flex items-center gap-2 w-full">
+        <div className="flex flex-row-reverse items-center gap-2 w-full">
           <PencilIcon
             className="h-5 w-5 text-gray-500 cursor-pointer"
             onClick={handleEdit} // Handle edit mode and set focus
           />
-          <span className="flex-grow">{children}</span>
+          <span className="flex-grow flex justify-end">{children}</span>
         </div>
       )}
     </div>

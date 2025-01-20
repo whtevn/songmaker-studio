@@ -11,7 +11,6 @@ import { Heading } from "~/components/catalyst-theme/heading";
 import { Divider } from "~/components/catalyst-theme/divider";
 import { Badge, BadgeButton } from "~/components/catalyst-theme/badge";
 import { PlusCircleIcon, PencilIcon } from '@heroicons/react/16/solid';
-import DefaultAlbumIcon from "~/components/studio-layout/Dashboard/defaultAlbumIcon";
 import EditInPlace from "~/components/common/editInPlace";
 
 export default function AlbumSection({onAdd, store}){
@@ -66,16 +65,18 @@ const AlbumSongSection = ({ album, store }) => {
   };
   return (
     <>
-      <div className="flex flex-row items-start gap-4 p-4">
-        <AlbumCoverEditor album={album} onUpdateImage={(image)=>{store.updateAlbum({...album, image})}} />
-        <div className="flex flex-col gap-4 grow">
+      <div className="flex flex-col sm:flex-row items-start gap-4 p-4">
+        <div className="w-full sm:w-auto pb-4 sm:pb-2 flex justify-start flex-row">
+          <AlbumCoverEditor album={album} onUpdateImage={(image)=>{store.updateAlbum({...album, image})}} />
+        </div>
+        <div className="w-full sm:w-auto flex flex-col gap-4 grow">
           <div className="flex flex-row grow items-center gap-2">
             <EditInPlace value={album.title} onSave={(title)=>updateAlbum({...album, title})} >
               <Heading>{album.title}</Heading>
             </EditInPlace>
           </div>
           <Divider />
-          <section className="ml-8" >
+          <section className="ml-0 sm:ml-8" >
             { songs.length > 0 
               ? songs.map((song) => <SongDisplay song={song} key={song.localId || song.id} />)
               :  addingSong || <Text>Add a song to start your album</Text> 
