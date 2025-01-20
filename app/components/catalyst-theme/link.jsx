@@ -9,10 +9,8 @@ export const Link = forwardRef(function Link({ onClick, href, ...props }, ref) {
       // Prevent default link behavior
       event.preventDefault();
 
-      // Push the new URL into the browser's history
-      window.history.pushState({}, "", href);
-
       navigate(href);
+      
       // Trigger custom navigation or SPA-specific logic if needed
       if (onClick) {
         onClick(event);
