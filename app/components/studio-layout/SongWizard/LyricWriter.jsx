@@ -16,9 +16,10 @@ You will arrange these lyrics into song sections in the Structure tab above
 Tap the camera icon below after writing some lyrics to save your progress or revisit a saved version`
 
 
-const CreateLyrics = ({ headerRef, store }) => {
-  const { lyrics, setLyrics, getSortedLyricVersions, addLyricVersion, setLyricVersion} = store;
-  const lyricVersions = getSortedLyricVersions()
+const CreateLyrics = ({ headerRef, song, updateSong, store }) => {
+  console.log(song)
+  const { lyrics, setLyrics, getSortedLyricVersions, addLyricVersion, setLyricVersion} = song;
+  const lyricVersions = song.getSortedLyricVersions()
   const [showToast, setShowToast] = useState(false)
   const [textareaRows, setTextareaRows] = useState(5); // Initial row count
   const [lyricWriterOptionsOpen, setLyricWriterOptionsOpen] = useState(false); 

@@ -1,77 +1,91 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useParams } from "react-router";
 import SongSectionEditor from "~/components/studio-layout/SongWizard/SongSectionEditor";
 import SongChartBuilder from "~/components/studio-layout/SongChartBuilder";
 import LyricWriter from "~/components/studio-layout/SongWizard/LyricWriter";
-import useSongInProgress from "~/stores/useSongInProgress";
 import { Button } from "~/components/catalyst-theme/button";
 import { Heading } from "~/components/catalyst-theme/heading";
 import { Input } from "~/components/catalyst-theme/input";
-import { PencilSquareIcon, XMarkIcon, CheckIcon, BoltIcon } from "@heroicons/react/16/solid";
-import SectionDetailsDialog from '~/components/studio-layout/SectionDetailsDialogue';
-import { useModal } from '~/context/ModalContext';
-
+import { PencilSquareIcon, XMarkIcon, CheckIcon } from "@heroicons/react/16/solid";
+import SectionDetailsDialog from "~/components/studio-layout/SectionDetailsDialogue";
+import { useModal } from "~/context/ModalContext";
+import useCatalogStore from "~/stores/useCatalogStore";
 
 export function SongWizard() {
+  const { id } = useParams(); // Retrieve song ID from the route
+  const catalogStore = useCatalogStore(); // Access the catalog store
   const modal = useModal();
-  const { activeModal, closeModal, activeModalOptions } = modal
-  const store = useSongInProgress();
+  const { activeModal, closeModal, activeModalOptions } = modal;
+  const store = useCatalogStore();
+
+  // Retrieve the song by ID from the catalog store
+  const originalSong = catalogStore.songs.find(
+    (song) => song.localId === id || song.id === id
+  );
+
+  const [song, setSong] = useState(originalSong || null); // Local state for editing
+
   const tabs = [
     { id: "lyrics", label: "Lyrics" },
     { id: "sections", label: "Structure" },
     { id: "music", label: "Phrasing" },
   ];
   const [activeTab, setActiveTab] = useState(tabs[0].id);
-
-  const renderActiveTabContent = (headerRef) => {
-    const active = tabs.find((tab) => tab.id === activeTab);
-    return active?.component || null;
-  };
-
-  const {
-    title,
-    setTitle,
-  } = store;
-
   const [isEditing, setIsEditing] = useState(false);
-  const [tempState, setTempState] = useState({ title });
-
-  const handleSave = () => {
-    setTitle(tempState.title);
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setTempState({ title });
-    setIsEditing(false);
-  };
+  const [tempTitle, setTempTitle] = useState(song?.title || "");
 
   const headerRef = useRef(null);
+
+  // Save updates back to the catalog store
+  const handleSave = () => {
+    catalogStore.updateSong({ ...song, title: tempTitle });
+    setSong((prev) => ({ ...prev, title: tempTitle }));
+    setIsEditing(false);
+  };
+
+  // Cancel editing
+  const handleCancel = () => {
+    setTempTitle(song?.title || "");
+    setIsEditing(false);
+  };
+
+  useEffect(() => {
+    if (!originalSong) {
+      console.error("Song not found in catalog");
+    }
+  }, [originalSong]);
+
+  if (!song) {
+    return <div>Loading song...</div>;
+  }
 
   return (
     <>
       <span ref={headerRef}>
-      {!isEditing ? (
-        <Heading className="border-gray-700 py-4">
-          <span className="text-ellipsis overflow-hidden">{title || "Untitled"}</span>
-          <Button plain onClick={() => setIsEditing(true)}>
-            <PencilSquareIcon className="h-6 w-6" />
-          </Button>
-        </Heading>
-      ) : (
-        <div className="flex flex-row py-4">
-          <Input
-            value={tempState.title}
-            onChange={(e) => setTempState({ ...tempState, title: e.target.value })}
-            placeholder="Enter title"
-          />
-          <Button plain onClick={handleCancel}>
-            <XMarkIcon className="h-6 w-6" />
-          </Button>
-          <Button plain onClick={handleSave}>
-            <CheckIcon className="h-6 w-6" />
-          </Button>
-        </div>
-      )}
+        {!isEditing ? (
+          <Heading className="border-gray-700 py-4">
+            <span className="text-ellipsis overflow-hidden">
+              {song.title || "Untitled"}
+            </span>
+            <Button plain onClick={() => setIsEditing(true)}>
+              <PencilSquareIcon className="h-6 w-6" />
+            </Button>
+          </Heading>
+        ) : (
+          <div className="flex flex-row py-4">
+            <Input
+              value={tempTitle}
+              onChange={(e) => setTempTitle(e.target.value)}
+              placeholder="Enter title"
+            />
+            <Button plain onClick={handleCancel}>
+              <XMarkIcon className="h-6 w-6" />
+            </Button>
+            <Button plain onClick={handleSave}>
+              <CheckIcon className="h-6 w-6" />
+            </Button>
+          </div>
+        )}
       </span>
       <div className="flex justify-end">
         {tabs.map((tab) => (
@@ -84,26 +98,33 @@ export function SongWizard() {
                 : "text-gray-600 hover:text-gray-400"
             }`}
           >
-          <div>
             {tab.label}
-          </div>
           </button>
         ))}
       </div>
-      {
-       activeTab === "lyrics" &&
-        <LyricWriter store={store} headerRef={headerRef}/>
-      }
-      {
-       activeTab === "sections" &&
-        <SongSectionEditor />
-      }
-      {
-       activeTab === "music" &&
-        <SongChartBuilder store={ store } />
-      }
-      {activeModal === 'showSectionDetails' && <SectionDetailsDialog isOpen onClose={closeModal} section={activeModalOptions} />}
-  </>
+      {activeTab === "lyrics" && (
+        <LyricWriter
+          store={store}
+          song={song} updateSong={setSong} // Pass the song and update function
+          headerRef={headerRef}
+        />
+      )}
+      {activeTab === "sections" && (
+        <SongSectionEditor
+          store={{ ...song, setSong }} // Pass the song and update function
+        />
+      )}
+      {activeTab === "music" && (
+        <SongChartBuilder store={{ ...song, setSong }} />
+      )}
+      {activeModal === "showSectionDetails" && (
+        <SectionDetailsDialog
+          isOpen
+          onClose={closeModal}
+          section={activeModalOptions}
+        />
+      )}
+    </>
   );
 }
 

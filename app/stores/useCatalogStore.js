@@ -1,25 +1,10 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
+import { Song, WRITING } from "~/stores/SongObject";
 import CrudBase from "~/stores/CrudBase"
+import { persist } from 'zustand/middleware'
 
-export const WRITING = "writing"
-export const RECORDING = "recording"
-export const RECORDED = "recorded"
-export const RELEASED = "released"
-export const STATUS_SET = [
-  WRITING,
-  RECORDING,
-  RECORDED,
-  RELEASED
-]
-export const newSong = (song={}) => {
-  return ({
-    title: "Untitled Song",
-    status: WRITING,
-    ...song,
-    localId: nanoid(),
-  })
-}
+
 export const newAlbum = (album={}) => {
   return ({
     title: "Untitled Album",
@@ -29,10 +14,38 @@ export const newAlbum = (album={}) => {
     localId: nanoid(),
   })
 }
-const useStore = create((set, get) => ({
-  ...CrudBase("songs")(set, get),
+const useStore = create(persist((set, get) => ({
   ...CrudBase("albums", [newAlbum()])(set, get),
   ...CrudBase("prompts")(set, get),
+  songs: [],
+
+  // Add a new song
+  addSong: (songData) =>{
+    const song = new Song(songData)
+    return set((state) => ({
+      songs: [...state.songs, song],
+    }))
+  },
+
+  // Update an existing song
+  updateSong: (updatedSong) => {
+    const id = updatedSong.id || updatedSong.localId;
+    set((state) => ({
+      songs: state.songs.map((song) =>
+        song.id === id || song.localId === id
+          ? { ...song, ...updatedSong }
+          : song
+      ),
+    }));
+  },
+
+  // Delete a song
+  deleteSong: (id) =>
+    set((state) => ({
+      songs: state.songs.filter(
+        (song) => song.id !== id && song.localId !== id
+      ),
+    })),
   getAlbumSongs: (albumId) => {
     const album = get().albums.find((a) => a.localId === albumId);
     if (!album) return [];
@@ -62,7 +75,7 @@ const useStore = create((set, get) => ({
       songs: updatedSongs,
     });
   },
-}));
+})), { name: "artistCatalogStore" });
 
 export default useStore;
 

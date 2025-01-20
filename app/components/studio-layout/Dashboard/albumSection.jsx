@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { STATUS_SET, WRITING, newSong } from '~/stores/useCatalogStore';
+import { STATUS_SET, WRITING, Song } from '~/stores/SongObject';
 import DashboardSection from "~/components/common/cardSection";
 import AlbumCoverEditor from "~/components/studio-layout/Dashboard/AlbumCoverEditor";
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "~/components/catalyst-theme/table";
@@ -14,6 +14,7 @@ import { PlusCircleIcon, PencilIcon } from '@heroicons/react/16/solid';
 import EditInPlace from "~/components/common/editInPlace";
 
 export default function AlbumSection({onAdd, store}){
+  console.log(store)
   const { albums } = store;
   return (
     <DashboardSection
@@ -35,15 +36,15 @@ export default function AlbumSection({onAdd, store}){
 const AlbumSongSection = ({ album, store }) => {
   const { getAlbumSongs, updateAlbum, updateSong } = store;
   const [ addingSong, setAddingSong ] = useState(false)
-  const [ newAlbumSong, setNewAlbumSong ] = useState(newSong())
+  const [ newAlbumSong, setNewAlbumSong ] = useState(new Song())
   const albumId = album.id || album.localId
   const songs = getAlbumSongs(albumId)
-  const addSongToAlbum = ({song, album}) => {
-    const songWithId = newSong(song)
-    store.addSong(songWithId)
-    store.addSongToAlbum({album, song: songWithId})
+  const addSongToAlbum = () => {
+    console.log(newAlbumSong)
+    store.addSong(newAlbumSong)
+    store.addSongToAlbum({album, song: newAlbumSong})
     setAddingSong(false)
-    setNewAlbumSong(newSong())
+    setNewAlbumSong(new Song())
   }
   const handleTitleChange = (e) => {
     const updatedTitle = e.target.value;
@@ -79,7 +80,7 @@ const AlbumSongSection = ({ album, store }) => {
           <section className="ml-0 sm:ml-8" >
             { songs.length > 0 
               ? songs.map((song) => <SongDisplay song={song} key={song.localId || song.id} />)
-              :  addingSong || <Text>Add a song to start your album</Text> 
+              :  addingSong || <Text className="text-center sm:text-left">Add a song to start your album</Text> 
             }
             <div className="flex grow">
               { addingSong 
@@ -87,7 +88,7 @@ const AlbumSongSection = ({ album, store }) => {
                       <Input className="grow p-2" value={newAlbumSong.title} onChange={handleTitleChange} ref={newSongTitleRef}/>
                       <div className="flex flex-row gap-2 items-center justify-end">
                         <BadgeButton color="red" onClick={()=>setAddingSong(false)} >Cancel</BadgeButton>
-                        <BadgeButton color="blue" onClick={()=>addSongToAlbum({song: newAlbumSong, album})} >Save</BadgeButton>
+                        <BadgeButton color="blue" onClick={()=>addSongToAlbum()} >Save</BadgeButton>
                         <BadgeButton color="emerald" onClick={()=>setAddingSong(false)} >Start Writing</BadgeButton>
                       </div>
                     </div>
