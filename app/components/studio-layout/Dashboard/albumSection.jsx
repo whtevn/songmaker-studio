@@ -14,7 +14,7 @@ import { PlusCircleIcon, PencilIcon } from '@heroicons/react/16/solid';
 import EditInPlace from "~/components/common/editInPlace";
 
 export default function AlbumSection({onAdd, store}){
-  const { albums, getAlbumSongs, updateAlbum, updateSong } = store;
+  const { albums } = store;
   return (
     <DashboardSection
       title="Albums"

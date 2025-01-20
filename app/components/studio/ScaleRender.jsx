@@ -6,7 +6,6 @@ const { scaleToNotation } = scaleFinder;
 
 const ScaleRender = ({ scale, degree = null, onNoteClick = () => {} }) => {
   const containerRef = useRef(null);
-  console.log(scale)
 
   useEffect(() => {
     const render = () => {

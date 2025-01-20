@@ -11,7 +11,6 @@ import { Button } from "~/components/catalyst-theme/button";
 import useCatalogStore from "~/stores/useCatalogStore";
 
 const NewSongDialog = ({ isOpen, onClose, onSave, lyric }) => {
-  console.log(lyric)
   const [lines, setLines] = useState(lyric ? lyric.lines : "");
   const [error, setError] = useState(null);
 

@@ -21,6 +21,7 @@
     "heroicons": "^2.2.0",
     "isbot": "^5.1.17",
     "nanoid": "^5.0.9",
+    "pluralize": "^8.0.0",
     "react": "^19.0.0",
     "react-device-detect": "^2.2.3",
     "react-dnd": "^16.0.1",

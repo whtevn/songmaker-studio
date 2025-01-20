@@ -15,7 +15,6 @@ const PillSelector = ({ options, onSelectionChange, defaultSelection }) => {
 
   // Notify parent when `selectedPills` changes
   useEffect(() => {
-    console.log(selectedPills);
     onSelectionChange(selectedPills);
   }, [selectedPills, onSelectionChange]);
 

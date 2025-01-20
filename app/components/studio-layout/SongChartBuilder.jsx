@@ -9,7 +9,6 @@ const SongChartBuilder = ({ store }) => {
   const { sections } = store;
 
   const selectedScale = store.getSelectedScale()
-  console.log(store)
   return (
     <>
       <SongDefinition />

@@ -19,7 +19,7 @@ export function Dashboard() {
   const [currentLyricFragment, setCurrentLyricFragment] = useState(null);
   const { openModal, activeModal, closeModal } = useModal();
   const store =  catalogStore();
-  const { songs, albums, lyricFragments, addSong, updateSong, addAlbum, updateAlbum, addLyricFragment, updateLyricFragment } =store;
+  const { songs, albums, prompts, addSong, updateSong, addAlbum, updateAlbum, addPrompts, updatePrompts } =store;
 
   const handleCreateSong = (newSong) => {
     addSong(newSong);
@@ -66,7 +66,7 @@ export function Dashboard() {
         />
         {/* Lyric Bank Section */}
         <SongPromptSection
-          prompts={lyricFragments}
+          prompts={prompts}
           onEdit={() => {
             setCurrentLyricFragment(fragment)
             openModal("newLyricFragment")

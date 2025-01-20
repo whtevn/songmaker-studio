@@ -49,7 +49,6 @@ const CreateLyrics = ({ headerRef, store }) => {
       const lineHeight = 24; // Assume line height of textarea is 24px
       const availableHeight = containerHeight - footerHeight;
       const calculatedRows = Math.floor(availableHeight / lineHeight);
-    console.log(calculatedRows)
       setTextareaRows(calculatedRows);
     }
   };
