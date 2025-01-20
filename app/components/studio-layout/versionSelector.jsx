@@ -16,15 +16,13 @@ import {
 
 const ITEMS_PER_PAGE = 3;
 
-const VersionSelector = ({ lyricVersions, store }) => {
+const VersionSelector = ({ song, updateSong}) => {
+  const lyricVersions = song.lyricVersions
   const {
     addVersion,
     lyrics,
-    setLyrics,
-    setLyricVersion,
-    getLyricVersion,
     deleteLyricVersion,
-  } = store;
+  } = song;
 
   const [currentPage, setCurrentPage] = useState(0);
   const [editingId, setEditingId] = useState(null);
@@ -42,12 +40,15 @@ const VersionSelector = ({ lyricVersions, store }) => {
 
   const handleEdit = (id) => {
     setEditingId(id);
-    const version = getLyricVersion(id);
+    console.log(song)
+    const version = song.getLyricVersion(id);
     setTempVersionName(version?.name || "");
   };
 
   const handleSave = (id) => {
-    setLyricVersion({ id, name: tempVersionName });
+    console.log({song})
+    song.setLyricVersion({ id, name: tempVersionName });
+    updateSong(song)
     setEditingId(null);
     setTempVersionName("");
   };
@@ -58,7 +59,8 @@ const VersionSelector = ({ lyricVersions, store }) => {
   };
 
   const handleDelete = (id) => {
-    deleteLyricVersion(id);
+    song.deleteLyricVersion(id);
+    updateSong(song)
     setConfirmDeleteId(null);
   };
 
@@ -84,7 +86,8 @@ const VersionSelector = ({ lyricVersions, store }) => {
               version={version}
               editingId={editingId}
               confirmDeleteId={confirmDeleteId}
-              store={store}
+              song={song}
+              updateSong={updateSong}
               tempVersionName={tempVersionName}
               setTempVersionName={setTempVersionName}
               handleEdit={handleEdit}
@@ -121,7 +124,8 @@ const VersionItem = ({
   version,
   editingId,
   confirmDeleteId,
-  store,
+  song,
+  updateSong,
   tempVersionName,
   setTempVersionName,
   handleEdit,
@@ -130,7 +134,7 @@ const VersionItem = ({
   handleDelete,
   setConfirmDeleteId,
 }) => {
-  const { lyrics, setLyrics } = store;
+  const { lyrics } = song;
   const isEditing = editingId === version.id;
   const isConfirmingDelete = confirmDeleteId === version.id;
   const isCurrent = lyrics === version.lyrics;
@@ -144,7 +148,7 @@ const VersionItem = ({
        >
         <div
           className="flex-grow flex items-center gap-2 cursor-pointer min-w-[200px]"
-          onClick={() => !isEditing && !isConfirmingDelete && setLyrics(version.lyrics)}
+          onClick={() => !isEditing && !isConfirmingDelete && updateSong({...song, lyrics: version.lyrics})}
         >
           <div className="w-4 h-4 flex items-center justify-center">
             {isCurrent && <StarIcon className="h-4 w-4 text-yellow-500" />}

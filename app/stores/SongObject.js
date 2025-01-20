@@ -51,11 +51,19 @@ export class Song {
 
   setLyricVersion(updatedVersion) {
     this.lyricVersions = this.lyricVersions.map((version) =>
-      version.id === updatedVersion.id ? updatedVersion : version
+      version.id === updatedVersion.id ? {...version, ...updatedVersion } : version
     );
   }
 
+  getLyricVersion(id) {
+    return this.lyricVersions.filter(
+      (version) => version.id === id
+    )[0];
+  }
+
+
   deleteLyricVersion(id) {
+    console.log(this)
     this.lyricVersions = this.lyricVersions.filter(
       (version) => version.id !== id
     );

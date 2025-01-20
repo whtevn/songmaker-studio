@@ -38,10 +38,14 @@ export function SongWizard() {
 
   // Save updates back to the catalog store
   const handleSave = () => {
-    catalogStore.updateSong({ ...song, title: tempTitle });
-    setSong((prev) => ({ ...prev, title: tempTitle }));
+    handleUpdate({ title: tempTitle })
     setIsEditing(false);
   };
+
+  const handleUpdate = (update) => {
+    catalogStore.updateSong({ ...song, ...update})
+    setSong((prev) => ({ ...prev, ...update }));
+  }
 
   // Cancel editing
   const handleCancel = () => {
@@ -105,13 +109,16 @@ export function SongWizard() {
       {activeTab === "lyrics" && (
         <LyricWriter
           store={store}
-          song={song} updateSong={setSong} // Pass the song and update function
+          song={song}
+          updateSong={handleUpdate} 
           headerRef={headerRef}
         />
       )}
       {activeTab === "sections" && (
         <SongSectionEditor
-          store={{ ...song, setSong }} // Pass the song and update function
+          store={store}
+          song={song}
+          updateSong={handleUpdate} 
         />
       )}
       {activeTab === "music" && (

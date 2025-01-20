@@ -6,6 +6,7 @@ import { Fieldset, Field, Label } from '~/components/catalyst-theme/fieldset'
 import { Listbox, ListboxLabel, ListboxOption } from '~/components/catalyst-theme/listbox'
 import VersionSelector from '~/components/studio-layout/versionSelector'
 import Toast from "~/components/common/Toast";
+import { Song } from "~/stores/SongObject"
 
 const placeholderText = `Tap here to write your lyrics 
 
@@ -17,9 +18,9 @@ Tap the camera icon below after writing some lyrics to save your progress or rev
 
 
 const CreateLyrics = ({ headerRef, song, updateSong, store }) => {
-  console.log(song)
-  const { lyrics, setLyrics, getSortedLyricVersions, addLyricVersion, setLyricVersion} = song;
-  const lyricVersions = song.getSortedLyricVersions()
+  const thisSong = new Song(song)
+  const { lyrics } = song;
+  const lyricVersions = thisSong.getSortedLyricVersions()
   const [showToast, setShowToast] = useState(false)
   const [textareaRows, setTextareaRows] = useState(5); // Initial row count
   const [lyricWriterOptionsOpen, setLyricWriterOptionsOpen] = useState(false); 
@@ -30,9 +31,11 @@ const CreateLyrics = ({ headerRef, song, updateSong, store }) => {
     return lyricVersions.find((version) => version.lyrics.trim() === lyrics.trim()) || false;
   };
   const handleAddVersion = () => {
+    const { lyrics, lyricVersions } = thisSong
     const foundVersion = findVersion(lyricVersions, lyrics)
     if (lyrics && !foundVersion) {
-      addLyricVersion(lyrics); 
+      thisSong.addLyricVersion(lyrics); 
+      updateSong(thisSong)
     }
     setShowToast(foundVersion || true)
   };
@@ -53,6 +56,10 @@ const CreateLyrics = ({ headerRef, song, updateSong, store }) => {
       setTextareaRows(calculatedRows);
     }
   };
+
+  const handleSetLyrics = (lyrics) => {
+    updateSong({...thisSong, lyrics})
+  }
 
   const handleFocus = () => {
     setIsFocused(true)
@@ -80,8 +87,8 @@ const CreateLyrics = ({ headerRef, song, updateSong, store }) => {
       {/* Main content */}
       <main className="flex-grow overflow-auto">
         <Textarea
-          value={lyrics}
-          onChange={(e) => setLyrics(e.target.value)}
+          value={thisSong.lyrics}
+          onChange={(e) => handleSetLyrics(e.target.value)}
           onFocus={handleFocus}
           onBlur={()=>setIsFocused(false)}
           placeholder={isFocused ? '' : placeholderText}
@@ -94,7 +101,10 @@ const CreateLyrics = ({ headerRef, song, updateSong, store }) => {
           <div className="fixed bottom-0 left-0 w-full bg-gray-700 border border-gray-600 
              sm:w-auto sm:right-24 sm:bottom-12 sm:left-auto sm:rounded-md sm:shadow-lg">
             <div className="overflow-y-auto">
-              <VersionSelector lyricVersions={lyricVersions} store={store} />
+              <VersionSelector
+                song={thisSong}
+                updateSong={updateSong}
+              />
             </div>
           </div>
 
@@ -105,7 +115,7 @@ const CreateLyrics = ({ headerRef, song, updateSong, store }) => {
             </button>
           </div>
       }
-      <Toast show={showToast} setShow={setShowToast} wait={5} viewSnapshots={onViewSnapshotsClick} version={store.lyricVersionTally} />
+      <Toast show={showToast} setShow={setShowToast} wait={5} viewSnapshots={onViewSnapshotsClick} version={thisSong.lyricVersionTally} />
     </div>
   );
 };
