@@ -147,6 +147,7 @@ const StateDiagramWrapper = ({
   inputLocation,
   setInputLocation,
   onCardClick,
+  onApplyLyrics,
 }) => (
     <StateDiagram
       cards={cards}
@@ -154,7 +155,7 @@ const StateDiagramWrapper = ({
       inputLocation={inputLocation}
       setInputLocation={setInputLocation}
       onCardClick={onCardClick}
-      onApplyLyrics={store.applyLyrics}
+      onApplyLyrics={onApplyLyrics}
     />
 );
 

@@ -10,6 +10,7 @@ import { PencilSquareIcon, XMarkIcon, CheckIcon } from "@heroicons/react/16/soli
 import SectionDetailsDialog from "~/components/studio-layout/SectionDetailsDialogue";
 import { useModal } from "~/context/ModalContext";
 import useCatalogStore from "~/stores/useCatalogStore";
+import { Song } from "~/stores/SongObject"
 
 export function SongWizard() {
   const { id } = useParams(); // Retrieve song ID from the route
@@ -23,7 +24,8 @@ export function SongWizard() {
     (song) => song.localId === id || song.id === id
   );
 
-  const [song, setSong] = useState(originalSong || null); // Local state for editing
+  console.log({originalSong})
+  const [song, setSong] = useState(new Song(originalSong || null)); // Local state for editing
 
   const tabs = [
     { id: "lyrics", label: "Lyrics" },
@@ -43,6 +45,7 @@ export function SongWizard() {
   };
 
   const handleUpdate = (update) => {
+    console.log({song, update})
     catalogStore.updateSong({ ...song, ...update})
     setSong((prev) => ({ ...prev, ...update }));
   }
@@ -109,7 +112,7 @@ export function SongWizard() {
       {activeTab === "lyrics" && (
         <LyricWriter
           store={store}
-          song={song}
+          songData={song}
           updateSong={handleUpdate} 
           headerRef={headerRef}
         />
@@ -117,7 +120,7 @@ export function SongWizard() {
       {activeTab === "sections" && (
         <SongSectionEditor
           store={store}
-          song={song}
+          songData={song}
           updateSong={handleUpdate} 
         />
       )}

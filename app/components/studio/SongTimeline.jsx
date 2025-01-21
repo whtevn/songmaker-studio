@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import PillSelector from "~/components/common/PillSelector";
 import SortableCards from "~/components/common/SortableCards";
 import { Heading } from "~/components/catalyst-theme/heading";
 import { Badge } from "~/components/catalyst-theme/badge";
@@ -10,10 +9,13 @@ import { ChevronDownIcon } from '@heroicons/react/16/solid';
 import { Field, Fieldset, Label } from "~/components/catalyst-theme/fieldset";
 import { Input } from "~/components/catalyst-theme/input";
 import { useModal } from '~/context/ModalContext';
+import { Song } from "~/stores/SongObject"
 
 
-const SongTimeline = ({ store, showSummary }) => {
-  const { sections, setSections, tempo, timeSignature, duration } = store;
+const SongTimeline = ({ songData, updateSong }) => {
+  console.log({songData})
+  const song = new Song(songData)
+  const { sections, tempo, timeSignature, duration } = song;
 
   const [inputLocation, setInputLocation] = React.useState(sections.length-1);
   const sectionOptions = [
@@ -37,7 +39,7 @@ const SongTimeline = ({ store, showSummary }) => {
       }
       return section;
     });
-    setSections(updatedSections);
+    song.setSections(updatedSections);
   };
 
   const handleTypeChange = (index, newType) => {
@@ -47,7 +49,7 @@ const SongTimeline = ({ store, showSummary }) => {
       }
       return section;
     });
-    setSections(updatedSections);
+    song.setSections(updatedSections);
   };
 
   const handleMeasureChange = (index, newMeasures) => {
@@ -57,7 +59,7 @@ const SongTimeline = ({ store, showSummary }) => {
       }
       return section;
     });
-    setSections(updatedSections);
+    song.setSections(updatedSections);
   };
 
   const calculateSectionTime = (measures) => {
@@ -84,7 +86,7 @@ const SongTimeline = ({ store, showSummary }) => {
         ...sections.slice(0, index),
         ...sections.slice(index + 1),
       ];
-      setSections(updatedSections);
+      song.setSections(updatedSections);
     }
   };
 
@@ -95,11 +97,12 @@ const SongTimeline = ({ store, showSummary }) => {
         newSection,
         ...sections.slice(inputLocation),
       ];
-      setSections(updatedSections);
+      song.setSections(updatedSections);
       setInputLocation(inputLocation + 1);
     } else {
-      setSections([...sections, newSection]);
+      song.setSections([...sections, newSection]);
     }
+    updateSong(song)
   };
 
   const totalTime = sections.reduce(
@@ -124,12 +127,18 @@ const SongTimeline = ({ store, showSummary }) => {
       <div className="p-4 flex flex-col">
         <SortableCards
           onCardClick={updateSelectedCards}
-          store={store}
-          cards={sections}
-          setCards={setSections}
+          store={song}
+          cards={song.sections}
+          setCards={(c)=>{
+            song.setSections(c)
+            updateSong(song)
+          }}
+          onApplyLyrics={(index, lyrics)=>{
+            song.applyLyrics(index, lyrics)
+            updateSong(song)
+          }}
           inputLocation={inputLocation}
           setInputLocation={setInputLocation}
-          showSummary={showSummary}
         />
       </div>
     </div>

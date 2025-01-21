@@ -17,10 +17,10 @@ You will arrange these lyrics into song sections in the Structure tab above
 Tap the camera icon below after writing some lyrics to save your progress or revisit a saved version`
 
 
-const CreateLyrics = ({ headerRef, song, updateSong, store }) => {
-  const thisSong = new Song(song)
+const CreateLyrics = ({ headerRef, songData, updateSong, store }) => {
+  const song = new Song(songData)
   const { lyrics } = song;
-  const lyricVersions = thisSong.getSortedLyricVersions()
+  const lyricVersions = song.getSortedLyricVersions()
   const [showToast, setShowToast] = useState(false)
   const [textareaRows, setTextareaRows] = useState(5); // Initial row count
   const [lyricWriterOptionsOpen, setLyricWriterOptionsOpen] = useState(false); 
@@ -31,11 +31,11 @@ const CreateLyrics = ({ headerRef, song, updateSong, store }) => {
     return lyricVersions.find((version) => version.lyrics.trim() === lyrics.trim()) || false;
   };
   const handleAddVersion = () => {
-    const { lyrics, lyricVersions } = thisSong
+    const { lyrics, lyricVersions } = song
     const foundVersion = findVersion(lyricVersions, lyrics)
     if (lyrics && !foundVersion) {
-      thisSong.addLyricVersion(lyrics); 
-      updateSong(thisSong)
+      song.addLyricVersion(lyrics); 
+      updateSong(song)
     }
     setShowToast(foundVersion || true)
   };
@@ -58,7 +58,7 @@ const CreateLyrics = ({ headerRef, song, updateSong, store }) => {
   };
 
   const handleSetLyrics = (lyrics) => {
-    updateSong({...thisSong, lyrics})
+    updateSong({...song, lyrics})
   }
 
   const handleFocus = () => {
@@ -87,7 +87,7 @@ const CreateLyrics = ({ headerRef, song, updateSong, store }) => {
       {/* Main content */}
       <main className="flex-grow overflow-auto">
         <Textarea
-          value={thisSong.lyrics}
+          value={song.lyrics}
           onChange={(e) => handleSetLyrics(e.target.value)}
           onFocus={handleFocus}
           onBlur={()=>setIsFocused(false)}
@@ -102,7 +102,7 @@ const CreateLyrics = ({ headerRef, song, updateSong, store }) => {
              sm:w-auto sm:right-24 sm:bottom-12 sm:left-auto sm:rounded-md sm:shadow-lg">
             <div className="overflow-y-auto">
               <VersionSelector
-                song={thisSong}
+                song={song}
                 updateSong={updateSong}
               />
             </div>
@@ -115,7 +115,7 @@ const CreateLyrics = ({ headerRef, song, updateSong, store }) => {
             </button>
           </div>
       }
-      <Toast show={showToast} setShow={setShowToast} wait={5} viewSnapshots={onViewSnapshotsClick} version={thisSong.lyricVersionTally} />
+      <Toast show={showToast} setShow={setShowToast} wait={5} viewSnapshots={onViewSnapshotsClick} version={song.lyricVersionTally} />
     </div>
   );
 };

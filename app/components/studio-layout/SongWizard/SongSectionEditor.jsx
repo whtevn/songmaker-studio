@@ -10,6 +10,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { TouchBackend } from "react-dnd-touch-backend";
 import { isMobile } from "react-device-detect";
 import { DndProvider } from 'react-dnd'
+import { Song } from "~/stores/SongObject"
 
 
 const chordFormulas = {
@@ -38,9 +39,8 @@ const HeaderButton = ()=>{
 }
 
 
-const SongSectionEditor = ({ expand }) => {
-  const songStore = useSongInProgress();
-  const { sections, setSections } = songStore;
+const SongSectionEditor = ({ songData, updateSong, store }) => {
+  const song = new Song(songData)
 
   const [currentSection, setCurrentSection] = useState({
     name: "",
@@ -83,8 +83,8 @@ const SongSectionEditor = ({ expand }) => {
         backend={isMobile ? TouchBackend : HTML5Backend}
         options={{ enableMouseEvents: true }} // For better compatibility
       >
-        <SongTimeline store={songStore} />
-        <LyricDisplay text={songStore.lyrics} />
+        <SongTimeline songData={song} updateSong={updateSong} />
+        <LyricDisplay text={song.lyrics} />
       </DndProvider>
   );
 };
