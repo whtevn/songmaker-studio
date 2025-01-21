@@ -22,7 +22,6 @@ export class Song {
       title: "Untitled Song",
       status: WRITING,
       tempo: 120,
-      duration: 260,
       measures: 130,
       timeSignature: "4/4",
       key: { root: "C", mode: "Ionian" },

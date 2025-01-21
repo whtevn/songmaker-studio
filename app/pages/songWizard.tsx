@@ -3,6 +3,7 @@ import { useParams } from "react-router";
 import SongSectionEditor from "~/components/studio-layout/SongWizard/SongSectionEditor";
 import SongChartBuilder from "~/components/studio-layout/SongChartBuilder";
 import LyricWriter from "~/components/studio-layout/SongWizard/LyricWriter";
+import { Link } from "~/components/catalyst-theme/link";
 import { Button } from "~/components/catalyst-theme/button";
 import { Heading } from "~/components/catalyst-theme/heading";
 import { Input } from "~/components/catalyst-theme/input";
@@ -13,11 +14,17 @@ import useCatalogStore from "~/stores/useCatalogStore";
 import { Song } from "~/stores/SongObject"
 
 export function SongWizard() {
-  const { id } = useParams(); // Retrieve song ID from the route
+  const { id, tab } = useParams(); // Retrieve song ID from the route
   const catalogStore = useCatalogStore(); // Access the catalog store
   const modal = useModal();
   const { activeModal, closeModal, activeModalOptions } = modal;
   const store = useCatalogStore();
+
+  useEffect(() => {
+    if (tab) {
+      setActiveTab(tab);
+    }
+  }, [tab]);
 
   // Retrieve the song by ID from the catalog store
   const originalSong = catalogStore.songs.find(
@@ -28,10 +35,10 @@ export function SongWizard() {
 
   const tabs = [
     { id: "lyrics", label: "Lyrics" },
-    { id: "sections", label: "Structure" },
-    { id: "music", label: "Phrasing" },
+    { id: "structure", label: "Structure" },
+    { id: "phrasing", label: "Phrasing" },
   ];
-  const [activeTab, setActiveTab] = useState(tabs[0].id);
+  const [activeTab, setActiveTab] = useState(tab || tabs[0].id);
   const [isEditing, setIsEditing] = useState(false);
   const [tempTitle, setTempTitle] = useState(song?.title || "");
 
@@ -94,9 +101,10 @@ export function SongWizard() {
       </span>
       <div className="flex justify-end">
         {tabs.map((tab) => (
-          <button
+          <Link
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            href={`/song/${id}/${tab.id}`}
+            onClick={()=>setActiveTab(tab.id)}
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === tab.id
                 ? "bg-gray-600 rounded-t-lg text-white"
@@ -104,7 +112,7 @@ export function SongWizard() {
             }`}
           >
             {tab.label}
-          </button>
+          </Link>
         ))}
       </div>
       {activeTab === "lyrics" && (
@@ -114,13 +122,13 @@ export function SongWizard() {
           headerRef={headerRef}
         />
       )}
-      {activeTab === "sections" && (
+      {activeTab === "structure" && (
         <SongSectionEditor
           songData={song}
           updateSong={handleUpdate} 
         />
       )}
-      {activeTab === "music" && (
+      {activeTab === "phrasing" && (
         <SongChartBuilder
           songData={song}
           updateSong={handleUpdate} 

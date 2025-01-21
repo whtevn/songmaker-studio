@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Button } from '~/components/catalyst-theme/button'
 import { Link } from '~/components/catalyst-theme/link'
 import { Avatar } from '~/components/catalyst-theme/avatar'
 import { Dropdown, DropdownDivider, DropdownItem, DropdownLabel, DropdownMenu, DropdownButton } from '~/components/catalyst-theme/dropdown'
@@ -11,15 +12,17 @@ import {
 } from '@heroicons/react/16/solid';
 
 
-export default function SmsNavbar() {
+export default function SmsNavbar({save}) {
   const { openModal } = useModal();
   const [isSignInDialogOpen, setIsSignInDialogOpen] = useState(false);
+  const [ isSaveDisabled, setIsSaveDisabled ] = useState(false);
   return (
     <Navbar>
       <NavbarItem className="min-w-[150px]">
         <Link href="/"><Logo /></Link>
       </NavbarItem>
       <NavbarSpacer />
+      <Button color={ isSaveDisabled ? "slate" : "pink" } onClick={save}>Save</Button>
       <AccountDropdown as={NavbarItem} className="min-w-[200px]">
         <NavbarItem onClick={() => openModal('signIn')}>
           <UserIcon /> Sign In

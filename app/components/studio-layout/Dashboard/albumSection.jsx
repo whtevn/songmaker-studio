@@ -11,6 +11,7 @@ import { Heading } from "~/components/catalyst-theme/heading";
 import { Divider } from "~/components/catalyst-theme/divider";
 import { Badge, BadgeButton } from "~/components/catalyst-theme/badge";
 import { PlusCircleIcon, PencilIcon } from '@heroicons/react/16/solid';
+import { useNavigate } from "react-router";
 import EditInPlace from "~/components/common/editInPlace";
 
 export default function AlbumSection({onAdd, store}){
@@ -34,17 +35,23 @@ export default function AlbumSection({onAdd, store}){
 }
 
 const AlbumSongSection = ({ album, store }) => {
+  const navigate = useNavigate();
   const { getAlbumSongs, updateAlbum, updateSong } = store;
   const [ addingSong, setAddingSong ] = useState(false)
   const [ newAlbumSong, setNewAlbumSong ] = useState(new Song())
   const albumId = album.id || album.localId
   const songs = getAlbumSongs(albumId)
-  const addSongToAlbum = () => {
+  const addSongToAlbum = ({navigateTo}) => {
     console.log(newAlbumSong)
     store.addSong(newAlbumSong)
     store.addSongToAlbum({album, song: newAlbumSong})
-    setAddingSong(false)
-    setNewAlbumSong(new Song())
+    if(navigateTo){
+      setAddingSong(false)
+      navigate(`/song/${newAlbumSong.localId}`)
+    }else{
+      setAddingSong(false)
+      setNewAlbumSong(new Song())
+    }
   }
   const handleTitleChange = (e) => {
     const updatedTitle = e.target.value;
@@ -89,7 +96,9 @@ const AlbumSongSection = ({ album, store }) => {
                       <div className="flex flex-row gap-2 items-center justify-end">
                         <BadgeButton color="red" onClick={()=>setAddingSong(false)} >Cancel</BadgeButton>
                         <BadgeButton color="blue" onClick={()=>addSongToAlbum()} >Save</BadgeButton>
-                        <BadgeButton color="emerald" onClick={()=>setAddingSong(false)} >Start Writing</BadgeButton>
+                        <BadgeButton color="emerald" onClick={()=>{
+                          addSongToAlbum({navigateTo: true})
+                        }} >Start Writing</BadgeButton>
                       </div>
                     </div>
                   : <div className="flex grow justify-end py-2">
