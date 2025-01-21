@@ -24,7 +24,6 @@ export function SongWizard() {
     (song) => song.localId === id || song.id === id
   );
 
-  console.log({originalSong})
   const [song, setSong] = useState(new Song(originalSong || null)); // Local state for editing
 
   const tabs = [
@@ -45,7 +44,6 @@ export function SongWizard() {
   };
 
   const handleUpdate = (update) => {
-    console.log({song, update})
     catalogStore.updateSong({ ...song, ...update})
     setSong((prev) => ({ ...prev, ...update }));
   }
@@ -111,7 +109,6 @@ export function SongWizard() {
       </div>
       {activeTab === "lyrics" && (
         <LyricWriter
-          store={store}
           songData={song}
           updateSong={handleUpdate} 
           headerRef={headerRef}
@@ -119,13 +116,15 @@ export function SongWizard() {
       )}
       {activeTab === "sections" && (
         <SongSectionEditor
-          store={store}
           songData={song}
           updateSong={handleUpdate} 
         />
       )}
       {activeTab === "music" && (
-        <SongChartBuilder store={{ ...song, setSong }} />
+        <SongChartBuilder
+          songData={song}
+          updateSong={handleUpdate} 
+        />
       )}
       {activeModal === "showSectionDetails" && (
         <SectionDetailsDialog
