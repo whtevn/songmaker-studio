@@ -8,7 +8,6 @@ import {
 import { Field } from "~/components/catalyst-theme/fieldset";
 import { Textarea } from "~/components/catalyst-theme/textarea";
 import { Button } from "~/components/catalyst-theme/button";
-import useCatalogStore from "~/stores/useCatalogStore";
 
 const NewSongDialog = ({ isOpen, onClose, onSave, lyric }) => {
   const [lines, setLines] = useState(lyric ? lyric.lines : "");

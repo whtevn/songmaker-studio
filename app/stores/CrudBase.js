@@ -10,10 +10,12 @@ const CrudBase = (key, defaultValue=[]) => {
 
   return (set, get) => ({
     [`${key}`]: defaultValue,
-    [`add${capitalizedKey}`]: (item) =>
-      set((state) => ({
-        [key]: [...state[key], { localId: nanoid(), ...item }],
-      })),
+    [`add${capitalizedKey}`]: (item) =>{
+    console.log(key)
+      return set((state) => ({
+        [key]: [...state[key], { ...item, localId: nanoid()}],
+      }))
+    },
     [`update${capitalizedKey}`]: (updatedItem) => {
       const id = updatedItem.id || updatedItem.localId;
       return set((state) => ({
@@ -22,9 +24,9 @@ const CrudBase = (key, defaultValue=[]) => {
         ),
       }));
     },
-    [`delete${capitalizedKey}`]: (id) =>
+    [`delete${capitalizedKey}`]: (deleteItem) =>
       set((state) => ({
-        [key]: state[key].filter((item) => item.id !== id && item.localId !== id),
+        [key]: state[key].filter((item) => item.id !== deleteItem.id && item.localId !== deleteItem.localId),
       })),
   });
 };

@@ -75,7 +75,7 @@ const useStore = create(persist((set, get) => ({
       songs: updatedSongs,
     });
   },
-})), { name: "artistCatalogStore" });
+}), { name: "artistCatalogStore" }));
 
 export default useStore;
 

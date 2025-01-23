@@ -7,19 +7,22 @@ import KeyFinderSection from "~/components/studio-layout/Dashboard/keyFinderSect
 import AlbumSection from "~/components/studio-layout/Dashboard/albumSection";
 import NewSongDialog from "~/components/studio-layout/Dashboard/SongDialog";
 import NewAlbumDialog from "~/components/studio-layout/Dashboard/AlbumDialog";
-import NewLyricFragmentDialog from "~/components/studio-layout/Dashboard/SongPromptDialog";
+import NewPromptDialog from "~/components/studio-layout/Dashboard/SongPromptDialog";
 import { useModal } from "~/context/ModalContext";
 import catalogStore from "~/stores/useCatalogStore";
-import { PlusCircleIcon } from '@heroicons/react/16/solid';
+import interfaceStore from "~/stores/useInterfaceStore";
 
 export function Dashboard() {
   const navigate = useNavigate();
   const [currentSong, setCurrentSong] = useState(null);
   const [currentAlbum, setCurrentAlbum] = useState(null);
-  const [currentLyricFragment, setCurrentLyricFragment] = useState(null);
+  const [currentPrompt, setCurrentPrompt] = useState(null);
   const { openModal, activeModal, closeModal } = useModal();
   const store =  catalogStore();
-  const { songs, albums, prompts, addSong, updateSong, addAlbum, updateAlbum, addPrompts, updatePrompts } =store;
+  const interfaceState =  interfaceStore();
+  const { songs, albums, prompts, addSong, updateSong, addAlbum, updateAlbum, addPrompt, updatePrompt } =store;
+
+  const selectedAlbum = interfaceState.selectedAlbum
 
   const handleCreateSong = (newSong) => {
     addSong(newSong);
@@ -42,13 +45,13 @@ export function Dashboard() {
     closeModal();
   };
 
-  const handleCreateLyricFragment = (newFragment) => {
-    addLyricFragment(newFragment);
+  const handleCreatePrompt = (newFragment) => {
+    addPrompt(newFragment);
     closeModal();
   };
 
-  const handleUpdateLyricFragment = (updatedFragment) => {
-    updateLyricFragment(updatedFragment);
+  const handleUpdatePrompt = (updatedFragment) => {
+    updatePrompt(updatedFragment);
     closeModal();
   };
 
@@ -67,14 +70,17 @@ export function Dashboard() {
         {/* Lyric Bank Section */}
         <SongPromptSection
           prompts={prompts}
-          onEdit={() => {
-            setCurrentLyricFragment(fragment)
-            openModal("newLyricFragment")
+          store={store}
+          onEdit={(newCurrentPrompt) => {
+            console.log(newCurrentPrompt)
+            setCurrentPrompt(newCurrentPrompt)
+            openModal("newPrompt")
           }}
           onAdd={() => {
-            setCurrentLyricFragment(null)
-            openModal("newLyricFragment")
+            setCurrentPrompt(null)
+            openModal("newPrompt")
           }}
+          album={selectedAlbum}
         />
         <KeyFinderSection />
 
@@ -82,14 +88,11 @@ export function Dashboard() {
 
       </div>
       {/* Modals */}
-      {activeModal === "newSong" && (
-        <NewSongDialog isOpen onClose={closeModal} onSave={currentSong ? handleUpdateSong : handleCreateSong} albums={albums} song={currentSong} />
-      )}
       {activeModal === "newAlbum" && (
         <NewAlbumDialog isOpen onClose={closeModal} onSave={currentAlbum ? handleUpdateAlbum : handleCreateAlbum } album={currentAlbum} />
       )}
-      {activeModal === "newLyricFragment" && (
-        <NewLyricFragmentDialog isOpen onClose={closeModal} onSave={currentLyricFragment ? handleUpdateLyricFragment : handleCreateLyricFragment} lyric={currentLyricFragment} />
+      {activeModal === "newPrompt" && (
+        <NewPromptDialog isOpen onClose={closeModal} onSave={currentPrompt ? handleUpdatePrompt : handleCreatePrompt} lyric={currentPrompt} />
       )}
     </>
   );

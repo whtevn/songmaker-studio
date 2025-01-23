@@ -5,7 +5,6 @@ import LyricDisplay from "~/components/studio-layout/SongWizard/LyricDisplay";
 import { Input } from "~/components/catalyst-theme/input";
 import { Button } from "~/components/catalyst-theme/button";
 import { DropdownMenu, DropdownItem } from "~/components/catalyst-theme/dropdown";
-import useSongInProgress from "~/stores/useSongInProgress";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { TouchBackend } from "react-dnd-touch-backend";
 import { isMobile } from "react-device-detect";

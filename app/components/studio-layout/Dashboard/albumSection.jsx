@@ -19,10 +19,9 @@ export default function AlbumSection({onAdd, store}){
   const { albums } = store;
   return (
     <DashboardSection
-      title="Albums"
-      onAction={onAdd}
-      actionButton={<PlusCircleIcon className="h-4 w-4" />}
+      title="Albums" 
     >
+{/* onAction={onAdd} actionButton={<PlusCircleIcon className="h-4 w-4" />} */}
       {albums.map((album) => (
         <AlbumSongSection
           album={album}
@@ -41,7 +40,8 @@ const AlbumSongSection = ({ album, store }) => {
   const [ newAlbumSong, setNewAlbumSong ] = useState(new Song())
   const albumId = album.id || album.localId
   const songs = getAlbumSongs(albumId)
-  const addSongToAlbum = ({navigateTo}) => {
+  const addSongToAlbum = (opts={}) => {
+    const {navigateTo} = opts
     console.log(newAlbumSong)
     store.addSong(newAlbumSong)
     store.addSongToAlbum({album, song: newAlbumSong})
