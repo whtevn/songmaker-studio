@@ -9,16 +9,16 @@ import { Fieldset, Field, Label } from "~/components/catalyst-theme/fieldset";
 import { Input } from "~/components/catalyst-theme/input";
 import { Textarea } from "~/components/catalyst-theme/textarea";
 import { Button } from "~/components/catalyst-theme/button";
-import useSongInProgress from "~/stores/useSongInProgress";
+import { Song } from "~/stores/SongObject"
 
-const SectionDetailsDialog = ({ isOpen, onClose, section }) => {
-  const { updateSection } = useSongInProgress();
+const SectionDetailsDialog = ({ isOpen, onClose, section, songData, updateSong }) => {
+  const song = new Song(songData)
   const [localSection, setLocalSection] = useState(section);
 
   const handleInputChange = (key, value) => {
     const updatedSection = { ...localSection, [key]: value };
     setLocalSection(updatedSection);
-    updateSection(updatedSection); // Persist changes to the store
+    song.updateSection(updatedSection); // Persist changes to the store
   };
 
   const handleClose = () => {

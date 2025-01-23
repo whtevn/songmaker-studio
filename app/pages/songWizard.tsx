@@ -137,6 +137,8 @@ export function SongWizard() {
       {activeModal === "showSectionDetails" && (
         <SectionDetailsDialog
           isOpen
+          songData={song}
+          updateSong={handleUpdate} 
           onClose={closeModal}
           section={activeModalOptions}
         />

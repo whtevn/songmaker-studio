@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import useStore from "~/stores/useSongInProgress"; // Adjust the path as needed
+//import useStore from "~/stores/useSongInProgress"; // Adjust the path as needed
 import ScaleRender from "~/components/studio/ScaleRender";
 import PlayScale from "~/components/studio/PlayScale";
 import { Heading } from "~/components/catalyst-theme/heading";
@@ -7,7 +7,7 @@ import { Button } from "~/components/catalyst-theme/button";
 import { Divider } from "~/components/catalyst-theme/divider";
 
 const ScalesList = ({ scales }) => {
-  const { selectedScale, setSelectedScale, clearSelectedScale } = useStore();
+  const { selectedScale, setSelectedScale, clearSelectedScale } = { selectedScale: null, setSelectedScale: ()=>{}, clearSelectedScale: ()=>{} } //useStore();
   const chosenScaleRef = useRef(null);
 
   const handleChooseScale = (scale) => {
