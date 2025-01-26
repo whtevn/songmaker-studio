@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { STATUS_SET, WRITING } from '~/models/Constants';
 import { Song } from "~/models/Song"
 import DashboardSection from "~/components/common/cardSection";
-import AlbumCoverEditor from "~/components/studio-layout/Dashboard/AlbumCoverEditor";
+import AlbumCoverEditor from "~/components/common/albumCoverEditor";
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "~/components/catalyst-theme/table";
 import { Listbox, ListboxOption, ListboxLabel   } from "~/components/catalyst-theme/listbox";
 import { Link } from "~/components/catalyst-theme/link";

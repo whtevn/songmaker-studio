@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { PencilIcon } from "@heroicons/react/16/solid";
 import { BadgeButton } from "~/components/catalyst-theme/badge";
-import DefaultAlbumIcon from "~/components/studio-layout/Dashboard/defaultAlbumIcon";
+import DefaultAlbumIcon from "~/components/common/defaultAlbumIcon";
 
 const AlbumCoverEditor = ({ album, onUpdateImage }) => {
   const fileInputRef = useRef(null); // Reference to the hidden file input

@@ -2,7 +2,7 @@ import { useState } from "react"
 import DashboardSection from "~/components/common/cardSection";
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "~/components/catalyst-theme/table";
 import { Link } from "~/components/catalyst-theme/link";
-import KeyFinder from "~/components/studio-layout/Dashboard/KeyFinder";
+import KeyFinder from "~/components/studio/KeyFinder";
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/16/solid';
 import { Text } from '~/components/catalyst-theme/text'
 
