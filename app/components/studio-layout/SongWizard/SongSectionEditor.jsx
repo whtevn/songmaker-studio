@@ -9,7 +9,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { TouchBackend } from "react-dnd-touch-backend";
 import { isMobile } from "react-device-detect";
 import { DndProvider } from 'react-dnd'
-import { Song } from "~/stores/SongObject"
+import { Song } from "~/models/Song"
 
 
 const chordFormulas = {

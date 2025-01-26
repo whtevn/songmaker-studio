@@ -11,11 +11,12 @@ import { PencilSquareIcon, XMarkIcon, CheckIcon } from "@heroicons/react/16/soli
 import SectionDetailsDialog from "~/components/studio-layout/SectionDetailsDialogue";
 import { useModal } from "~/context/ModalContext";
 import useCatalogStore from "~/stores/useCatalogStore";
-import { Song } from "~/stores/SongObject"
+import { Song } from "~/models/Song"
 
 export function SongWizard() {
   const { id, tab } = useParams(); // Retrieve song ID from the route
-  const catalogStore = useCatalogStore(); // Access the catalog store
+  const songs = useCatalogStore(state => state.songs); // Access the catalog store
+  const { updateSong } = useCatalogStore.getState();
   const modal = useModal();
   const { activeModal, closeModal, activeModalOptions } = modal;
   const store = useCatalogStore();
@@ -27,7 +28,7 @@ export function SongWizard() {
   }, [tab]);
 
   // Retrieve the song by ID from the catalog store
-  const originalSong = catalogStore.songs.find(
+  const originalSong = songs.find(
     (song) => song.localId === id || song.id === id
   );
 
@@ -51,7 +52,7 @@ export function SongWizard() {
   };
 
   const handleUpdate = (update) => {
-    catalogStore.updateSong({ ...song, ...update})
+    updateSong({ ...song, ...update})
     setSong((prev) => ({ ...prev, ...update }));
   }
 

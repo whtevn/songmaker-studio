@@ -6,7 +6,8 @@ import { Fieldset, Field, Label } from '~/components/catalyst-theme/fieldset'
 import { Listbox, ListboxLabel, ListboxOption } from '~/components/catalyst-theme/listbox'
 import VersionSelector from '~/components/studio-layout/versionSelector'
 import Toast from "~/components/common/Toast";
-import { Song } from "~/stores/SongObject"
+import { Song } from "~/models/Song"
+import useCatalogStore from "~/stores/useCatalogStore";
 
 const placeholderText = `Tap here to write your lyrics 
 
@@ -17,10 +18,11 @@ You will arrange these lyrics into song sections in the Structure tab above
 Tap the camera icon below after writing some lyrics to save your progress or revisit a saved version`
 
 
-const CreateLyrics = ({ headerRef, songData, updateSong, store }) => {
+const CreateLyrics = ({ headerRef, songData, updateSong }) => {
   const song = new Song(songData)
-  const { lyrics } = song;
-  const lyricVersions = song.getSortedLyricVersions()
+  const { getLyricVersionsForSong } = useCatalogStore.getState()
+  const lyricVersions = getLyricVersionsForSong(song);
+
   const [showToast, setShowToast] = useState(false)
   const [textareaRows, setTextareaRows] = useState(5); // Initial row count
   const [lyricWriterOptionsOpen, setLyricWriterOptionsOpen] = useState(false); 

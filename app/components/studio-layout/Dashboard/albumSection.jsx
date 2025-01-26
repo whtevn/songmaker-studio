@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
-import { STATUS_SET, WRITING, Song } from '~/stores/SongObject';
+import { STATUS_SET, WRITING } from '~/models/Constants';
+import { Song } from "~/models/Song"
 import DashboardSection from "~/components/common/cardSection";
 import AlbumCoverEditor from "~/components/studio-layout/Dashboard/AlbumCoverEditor";
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "~/components/catalyst-theme/table";
@@ -13,10 +14,10 @@ import { Badge, BadgeButton } from "~/components/catalyst-theme/badge";
 import { PlusCircleIcon, PencilIcon } from '@heroicons/react/16/solid';
 import { useNavigate } from "react-router";
 import EditInPlace from "~/components/common/editInPlace";
+import useCatalogStore from "~/stores/useCatalogStore";
 
-export default function AlbumSection({onAdd, store}){
-  console.log(store)
-  const { albums } = store;
+export default function AlbumSection({onAdd}){
+  const albums = useCatalogStore(state => state.albums);
   return (
     <DashboardSection
       title="Albums" 
@@ -25,7 +26,6 @@ export default function AlbumSection({onAdd, store}){
       {albums.map((album) => (
         <AlbumSongSection
           album={album}
-          store={store}
           key={album.localId || album.id}
         />
       ))}
@@ -33,29 +33,27 @@ export default function AlbumSection({onAdd, store}){
   )
 }
 
-const AlbumSongSection = ({ album, store }) => {
+const AlbumSongSection = ({ album }) => {
   const navigate = useNavigate();
-  const { getAlbumSongs, updateAlbum, updateSong } = store;
+  const { getSongsForAlbum, updateAlbum, updateSong, addSong, addSongToAlbum } = useCatalogStore.getState();
   const [ addingSong, setAddingSong ] = useState(false)
-  const [ newAlbumSong, setNewAlbumSong ] = useState(new Song())
-  const albumId = album.id || album.localId
-  const songs = getAlbumSongs(albumId)
-  const addSongToAlbum = (opts={}) => {
+  const [ song, setSong ] = useState(new Song())
+  const songs = getSongsForAlbum(album)
+  const onAddSongToAlbum = (opts={}) => {
     const {navigateTo} = opts
-    console.log(newAlbumSong)
-    store.addSong(newAlbumSong)
-    store.addSongToAlbum({album, song: newAlbumSong})
+    addSong(song)
+    addSongToAlbum(album, song)
     if(navigateTo){
       setAddingSong(false)
-      navigate(`/song/${newAlbumSong.localId}`)
+      navigate(`/song/${song.localId}`)
     }else{
       setAddingSong(false)
-      setNewAlbumSong(new Song())
+      setSong(new Song())
     }
   }
   const handleTitleChange = (e) => {
     const updatedTitle = e.target.value;
-    setNewAlbumSong((prevSong) => ({
+    setSong((prevSong) => ({
       ...prevSong,
       title: updatedTitle,
     }));
@@ -75,7 +73,7 @@ const AlbumSongSection = ({ album, store }) => {
     <>
       <div className="flex flex-col sm:flex-row items-start gap-4 p-4">
         <div className="w-full sm:w-auto pb-4 sm:pb-2 flex justify-start flex-row">
-          <AlbumCoverEditor album={album} onUpdateImage={(image)=>{store.updateAlbum({...album, image})}} />
+          <AlbumCoverEditor album={album} onUpdateImage={(image)=>{updateAlbum({...album, image})}} />
         </div>
         <div className="w-full sm:w-auto flex flex-col gap-4 grow">
           <div className="flex flex-row grow items-center gap-2">
@@ -92,10 +90,10 @@ const AlbumSongSection = ({ album, store }) => {
             <div className="flex grow">
               { addingSong 
                   ? <div className="grow">
-                      <Input className="grow p-2" value={newAlbumSong.title} onChange={handleTitleChange} ref={newSongTitleRef}/>
+                      <Input className="grow p-2" value={song.title} onChange={handleTitleChange} ref={newSongTitleRef}/>
                       <div className="flex flex-row gap-2 items-center justify-end">
                         <BadgeButton color="red" onClick={()=>setAddingSong(false)} >Cancel</BadgeButton>
-                        <BadgeButton color="blue" onClick={()=>addSongToAlbum()} >Save</BadgeButton>
+                        <BadgeButton color="blue" onClick={()=>onAddSongToAlbum()} >Save</BadgeButton>
                         <BadgeButton color="emerald" onClick={()=>{
                           addSongToAlbum({navigateTo: true})
                         }} >Start Writing</BadgeButton>

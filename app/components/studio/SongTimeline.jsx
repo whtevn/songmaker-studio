@@ -9,7 +9,7 @@ import { ChevronDownIcon } from '@heroicons/react/16/solid';
 import { Field, Fieldset, Label } from "~/components/catalyst-theme/fieldset";
 import { Input } from "~/components/catalyst-theme/input";
 import { useModal } from '~/context/ModalContext';
-import { Song } from "~/stores/SongObject"
+import { Song } from "~/models/Song"
 
 
 const SongTimeline = ({ songData, updateSong }) => {

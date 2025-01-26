@@ -2,7 +2,7 @@ import React from "react";
 import { Heading } from "~/components/catalyst-theme/heading";
 import Keyboard from "~/components/studio/Keyboard";
 import ScaleRender from "~/components/studio/ScaleRender";
-import { Song } from "~/stores/SongObject"
+import { Song } from "~/models/Song"
 
 
 const SongChartBuilder = ({ songData, updateSong }) => {

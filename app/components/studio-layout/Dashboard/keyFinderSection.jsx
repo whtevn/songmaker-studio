@@ -6,7 +6,7 @@ import KeyFinder from "~/components/studio-layout/Dashboard/KeyFinder";
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/16/solid';
 import { Text } from '~/components/catalyst-theme/text'
 
-export default function SongPromptSection({onEdit, onAdd, prompts}){
+export default function KeyFinderSection(){
   const [showKeyfinder, setShowKeyfinder] = useState(false)
   return (
     <DashboardSection

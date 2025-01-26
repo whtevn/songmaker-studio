@@ -9,8 +9,8 @@ import NewSongDialog from "~/components/studio-layout/Dashboard/SongDialog";
 import NewAlbumDialog from "~/components/studio-layout/Dashboard/AlbumDialog";
 import NewPromptDialog from "~/components/studio-layout/Dashboard/SongPromptDialog";
 import { useModal } from "~/context/ModalContext";
-import catalogStore from "~/stores/useCatalogStore";
-import interfaceStore from "~/stores/useInterfaceStore";
+import useCatalogStore from "~/stores/useCatalogStore";
+import useInterfaceStore from "~/stores/useInterfaceStore";
 
 export function Dashboard() {
   const navigate = useNavigate();
@@ -18,22 +18,14 @@ export function Dashboard() {
   const [currentAlbum, setCurrentAlbum] = useState(null);
   const [currentPrompt, setCurrentPrompt] = useState(null);
   const { openModal, activeModal, closeModal } = useModal();
-  const store =  catalogStore();
-  const interfaceState =  interfaceStore();
-  const { songs, albums, prompts, addSong, updateSong, addAlbum, updateAlbum, addPrompt, updatePrompt } =store;
 
-  const selectedAlbum = interfaceState.selectedAlbum
+  const selectedAlbum =  useInterfaceStore(state => state.selectedAlbum);
+  const { addSong, updateSong, addAlbum, updateAlbum, addSongPrompt, updatePrompt } = useCatalogStore.getState();
 
   const handleCreateSong = (newSong) => {
     addSong(newSong);
     closeModal();
   };
-
-  const handleUpdateSong = (updatedSong) => {
-    updateSong(updatedSong);
-    closeModal();
-  };
-
 
   const handleCreateAlbum = (newAlbum) => {
     addAlbum(newAlbum);
@@ -46,7 +38,7 @@ export function Dashboard() {
   };
 
   const handleCreatePrompt = (newFragment) => {
-    addPrompt(newFragment);
+    addSongPrompt(newFragment);
     closeModal();
   };
 
@@ -61,18 +53,13 @@ export function Dashboard() {
 
         {/* Albums Section */}
         <AlbumSection
-          store={store}
           onAdd={() => {
-            setCurrentAlbum(null)
             openModal("newAlbum")
           }}
         />
         {/* Lyric Bank Section */}
         <SongPromptSection
-          prompts={prompts}
-          store={store}
           onEdit={(newCurrentPrompt) => {
-            console.log(newCurrentPrompt)
             setCurrentPrompt(newCurrentPrompt)
             openModal("newPrompt")
           }}
@@ -93,6 +80,7 @@ export function Dashboard() {
       )}
       {activeModal === "newPrompt" && (
         <NewPromptDialog isOpen onClose={closeModal} onSave={currentPrompt ? handleUpdatePrompt : handleCreatePrompt} lyric={currentPrompt} />
+          
       )}
     </>
   );

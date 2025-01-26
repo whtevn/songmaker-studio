@@ -3,23 +3,22 @@ import DashboardSection from "~/components/common/cardSection";
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "~/components/catalyst-theme/table";
 import { Text } from "~/components/catalyst-theme/text";
 import { BadgeButton } from "~/components/catalyst-theme/badge";
-import { Song } from '~/stores/SongObject';
+import { Song } from "~/models/Song"
 import { PlusCircleIcon } from '@heroicons/react/16/solid';
 import { useNavigate } from "react-router";
+import useCatalogStore from "~/stores/useCatalogStore";
 
-export default function SongPromptSection({onEdit, onAdd, prompts, album, store}){
-  const [ isDeleting, setIsDeleting ] = useState(null)
+export default function SongPromptSection({onEdit, onAdd }){
+  const prompts = useCatalogStore(state => state.songPrompts);
+  const { addSong, addSongToAlbum, deletePrompt } = useCatalogStore.getState()
   const navigate = useNavigate();
-  const deletePrompt = (prompt) => {
-    store.deletePrompt(prompt)
-  }
-  const addSongToAlbum = (prompt) => {
+  const onAddSongToAlbum = (prompt) => {
     const lyrics = prompt.lines;
     const title = lyrics.split("\n")[0];
     const song = new Song({lyrics, title})
-    store.addSong(song)
-    store.addSongToAlbum({album, song})
-    store.deletePrompt(prompt)
+    addSong(song)
+    addSongToAlbum({album, song})
+    deletePrompt(prompt)
     navigate(`/song/${song.localId}`)
   }
   return (
@@ -33,28 +32,11 @@ export default function SongPromptSection({onEdit, onAdd, prompts, album, store}
           <div className={`flex flex-row items-center justify-between ${ i % 2 ?  "bg-zinc-900" : "" } p-2`} key={songPrompt.localId || songPrompt.id}>
             <Text className="grow cursor-pointer" onClick={()=>onEdit(songPrompt)}>{songPrompt.lines}</Text>
 
-            { isDeleting && isDeleting.id === songPrompt.id && isDeleting.localId === songPrompt.localId 
-              ? (
-            <span className="flex flex-row gap-2">
-              <Text>Are you sure?</Text>
-              <BadgeButton color="blue" onClick={()=>setIsDeleting(null)}>
-                Cancel
-              </BadgeButton>
-              <BadgeButton color="red" onClick={()=>deletePrompt(songPrompt)}>
-                Delete 
-              </BadgeButton>
-            </span>
-              ) : (
             <span>
-              <BadgeButton color="red" onClick={()=>setIsDeleting(songPrompt)}>
-                Delete 
-              </BadgeButton>
-              <BadgeButton color="blue" onClick={()=>addSongToAlbum(songPrompt)}>
+              <BadgeButton color="blue" onClick={()=>onAddSongToAlbum(songPrompt)}>
                 Start Song
               </BadgeButton>
             </span>
-              )
-            }
           </div>
         ))
         : <Text>
