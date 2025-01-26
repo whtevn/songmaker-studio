@@ -13,7 +13,6 @@ export class SongSection extends BaseObject {
       type: "Untitled Section",
       measures: 4,
       lyrics: "",
-      color: "gray",
     };
 
     Object.assign(this, defaultData, sectionData);

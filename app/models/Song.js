@@ -1,9 +1,5 @@
 import { BaseObject } from "./BaseObject";
 
-import { Album } from "./Album";
-import { SongSection } from "./SongSection";
-import { LyricVersion } from "./LyricVersion";
-
 export class Song extends BaseObject {
   constructor(songData = {}) {
     super(songData);
@@ -23,7 +19,6 @@ export class Song extends BaseObject {
 
     Object.assign(this, defaultData, songData);
   }
-
 }
 
 // Define `has_many` relationships
