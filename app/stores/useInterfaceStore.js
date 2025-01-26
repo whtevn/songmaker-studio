@@ -5,7 +5,7 @@ import useCatalogStore from "~/stores/useCatalogStore";
 const useInterfaceStore = create(
   persist(
     (set, get) => ({
-      selectedAlbum: getSelectedFirstAlbum(),
+      selectedAlbumId: getSelectedFirstAlbumId(),
 
       // Function to set a new selected album
       setSelectedAlbum: (albumId) =>
@@ -18,7 +18,7 @@ const useInterfaceStore = create(
 );
 
 // Helper function to get the first album
-function getSelectedFirstAlbum() {
+function getSelectedFirstAlbumId() {
   const catalogStore = useCatalogStore.getState(); // Access the catalog store state
   const firstAlbum = catalogStore.albums?.[0] || null;
   return firstAlbum ? firstAlbum.localId || firstAlbum.id : null; // Return the first album's ID or null

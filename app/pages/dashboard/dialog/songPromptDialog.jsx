@@ -11,27 +11,23 @@ import { Button } from "~/components/catalyst-theme/button";
 import { BadgeButton } from "~/components/catalyst-theme/badge";
 import { TrashIcon } from '@heroicons/react/16/solid';
 
-const NewSongDialog = ({ isOpen, onClose, onSave, lyric, store }) => {
+const NewSongDialog = ({ isOpen, onClose, onSave, currentSongPrompt, store }) => {
   const [ isDeleting, setIsDeleting ] = useState(false)
-  const [lines, setLines] = useState(lyric ? lyric.lines : "");
+  const [text, setText] = useState(currentSongPrompt ? currentSongPrompt.text : "");
   const [error, setError] = useState(null);
 
   const deletePrompt = () => {
-    store.deletePrompt(lyric)
+    store.deletePrompt(currentSongPrompt)
     onClose()
   }
 
   const handleSave = () => {
-    if (!lines.trim()) {
-      setError("Lines is required");
+    if (!text.trim()) {
+      setError("some text is required");
       return;
     }
 
-    onSave({
-      id: lyric?.id,
-      localId: lyric?.localId,
-      lines
-    });
+    onSave({ ...currentSongPrompt, text });
 
     onClose(); // Close the dialog
   };
@@ -44,9 +40,9 @@ const NewSongDialog = ({ isOpen, onClose, onSave, lyric, store }) => {
         <Field>
           <Textarea
             placeholder="Add a song fragment here. These can be used to start a song later"
-            value={lines}
+            value={text}
             rows={10}
-            onChange={(e) => setLines(e.target.value)}
+            onChange={(e) => setText(e.target.value)}
           />
         </Field>
       </DialogBody>
@@ -62,7 +58,7 @@ const NewSongDialog = ({ isOpen, onClose, onSave, lyric, store }) => {
               </span>
             </> : <>
               <span>
-              { lyric && 
+              { currentSongPrompt && 
               <BadgeButton color="red" className="p-2 cursor-pointer" onClick={()=>setIsDeleting(true)}>
                 Delete
               </BadgeButton>
@@ -70,9 +66,9 @@ const NewSongDialog = ({ isOpen, onClose, onSave, lyric, store }) => {
               </span>
               <span className="flex gap-2">
               <BadgeButton onClick={onClose}>
-                Close
+                Cancel
               </BadgeButton>
-              <BadgeButton color="emerald" onClick={handleSave}>Start Song</BadgeButton>
+              <BadgeButton color="blue" onClick={handleSave}>Save</BadgeButton>
               </span>
             </>
         }

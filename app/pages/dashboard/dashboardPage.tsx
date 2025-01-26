@@ -11,6 +11,7 @@ import NewPromptDialog from "./dialog/songPromptDialog";
 import { useModal } from "~/context/ModalContext";
 import useCatalogStore from "~/stores/useCatalogStore";
 import useInterfaceStore from "~/stores/useInterfaceStore";
+import { SongPrompt } from "~/models/SongPrompt"
 
 export function Dashboard() {
   const navigate = useNavigate();
@@ -19,8 +20,8 @@ export function Dashboard() {
   const [currentPrompt, setCurrentPrompt] = useState(null);
   const { openModal, activeModal, closeModal } = useModal();
 
-  const selectedAlbum =  useInterfaceStore(state => state.selectedAlbum);
-  const { addSong, updateSong, addAlbum, updateAlbum, addSongPrompt, updatePrompt } = useCatalogStore.getState();
+  const selectedAlbumId =  useInterfaceStore(state => state.selectedAlbumId);
+  const { addSong, updateSong, addAlbum, updateAlbum, addSongPrompt, updateSongPrompt } = useCatalogStore.getState();
 
   const handleCreateSong = (newSong) => {
     addSong(newSong);
@@ -38,12 +39,17 @@ export function Dashboard() {
   };
 
   const handleCreatePrompt = (newFragment) => {
-    addSongPrompt(newFragment);
+console.log(newFragment)
+    const prompt = new SongPrompt(newFragment)
+    console.log(prompt)
+    addSongPrompt(prompt);
+    setCurrentPrompt(null)
     closeModal();
   };
 
   const handleUpdatePrompt = (updatedFragment) => {
-    updatePrompt(updatedFragment);
+console.log(updatedFragment)
+    updateSongPrompt(updatedFragment);
     closeModal();
   };
 
@@ -67,7 +73,7 @@ export function Dashboard() {
             setCurrentPrompt(null)
             openModal("newPrompt")
           }}
-          album={selectedAlbum}
+          albumId={selectedAlbumId}
         />
         <KeyFinderSection />
 
@@ -79,7 +85,7 @@ export function Dashboard() {
         <NewAlbumDialog isOpen onClose={closeModal} onSave={currentAlbum ? handleUpdateAlbum : handleCreateAlbum } album={currentAlbum} />
       )}
       {activeModal === "newPrompt" && (
-        <NewPromptDialog isOpen onClose={closeModal} onSave={currentPrompt ? handleUpdatePrompt : handleCreatePrompt} lyric={currentPrompt} />
+        <NewPromptDialog isOpen onClose={closeModal} onSave={currentPrompt ? handleUpdatePrompt : handleCreatePrompt} currentSongPrompt={currentPrompt} />
           
       )}
     </>

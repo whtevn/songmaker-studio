@@ -8,17 +8,19 @@ import { PlusCircleIcon } from '@heroicons/react/16/solid';
 import { useNavigate } from "react-router";
 import useCatalogStore from "~/stores/useCatalogStore";
 
-export default function SongPromptSection({onEdit, onAdd }){
+export default function SongPromptSection({ onEdit, onAdd, albumId }){
   const prompts = useCatalogStore(state => state.songPrompts);
-  const { addSong, addSongToAlbum, deletePrompt } = useCatalogStore.getState()
+  const { addSong, addSongToAlbum, deleteSongPrompt, getAlbum } = useCatalogStore.getState()
+  const album = getAlbum({localId: albumId})
   const navigate = useNavigate();
   const onAddSongToAlbum = (prompt) => {
-    const lyrics = prompt.lines;
+    const lyrics = prompt.text;
     const title = lyrics.split("\n")[0];
     const song = new Song({lyrics, title})
+    console.log({ album, song })
     addSong(song)
-    addSongToAlbum({album, song})
-    deletePrompt(prompt)
+    addSongToAlbum(album, song)
+    deleteSongPrompt(prompt)
     navigate(`/song/${song.localId}`)
   }
   return (
@@ -30,10 +32,10 @@ export default function SongPromptSection({onEdit, onAdd }){
       {prompts.length > 0
         ? prompts.map((songPrompt, i) => (
           <div className={`flex flex-row items-center justify-between ${ i % 2 ?  "bg-zinc-900" : "" } p-2`} key={songPrompt.localId || songPrompt.id}>
-            <Text className="grow cursor-pointer" onClick={()=>onEdit(songPrompt)}>{songPrompt.lines}</Text>
+            <Text className="grow cursor-pointer" onClick={()=>onEdit(songPrompt)}>{songPrompt.text}</Text>
 
             <span>
-              <BadgeButton color="blue" onClick={()=>onAddSongToAlbum(songPrompt)}>
+              <BadgeButton color="orange" onClick={()=>onAddSongToAlbum(songPrompt)}>
                 Start Song
               </BadgeButton>
             </span>
