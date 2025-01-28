@@ -13,6 +13,7 @@ export class Song extends BaseObject {
       key: { root: "C", mode: "Ionian" },
       lyrics: "",
       sections: [], // List of { SongSectionId, Order }
+      lyricVersionTally: 0,
       lyricVersions: [], // List of { LyricVersionId, Order }
       albums: [], // List of { LyricVersionId, Order }
     };
@@ -23,8 +24,21 @@ export class Song extends BaseObject {
 
 // Define `has_many` relationships
 Song.has_many(
-  { on: "sections", orderable: true },
-  { on: "lyricVersions", orderable: true },
-  { on: "albums" },
+  { type: "section", on: "sections", orderable: true },
+  { type: "lyricVersion",  on: "lyricVersions", orderable: true },
+  { type: "album", on: "albums" },
 )
 
+  /*
+Song.customizeStore((set, get) => ({
+  incrementSongLyricVersionTally: (song) => {
+    set((state) => {
+      state.updateSong({
+        ...song,
+        lyricVersionTally: (song.lyricVersionTally || 0) + 1, // Handle undefined tally gracefully
+      });
+    });
+  },
+}));
+
+*/

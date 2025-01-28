@@ -7,7 +7,7 @@ import { Listbox, ListboxLabel, ListboxOption } from '~/components/catalyst-them
 import VersionSelector from '../component/versionSelector'
 import Toast from "~/components/common/Toast";
 import { Song } from "~/models/Song"
-import useCatalogStore from "~/stores/useCatalogStore";
+import { LyricVersion } from "~/models/LyricVersion"
 
 const placeholderText = `Tap here to write your lyrics 
 
@@ -18,26 +18,21 @@ You will arrange these lyrics into song sections in the Structure tab above
 Tap the camera icon below after writing some lyrics to save your progress or revisit a saved version`
 
 
-const CreateLyrics = ({ headerRef, songData, updateSong }) => {
-  const song = new Song(songData)
-  const { getLyricVersionsForSong } = useCatalogStore.getState()
-  const lyricVersions = getLyricVersionsForSong(song);
-
+const LyricWriter = ({ headerRef, updateSong, addLyricVersionToSong, lyrics, lyricVersions, song }) => {
   const [showToast, setShowToast] = useState(false)
   const [textareaRows, setTextareaRows] = useState(5); // Initial row count
   const [lyricWriterOptionsOpen, setLyricWriterOptionsOpen] = useState(false); 
   const [isFocused, setIsFocused] = useState(false); 
   const containerRef = useRef(null);
 
-  const findVersion = (lyricVersions, lyrics) => {
-    return lyricVersions.find((version) => version.lyrics.trim() === lyrics.trim()) || false;
-  };
   const handleAddVersion = () => {
-    const { lyrics, lyricVersions } = song
-    const foundVersion = findVersion(lyricVersions, lyrics)
+    const foundVersion = lyricVersions.find((version) => version.lyrics?.trim() === lyrics.trim()) 
     if (lyrics && !foundVersion) {
-      song.addLyricVersion(lyrics); 
-      updateSong(song)
+      // TODO: songId should be { id: song.id, localId: song.localId }?
+      const lyricVersion = new LyricVersion({ lyrics, songId: song.localId, name: `Version #${song.lyricVersionTally+1}` })
+      console.log(song)
+      addLyricVersionToSong(song, lyricVersion)
+      updateSong({...song, lyricVersionTally: song.lyricVersionTally + 1 })
     }
     setShowToast(foundVersion || true)
   };
@@ -106,6 +101,8 @@ const CreateLyrics = ({ headerRef, songData, updateSong }) => {
               <VersionSelector
                 song={song}
                 updateSong={updateSong}
+                lyrics={lyrics}
+                lyricVersions={lyricVersions}
               />
             </div>
           </div>
@@ -122,5 +119,5 @@ const CreateLyrics = ({ headerRef, songData, updateSong }) => {
   );
 };
 
-export default CreateLyrics;
+export default LyricWriter;
 

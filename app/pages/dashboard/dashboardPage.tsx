@@ -39,16 +39,13 @@ export function Dashboard() {
   };
 
   const handleCreatePrompt = (newFragment) => {
-console.log(newFragment)
     const prompt = new SongPrompt(newFragment)
-    console.log(prompt)
     addSongPrompt(prompt);
     setCurrentPrompt(null)
     closeModal();
   };
 
   const handleUpdatePrompt = (updatedFragment) => {
-console.log(updatedFragment)
     updateSongPrompt(updatedFragment);
     closeModal();
   };

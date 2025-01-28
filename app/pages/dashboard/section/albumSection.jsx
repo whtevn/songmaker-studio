@@ -41,7 +41,6 @@ const AlbumSongSection = ({ album }) => {
   const songs = getSongsForAlbum(album)
   const onAddSongToAlbum = (opts={}) => {
     const {navigateTo} = opts
-    addSong(song)
     addSongToAlbum(album, song)
     if(navigateTo){
       setAddingSong(false)

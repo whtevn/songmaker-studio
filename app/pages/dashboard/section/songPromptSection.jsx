@@ -17,7 +17,6 @@ export default function SongPromptSection({ onEdit, onAdd, albumId }){
     const lyrics = prompt.text;
     const title = lyrics.split("\n")[0];
     const song = new Song({lyrics, title})
-    console.log({ album, song })
     addSong(song)
     addSongToAlbum(album, song)
     deleteSongPrompt(prompt)
@@ -29,7 +28,7 @@ export default function SongPromptSection({ onEdit, onAdd, albumId }){
       onAction={onAdd}
       actionButton={<PlusCircleIcon className="h-4 w-4" />}
     >
-      {prompts.length > 0
+      {prompts?.length > 0
         ? prompts.map((songPrompt, i) => (
           <div className={`flex flex-row items-center justify-between ${ i % 2 ?  "bg-zinc-900" : "" } p-2`} key={songPrompt.localId || songPrompt.id}>
             <Text className="grow cursor-pointer" onClick={()=>onEdit(songPrompt)}>{songPrompt.text}</Text>

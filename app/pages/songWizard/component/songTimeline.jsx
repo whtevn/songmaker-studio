@@ -13,7 +13,6 @@ import { Song } from "~/models/Song"
 
 
 const SongTimeline = ({ songData, updateSong }) => {
-  console.log({songData})
   const song = new Song(songData)
   const { sections, tempo, timeSignature, duration } = song;
 

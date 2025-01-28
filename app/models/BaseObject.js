@@ -84,7 +84,6 @@ export class BaseObject {
       ) => {
         set((state) => {
           const ownerList = state[key];
-          console.log({relatedItem, owner, ownerList})
           const foundOwner = ownerList.find((item) => item.localId === owner.localId);
           if (!foundOwner) {
             throw new Error(`${objectName} not found.`);

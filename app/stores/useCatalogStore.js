@@ -15,6 +15,12 @@ const useStore = create(persist((set, get) => ({
   ...SongSection.toStore(set, get),
   ...SongPrompt.toStore(set, get),
   ...LyricVersion.toStore(set, get),
+  workingOnSong: null,
+  setWorkingOnSong: (localId) => {
+    set((state) => ({
+      "workingOnSong": localId
+    }))
+  }
 }), { name: "artistCatalogStore" }));
 
 console.log(useStore.getState())

@@ -13,42 +13,31 @@ import {
   TrashIcon,
   CheckIcon,
 } from "@heroicons/react/16/solid";
+import useCatalogStore from "~/stores/useCatalogStore";
 
 const ITEMS_PER_PAGE = 3;
 
-const VersionSelector = ({ song, updateSong}) => {
-  const lyricVersions = song.lyricVersions
-  const {
-    addVersion,
-    lyrics,
-    deleteLyricVersion,
-  } = song;
-
+const VersionSelector = ({lyrics, lyricVersions, updateSong, song}) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [editingId, setEditingId] = useState(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [tempVersionName, setTempVersionName] = useState("");
+
+  const { deleteLyricVersion, removeLyricVersionFromSong, updateLyricVersion } = useCatalogStore.getState()
 
   const paginatedVersions = lyricVersions.slice(
     currentPage * ITEMS_PER_PAGE,
     (currentPage + 1) * ITEMS_PER_PAGE
   );
 
-  const handleAddVersion = () => {
-    addVersion(lyrics);
-  };
-
   const handleEdit = (id) => {
     setEditingId(id);
-    console.log(song)
-    const version = song.getLyricVersion(id);
+    const version = lyricVersions.find((v) => v.localId === id);
     setTempVersionName(version?.name || "");
   };
 
-  const handleSave = (id) => {
-    console.log({song})
-    song.setLyricVersion({ id, name: tempVersionName });
-    updateSong(song)
+  const handleSave = (localId) => {
+    updateLyricVersion({ localId, name: tempVersionName });
     setEditingId(null);
     setTempVersionName("");
   };
@@ -58,9 +47,10 @@ const VersionSelector = ({ song, updateSong}) => {
     setTempVersionName("");
   };
 
-  const handleDelete = (id) => {
-    song.deleteLyricVersion(id);
-    updateSong(song)
+  const handleDelete = (localId) => {
+    const lyricVersion = { localId }
+    removeLyricVersionFromSong(song, lyricVersion)
+    deleteLyricVersion(lyricVersion)
     setConfirmDeleteId(null);
   };
 
@@ -82,11 +72,11 @@ const VersionSelector = ({ song, updateSong}) => {
         <Field>
           {paginatedVersions.map((version) => (
             <VersionItem
-              key={version.id}
+              key={version.localId}
               version={version}
               editingId={editingId}
               confirmDeleteId={confirmDeleteId}
-              song={song}
+              lyrics={lyrics}
               updateSong={updateSong}
               tempVersionName={tempVersionName}
               setTempVersionName={setTempVersionName}
@@ -124,7 +114,7 @@ const VersionItem = ({
   version,
   editingId,
   confirmDeleteId,
-  song,
+  lyrics,
   updateSong,
   tempVersionName,
   setTempVersionName,
@@ -134,9 +124,8 @@ const VersionItem = ({
   handleDelete,
   setConfirmDeleteId,
 }) => {
-  const { lyrics } = song;
-  const isEditing = editingId === version.id;
-  const isConfirmingDelete = confirmDeleteId === version.id;
+  const isEditing = editingId === version.localId;
+  const isConfirmingDelete = confirmDeleteId === version.localId;
   const isCurrent = lyrics === version.lyrics;
 
   return (
@@ -145,10 +134,14 @@ const VersionItem = ({
         className={`flex items-center justify-between w-full gap-2 p-2 ${
           isConfirmingDelete ? "bg-slate-600" : ""
         }`}
-       >
+      >
         <div
           className="flex-grow flex items-center gap-2 cursor-pointer min-w-[200px]"
-          onClick={() => !isEditing && !isConfirmingDelete && updateSong({...song, lyrics: version.lyrics})}
+          onClick={() =>
+            !isEditing &&
+            !isConfirmingDelete &&
+            updateSong({ lyrics: version.lyrics })
+          }
         >
           <div className="w-4 h-4 flex items-center justify-center">
             {isCurrent && <StarIcon className="h-4 w-4 text-yellow-500" />}
@@ -169,7 +162,7 @@ const VersionItem = ({
               <Button onClick={handleCancel}>
                 <XMarkIcon className="h-4 w-4" />
               </Button>
-              <Button onClick={() => handleSave(version.id)} color="blue">
+              <Button onClick={() => handleSave(version.localId)} color="blue">
                 <CheckIcon className="h-4 w-4" />
               </Button>
             </>
@@ -178,19 +171,19 @@ const VersionItem = ({
               <Button onClick={() => setConfirmDeleteId(null)} color="blue">
                 <XMarkIcon className="h-4 w-4" />
               </Button>
-              <Button onClick={() => handleDelete(version.id)} color="red">
+              <Button
+                onClick={() => handleDelete(version.localId)}
+                color="red"
+              >
                 <TrashIcon className="h-4 w-4" />
               </Button>
             </>
           ) : (
             <>
-              <Button plain onClick={() => handleEdit(version.id)}>
+              <Button plain onClick={() => handleEdit(version.localId)}>
                 <PencilSquareIcon className="h-4 w-4" />
               </Button>
-              <Button
-                plain
-                onClick={() => setConfirmDeleteId(version.id)}
-              >
+              <Button plain onClick={() => setConfirmDeleteId(version.localId)}>
                 <TrashIcon className="h-4 w-4" />
               </Button>
             </>
