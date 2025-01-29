@@ -17,7 +17,7 @@ import EditInPlace from "~/components/common/editInPlace";
 import useCatalogStore from "~/stores/useCatalogStore";
 
 export default function AlbumSection({onAdd, handleCreateSong}){
-  const albums = useCatalogStore(state => state.albums);
+  const albums = useCatalogStore(state => state.albums || []);
   return (
     <DashboardSection
       title="Albums" 
