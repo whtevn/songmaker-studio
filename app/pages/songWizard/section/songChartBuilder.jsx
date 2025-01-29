@@ -3,17 +3,16 @@ import { Heading } from "~/components/catalyst-theme/heading";
 import Keyboard from "~/components/studio/Keyboard";
 import ScaleRender from "~/components/studio/ScaleRender";
 import { Song } from "~/models/Song"
+import useCatalogStore from "~/stores/useCatalogStore";
 
 
-const SongChartBuilder = ({ songData, updateSong }) => {
-  const song = new Song(songData)
-  const { sections } = song;
+const SongChartBuilder = ({ songData, songSections }) => {
 
   return (
     <>
       <div className="rounded-md bg-black border border-gray-700 p-6">
         <Keyboard onNoteClick={ ()=>{} } selectedNotes={ [] } />
-        {sections.map((section, index) => (
+        {songSections.map((section, index) => (
           <div key={section.id || index} className="mb-6 text-center">
             {/* Section Heading */}
             <Heading level={2} className="mb-2">

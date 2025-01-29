@@ -14,6 +14,7 @@ import SongChartBuilder from "./section/songChartBuilder";
 import LyricWriter from "./section/lyricWriter";
 
 import { Song } from "~/models/Song";
+import { orderedSectionOptions , colorDefaults } from "~/models/Constants"
 
 
 export function SongWizard() {
@@ -25,12 +26,18 @@ export function SongWizard() {
   const workingOnSong = useCatalogStore((state) => state.workingOnSong)
   const songs = useCatalogStore((state) => state.songs)
   const lyricVersionStore = useCatalogStore((state) => state.lyricVersions || [] )
+  const songSectionStore = useCatalogStore((state) => state.songSections || [] )
+  const song = songs.find(s => s.localId === workingOnSong)
+  const sectionIds = new Set(song.songSections.map(s => s.localId)); // Create a Set for faster lookup
 
   const lyricVersions = lyricVersionStore
     .filter((v) => v.songId === workingOnSong)
     .sort((a, b) => b.timestamp - a.timestamp); 
 
-  const song = songs.find(s => s.localId === workingOnSong)
+  const songSections = songSectionStore
+    .filter(v => sectionIds.has(v.localId)) 
+    .map((section) => ({...section, color: colorDefaults[section.type], ...song.songSections.find(s => s.localId === section.localId)}))
+    .sort((a, b) => a.order - b.order); 
 
   const { updateSong, addLyricVersionToSong, setWorkingOnSong } = useCatalogStore.getState();
 
@@ -114,14 +121,16 @@ export function SongWizard() {
       )}
       {activeTab === "structure" && (
         <SongSectionEditor
-          songData={song}
+          song={song}
+          songSections={songSections}
+          lyrics={song.lyrics}
           updateSong={(update) => updateSong({ ...song, ...update })}
         />
       )}
       {activeTab === "phrasing" && (
         <SongChartBuilder
           songData={song}
-          updateSong={(update) => updateSong({ ...song, ...update })}
+          songSections={songSections}
         />
       )}
       {activeModal === "showSectionDetails" && (

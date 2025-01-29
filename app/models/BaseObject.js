@@ -101,6 +101,66 @@ export class BaseObject {
         });
       };
 
+      storeMethods[`add${uppercaseFirstLetter(type)}To${objectName}AtIndex`] = (
+        owner,
+        relatedItem,
+        index
+      ) => {
+        set((state) => {
+          const ownerList = state[key];
+          const foundOwner = ownerList.find((item) => item.localId === owner.localId);
+          if (!foundOwner) {
+            throw new Error(`${objectName} not found.`);
+          }
+
+          foundOwner[on] = foundOwner[on] || [];
+          const newItem = { localId: relatedItem.localId, ...(orderable && { order: index }) };
+
+          // Insert at the specified index and shift others
+          foundOwner[on].splice(index, 0, newItem);
+          foundOwner[on] = foundOwner[on].map((item, idx) => ({ ...item, order: idx }));
+
+          return {
+            [key]: [...ownerList],
+            [on]: [...state[on], relatedItem],
+          };
+        });
+      };
+
+      storeMethods[`move${uppercaseFirstLetter(type)}ToIndexOn${objectName}`] = (
+        owner,
+        relatedItem,
+        index
+      ) => {
+        set((state) => {
+          const ownerList = state[key];
+          const foundOwner = ownerList.find((item) => item.localId === owner.localId);
+          if (!foundOwner) {
+            throw new Error(`${objectName} not found.`);
+          }
+
+          foundOwner[on] = foundOwner[on] || [];
+
+          // Remove the item from its current position
+          const itemIndex = foundOwner[on].findIndex(
+            (item) => item.localId === relatedItem.localId
+          );
+          if (itemIndex === -1) {
+            throw new Error(`${type} not found in ${objectName}.`);
+          }
+
+          const [removedItem] = foundOwner[on].splice(itemIndex, 1);
+
+          // Insert at the specified index and re-order
+          foundOwner[on].splice(index, 0, removedItem);
+          foundOwner[on] = foundOwner[on].map((item, idx) => ({ ...item, order: idx }));
+
+          return {
+            [key]: [...ownerList],
+          };
+        });
+      };
+
       storeMethods[`remove${uppercaseFirstLetter(type)}From${objectName}`] = (
         owner,
         relatedItem

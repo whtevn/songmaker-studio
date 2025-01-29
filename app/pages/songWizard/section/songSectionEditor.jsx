@@ -27,7 +27,7 @@ const chordExtensions = [
   { id: "9", semitones: 15, label: "Major 9th" },
 ];
 
-const predefinedSections = ["Intro", "Verse", "Chorus", "Bridge", "Outro"];
+import { orderedSectionOptions } from "~/models/Constants"
 
 const HeaderButton = ()=>{
   return (
@@ -38,23 +38,22 @@ const HeaderButton = ()=>{
 }
 
 
-const SongSectionEditor = ({ songData, updateSong, store }) => {
-  const song = new Song(songData)
+const SongSectionEditor = ({ song, updateSong, lyrics, songSections }) => {
 
   const [currentSection, setCurrentSection] = useState({
     name: "",
     chordProgressions: [],
   });
 
-  const [filteredSections, setFilteredSections] = useState(predefinedSections);
+  const [filteredSections, setFilteredSections] = useState(orderedSectionOptions);
 
   const handleSectionNameChange = (value) => {
     setCurrentSection((prev) => ({ ...prev, name: value }));
     if (value === "") {
-      setFilteredSections(predefinedSections);
+      setFilteredSections(orderedSectionOptions);
     } else {
       setFilteredSections(
-        predefinedSections.filter((section) =>
+        orderedSectionOptions.filter((section) =>
           section.toLowerCase().includes(value.toLowerCase())
         )
       );
@@ -82,8 +81,8 @@ const SongSectionEditor = ({ songData, updateSong, store }) => {
         backend={isMobile ? TouchBackend : HTML5Backend}
         options={{ enableMouseEvents: true }} // For better compatibility
       >
-        <SongTimeline songData={song} updateSong={updateSong} />
-        <LyricDisplay text={song.lyrics} />
+        <SongTimeline songData={song} updateSong={updateSong} songSections={songSections} />
+        <LyricDisplay text={lyrics} />
       </DndProvider>
   );
 };

@@ -85,7 +85,7 @@ const DraggableCard = ({
       >
         <div
           className={`flex-grow-0 text-center text-${card.color}-700 bg-${card.color}-200 rounded-md p-4 m-2 shadow-md cursor-pointer`}
-          data-id={card.id}
+          data-id={card.localId}
         >
           <p>{card.type}</p>
         </div>
@@ -110,23 +110,13 @@ const StateDiagram = ({
   setInputLocation,
   onCardClick,
 }) => {
-  const moveCard = useCallback(
-    (fromIndex, toIndex) => {
-      setCards((prevCards) => {
-        const updatedCards = [...prevCards];
-        const [movedCard] = updatedCards.splice(fromIndex, 1);
-        updatedCards.splice(toIndex, 0, movedCard);
-        return updatedCards;
-      });
-    },
-    [setCards]
-  );
+  const moveCard = useCallback(setCards, [setCards]);
 
   return (
     <div className="flex flex-wrap justify-start items-center gap-4">
       {cards.map((card, index) => (
         <DraggableCard
-          key={card.id}
+          key={card.localId}
           card={card}
           index={index}
           moveCard={moveCard}

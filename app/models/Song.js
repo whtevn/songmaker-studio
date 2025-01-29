@@ -12,7 +12,7 @@ export class Song extends BaseObject {
       timeSignature: "4/4",
       key: { root: "C", mode: "Ionian" },
       lyrics: "",
-      sections: [], // List of { SongSectionId, Order }
+      songSections: [], // List of { SongSectionId, Order }
       lyricVersionTally: 0,
       lyricVersions: [], // List of { LyricVersionId, Order }
       albums: [], // List of { LyricVersionId, Order }
@@ -24,7 +24,7 @@ export class Song extends BaseObject {
 
 // Define `has_many` relationships
 Song.has_many(
-  { type: "section", on: "sections", orderable: true },
+  { type: "songSection", on: "songSections", orderable: true },
   { type: "lyricVersion",  on: "lyricVersions", orderable: true },
   { type: "album", on: "albums" },
 )

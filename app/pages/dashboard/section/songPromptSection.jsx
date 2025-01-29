@@ -8,7 +8,7 @@ import { PlusCircleIcon } from '@heroicons/react/16/solid';
 import { useNavigate } from "react-router";
 import useCatalogStore from "~/stores/useCatalogStore";
 
-export default function SongPromptSection({ onEdit, onAdd, albumId }){
+export default function SongPromptSection({ onEdit, onAdd, albumId, handleCreateSong }){
   const prompts = useCatalogStore(state => state.songPrompts);
   const { addSong, addSongToAlbum, deleteSongPrompt, getAlbum } = useCatalogStore.getState()
   const album = getAlbum({localId: albumId})
@@ -17,8 +17,7 @@ export default function SongPromptSection({ onEdit, onAdd, albumId }){
     const lyrics = prompt.text;
     const title = lyrics.split("\n")[0];
     const song = new Song({lyrics, title})
-    addSong(song)
-    addSongToAlbum(album, song)
+    handleCreateSong(song)
     deleteSongPrompt(prompt)
     navigate(`/song/${song.localId}`)
   }

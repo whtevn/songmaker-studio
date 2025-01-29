@@ -16,7 +16,7 @@ import { useNavigate } from "react-router";
 import EditInPlace from "~/components/common/editInPlace";
 import useCatalogStore from "~/stores/useCatalogStore";
 
-export default function AlbumSection({onAdd}){
+export default function AlbumSection({onAdd, handleCreateSong}){
   const albums = useCatalogStore(state => state.albums);
   return (
     <DashboardSection
@@ -25,6 +25,7 @@ export default function AlbumSection({onAdd}){
 {/* onAction={onAdd} actionButton={<PlusCircleIcon className="h-4 w-4" />} */}
       {albums.map((album) => (
         <AlbumSongSection
+          handleCreateSong={handleCreateSong}
           album={album}
           key={album.localId || album.id}
         />
@@ -33,15 +34,15 @@ export default function AlbumSection({onAdd}){
   )
 }
 
-const AlbumSongSection = ({ album }) => {
+const AlbumSongSection = ({ album, handleCreateSong }) => {
   const navigate = useNavigate();
-  const { getSongsForAlbum, updateAlbum, updateSong, addSong, addSongToAlbum } = useCatalogStore.getState();
+  const { getSongsForAlbum, updateAlbum } = useCatalogStore.getState();
   const [ addingSong, setAddingSong ] = useState(false)
   const [ song, setSong ] = useState(new Song())
   const songs = getSongsForAlbum(album)
   const onAddSongToAlbum = (opts={}) => {
     const {navigateTo} = opts
-    addSongToAlbum(album, song)
+    handleCreateSong(song)
     if(navigateTo){
       setAddingSong(false)
       navigate(`/song/${song.localId}`)
@@ -94,7 +95,7 @@ const AlbumSongSection = ({ album }) => {
                         <BadgeButton color="red" onClick={()=>setAddingSong(false)} >Cancel</BadgeButton>
                         <BadgeButton color="blue" onClick={()=>onAddSongToAlbum()} >Save</BadgeButton>
                         <BadgeButton color="emerald" onClick={()=>{
-                          addSongToAlbum({navigateTo: true})
+                          onAddSongToAlbum({navigateTo: true})
                         }} >Start Writing</BadgeButton>
                       </div>
                     </div>

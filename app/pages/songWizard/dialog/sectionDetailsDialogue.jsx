@@ -10,15 +10,16 @@ import { Input } from "~/components/catalyst-theme/input";
 import { Textarea } from "~/components/catalyst-theme/textarea";
 import { Button } from "~/components/catalyst-theme/button";
 import { Song } from "~/models/Song"
+import useCatalogStore from "~/stores/useCatalogStore";
 
 const SectionDetailsDialog = ({ isOpen, onClose, section, songData, updateSong }) => {
-  const song = new Song(songData)
   const [localSection, setLocalSection] = useState(section);
+  const { updateSongSection } = useCatalogStore.getState();
 
   const handleInputChange = (key, value) => {
     const updatedSection = { ...localSection, [key]: value };
     setLocalSection(updatedSection);
-    song.updateSection(updatedSection); // Persist changes to the store
+    updateSongSection(updatedSection); // Persist changes to the store
   };
 
   const handleClose = () => {

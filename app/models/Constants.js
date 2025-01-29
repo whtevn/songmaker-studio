@@ -31,11 +31,11 @@ export const orderedSectionOptions = [
 
 export const colorDefaults = {
   [INTRO]: "pink",
-  [VERSE]: "fuchsia",
+  [VERSE]: "blue",
   [PRECHORUS]: "amber",
-  [CHORUS]: "yellow",
-  [BRIDGE]: "emerald",
+  [CHORUS]: "emerald",
+  [BRIDGE]: "yellow",
   [REFRAIN]: "cyan",
-  [INTERLUDE]: "blue",
+  [INTERLUDE]: "fuchsia",
   [OUTRO]: "violet",
 }

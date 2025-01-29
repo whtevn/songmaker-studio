@@ -11,7 +11,10 @@ import NewPromptDialog from "./dialog/songPromptDialog";
 import { useModal } from "~/context/ModalContext";
 import useCatalogStore from "~/stores/useCatalogStore";
 import useInterfaceStore from "~/stores/useInterfaceStore";
+import { Song } from "~/models/Song"
 import { SongPrompt } from "~/models/SongPrompt"
+import { SongSection } from "~/models/SongSection"
+import { INTRO, OUTRO } from "~/models/Constants"
 
 export function Dashboard() {
   const navigate = useNavigate();
@@ -21,10 +24,17 @@ export function Dashboard() {
   const { openModal, activeModal, closeModal } = useModal();
 
   const selectedAlbumId =  useInterfaceStore(state => state.selectedAlbumId);
-  const { addSong, updateSong, addAlbum, updateAlbum, addSongPrompt, updateSongPrompt } = useCatalogStore.getState();
+  const { addSongToAlbum, updateSong, addAlbum, updateAlbum, addSongPrompt, updateSongPrompt, addSongSectionToSong } = useCatalogStore.getState();
 
-  const handleCreateSong = (newSong) => {
-    addSong(newSong);
+  const handleCreateSong = (songData) => {
+    //addSong(songData);
+    const songId = songData.localId
+    const intro = new SongSection({ type: INTRO }, songId);
+    const outro = new SongSection({ type: OUTRO }, songId);
+    const album = {localId: selectedAlbumId}
+    addSongToAlbum(album, songData)
+    addSongSectionToSong(songData, intro)
+    addSongSectionToSong(songData, outro)
     closeModal();
   };
 
@@ -59,6 +69,7 @@ export function Dashboard() {
           onAdd={() => {
             openModal("newAlbum")
           }}
+          handleCreateSong={handleCreateSong}
         />
         {/* Lyric Bank Section */}
         <SongPromptSection
@@ -70,6 +81,7 @@ export function Dashboard() {
             setCurrentPrompt(null)
             openModal("newPrompt")
           }}
+          handleCreateSong={handleCreateSong}
           albumId={selectedAlbumId}
         />
         <KeyFinderSection />

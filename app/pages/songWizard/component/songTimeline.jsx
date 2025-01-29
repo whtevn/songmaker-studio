@@ -10,104 +10,38 @@ import { Field, Fieldset, Label } from "~/components/catalyst-theme/fieldset";
 import { Input } from "~/components/catalyst-theme/input";
 import { useModal } from '~/context/ModalContext';
 import { Song } from "~/models/Song"
+import { SongSection } from "~/models/SongSection"
+import useCatalogStore from "~/stores/useCatalogStore";
 
+import { orderedSectionOptions, colorDefaults } from '~/models/Constants'
 
-const SongTimeline = ({ songData, updateSong }) => {
-  const song = new Song(songData)
-  const { sections, tempo, timeSignature, duration } = song;
+const SongTimeline = ({ songData, songSections }) => {
 
-  const [inputLocation, setInputLocation] = React.useState(sections.length-1);
-  const sectionOptions = [
-    { type: "Intro", color: "pink" },
-    { type: "Verse", color: "fuchsia" },
-    { type: "Pre-Chorus", color: "amber" },
-    { type: "Chorus", color: "yellow" },
-    { type: "Bridge", color: "emerald" },
-    { type: "Refrain", color: "cyan" },
-    { type: "Interlude", color: "blue" },
-    { type: "Outro", color: "violet" },
-  ];
+  const [inputLocation, setInputLocation] = React.useState(songSections.length-1);
+  const sectionOptions = orderedSectionOptions.map(type => ({ type, color: colorDefaults[type] }))
+
+  const { addSongSectionToSong, addSongSectionToSongAtIndex, removeSongSectionFromSong, deleteSongSection, updateSongSection, moveSongSectionToIndexOnSong } = useCatalogStore.getState()
 
   const { openModal } = useModal();
 
-
-  const handleNameChange = (index, newName) => {
-    const updatedSections = sections.map((section, idx) => {
-      if (idx === index) {
-        return { ...section, name: newName };
-      }
-      return section;
-    });
-    song.setSections(updatedSections);
-  };
-
-  const handleTypeChange = (index, newType) => {
-    const updatedSections = sections.map((section, idx) => {
-      if (idx === index) {
-        return { ...section, type: newType };
-      }
-      return section;
-    });
-    song.setSections(updatedSections);
-  };
-
-  const handleMeasureChange = (index, newMeasures) => {
-    const updatedSections = sections.map((section, idx) => {
-      if (idx === index) {
-        return { ...section, measures: newMeasures };
-      }
-      return section;
-    });
-    song.setSections(updatedSections);
-  };
-
-  const calculateSectionTime = (measures) => {
-    if (!tempo || !timeSignature) return 0;
-    const [beatsPerMeasure] = timeSignature.split("/").map(Number); // Extract beats per measure from timeSignature
-    const secondsPerBeat = 60 / tempo;
-    return Math.floor(measures * beatsPerMeasure * secondsPerBeat);
-  };
-
-  const secondsToMinuteNotation = (seconds) => {
-    if(!seconds) return { minutes: 0, seconds: 0, asString: "0m 00s" }
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return {
-      minutes,
-      seconds: remainingSeconds,
-      asString: `${minutes}m ${remainingSeconds}s`,
-    };
-  };
-
-  const handleDeleteSection = (index) => {
-    if (sections.length > 1) {
-      const updatedSections = [
-        ...sections.slice(0, index),
-        ...sections.slice(index + 1),
-      ];
-      song.setSections(updatedSections);
+  const handleDeleteSection = (songSection) => {
+    if (songSections.length > 1) {
+      removeSongSectionFromSong(songData, songSection)
+      deleteSongSection(songSection)
     }
   };
 
   const handleAddSection = (newSection) => {
+    const section = new SongSection(newSection, songData.localId)
+    console.log(inputLocation)
     if (inputLocation !== null) {
-      const updatedSections = [
-        ...sections.slice(0, inputLocation),
-        newSection,
-        ...sections.slice(inputLocation),
-      ];
-      song.setSections(updatedSections);
+      addSongSectionToSongAtIndex(songData, section, inputLocation)
       setInputLocation(inputLocation + 1);
     } else {
-      song.setSections([...sections, newSection]);
+      addSongSectionToSong(songData, section)
     }
-    updateSong(song)
   };
 
-  const totalTime = sections.reduce(
-    (total, section) => total + calculateSectionTime(section.measures),
-    0
-  );
 
   const updateSelectedCards = (section) => {
     openModal("showSectionDetails", section)
@@ -126,15 +60,12 @@ const SongTimeline = ({ songData, updateSong }) => {
       <div className="p-4 flex flex-col">
         <SortableCards
           onCardClick={updateSelectedCards}
-          store={song}
-          cards={song.sections}
-          setCards={(c)=>{
-            song.setSections(c)
-            updateSong(song)
+          cards={songSections}
+          setCards={(fromIndex, toIndex)=>{
+            moveSongSectionToIndexOnSong(songData, songSections[fromIndex], toIndex)
           }}
           onApplyLyrics={(index, lyrics)=>{
-            song.applyLyrics(index, lyrics)
-            updateSong(song)
+            updateSongSection({ ...songSections[index], lyrics })
           }}
           inputLocation={inputLocation}
           setInputLocation={setInputLocation}
