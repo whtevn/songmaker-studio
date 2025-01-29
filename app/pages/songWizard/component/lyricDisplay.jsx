@@ -1,14 +1,19 @@
 import React from "react";
 import { useDrag } from "react-dnd";
+import { Text } from "~/components/catalyst-theme/text";
 
 const LyricDisplay = ({ text }) => {
-  const sections = text.split(/\n{2,}/).map((section) => section.trim());
+  const sections = text.split(/\n{2,}/).map((section) => section.trim()).filter(Boolean);
 
   return (
     <div className="border border-gray-700 flex flex-row flex-wrap gap-4 mt-4 bg-black w-full p-4 rounded-lg">
-      {sections.map((section, index) => (
-        <LyricSection key={index} lyrics={section} />
-      ))}
+
+      {sections.length > 0
+        ? sections.map((section, index) => (
+          <LyricSection key={index} lyrics={section} />
+        ))
+        : <Text>Add some lyrics to apply them to your song sections</Text>
+      }
     </div>
   );
 };
