@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '~/components/catalyst-theme/button'
-import { Link } from '~/components/catalyst-theme/link'
+//import { Link } from '~/components/catalyst-theme/link'
+import { Link } from 'react-router';
 import { Avatar } from '~/components/catalyst-theme/avatar'
 import { Dropdown, DropdownDivider, DropdownItem, DropdownLabel, DropdownMenu, DropdownButton } from '~/components/catalyst-theme/dropdown'
 import { Navbar, NavbarItem, NavbarSection, NavbarDivider, NavbarSpacer } from '~/components/catalyst-theme/navbar'
@@ -18,9 +19,7 @@ export default function SmsNavbar({save}) {
   const [ isSaveDisabled, setIsSaveDisabled ] = useState(false);
   return (
     <Navbar>
-      <NavbarItem className="min-w-[150px]">
-        <Link href="/"><Logo /></Link>
-      </NavbarItem>
+      <Link to={{ pathname: "/" }} className="min-w-[150px]"><Logo /></Link>
       <NavbarSpacer />
         { false && 
       <Button color={ isSaveDisabled ? "slate" : "pink" } onClick={save}>Save</Button>
