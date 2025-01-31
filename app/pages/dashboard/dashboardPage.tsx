@@ -17,9 +17,6 @@ import SongPrompt from "~/models/SongPrompt"
 import SongSection from "~/models/SongSection"
 import { INTRO, OUTRO } from "~/models/Constants"
 
-
-
-
 export function Dashboard() {
   const navigate = useNavigate();
   const [currentSong, setCurrentSong] = useState(null);
@@ -31,14 +28,15 @@ export function Dashboard() {
   const { addSongToAlbum, updateSong, addAlbum, updateAlbum, addSongPrompt, updateSongPrompt, addSongSectionToSong } = useCatalogStore.getState();
 
   const handleCreateSong = (songData) => {
-    //addSong(songData);
-    const songId = songData.localId
+    const song = new Song(songData);
+    const songId = song.localId
     const intro = new SongSection({ type: INTRO, songId });
     const outro = new SongSection({ type: OUTRO, songId });
-    addSongToAlbum(album, songData)
-    addSongSectionToSong(songData, intro)
-    addSongSectionToSong(songData, outro)
+    addSongToAlbum(album, song)
+    addSongSectionToSong(song, intro)
+    addSongSectionToSong(song, outro)
     closeModal();
+    return songId;
   };
 
   const handleCreateAlbum = (newAlbum) => {

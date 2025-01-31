@@ -9,10 +9,7 @@ export default objectFor({
     timeSignature: "4/4",
     key: { root: "C", mode: "Ionian" },
     lyrics: "",
-    songSections: [], // List of { SongSectionId, Order }
     lyricVersionTally: 0,
-    lyricVersions: [], // List of { LyricVersionId, Order }
-    albums: [], // List of { LyricVersionId, Order }
   },
   has_many: [
     { type: "songSection", on: "songSections", orderable: true },

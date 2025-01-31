@@ -80,6 +80,8 @@ export default function crudStore({set, get}, entity = {}) {
     const capitalizedChildType = uppercaseFirstLetter(childType);
     const capitalizedOn = uppercaseFirstLetter(on);
 
+    storeMethods[on] = storeMethods[on] || [];
+
     // Example: getSongSectionsForSong
     storeMethods[`get${capitalizedOn}For${objectName}`] = (ownerObj) => {
       if (!ownerObj[on]) return [];
@@ -92,6 +94,7 @@ export default function crudStore({set, get}, entity = {}) {
     // Example: addSongSectionToSong
     storeMethods[`add${capitalizedChildType}To${objectName}`] = (ownerObj, childItem) => {
       set((state) => {
+        console.log("CALLING WITH", {ownerObj, childItem})
         const owners = state[entityKey];
         const foundOwner = owners.find((item) => item.localId === ownerObj.localId);
         if (!foundOwner) {

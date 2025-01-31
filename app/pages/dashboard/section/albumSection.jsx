@@ -40,25 +40,26 @@ const AlbumSongSection = ({ album, handleCreateSong }) => {
   const navigate = useNavigate();
   const { getSongsForAlbum, updateAlbum, setWorkingOnSong } = useCatalogStore.getState();
   const [ addingSong, setAddingSong ] = useState(false)
-  const [ song, setSong ] = useState(new Song())
+  const [ title, setTitle ] = useState("Untitled Song")
+
   const songs = album ? getSongsForAlbum(album) : []
+
   const onAddSongToAlbum = (opts={}) => {
     const {navigateTo} = opts
-    handleCreateSong(song)
+    const id = handleCreateSong({title})
     if(navigateTo){
       setAddingSong(false)
-      navigate(`/song/${song.localId}`)
+      setTitle("Untitled Song")
+      navigate(`/song/${id}`)
     }else{
       setAddingSong(false)
-      setSong(new Song())
+      setTitle("Untitled Song")
     }
   }
+
   const handleTitleChange = (e) => {
     const updatedTitle = e.target.value;
-    setSong((prevSong) => ({
-      ...prevSong,
-      title: updatedTitle,
-    }));
+    setTitle(updatedTitle)
   };
   const newSongTitleRef = useRef(null);
 
@@ -92,7 +93,7 @@ const AlbumSongSection = ({ album, handleCreateSong }) => {
             <div className="flex grow">
               { addingSong 
                   ? <div className="grow">
-                      <Input className="grow p-2" value={song.title} onChange={handleTitleChange} ref={newSongTitleRef}/>
+                      <Input className="grow p-2" value={title} onChange={handleTitleChange} ref={newSongTitleRef} />
                       <div className="flex flex-row gap-2 items-center justify-end">
                         <BadgeButton color="red" onClick={()=>setAddingSong(false)} >Cancel</BadgeButton>
                         <BadgeButton color="blue" onClick={()=>onAddSongToAlbum()} >Save</BadgeButton>

@@ -14,16 +14,17 @@ import crudStore from './crudStore';
  * }
  * @returns {Class} A dynamically created class
  */
-export default function objectify(definition) {
+export default function objectify(definitionArg) {
   const {
     type = "Unnamed",
     default: defaultFields = {},
     required = [],
-  } = definition;
+    has_many = [],
+  } = definitionArg;
 
   return class {
     // Attach the raw definition to the class (for static usage)
-    static definition = definition;
+    static definition = definitionArg;
 
     constructor(data = {}) {
       // localId

@@ -4,7 +4,6 @@ export default objectFor({
   default: {
     title: "Untitled Album",
     status: "writing",
-    songs: [], // List of { SongId, Order }
     image: null, // Optional album image
   },
   has_many: [
