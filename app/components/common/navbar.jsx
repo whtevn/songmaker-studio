@@ -22,12 +22,16 @@ export default function SmsNavbar({save}) {
         <Link href="/"><Logo /></Link>
       </NavbarItem>
       <NavbarSpacer />
+        { false && 
       <Button color={ isSaveDisabled ? "slate" : "pink" } onClick={save}>Save</Button>
+        }
+        { false && 
       <AccountDropdown as={NavbarItem} className="min-w-[200px]">
         <NavbarItem onClick={() => openModal('signIn')}>
           <UserIcon /> Sign In
         </NavbarItem>
       </AccountDropdown>
+        }
     </Navbar>
   );
 }
