@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react'
 import { STATUS_SET, WRITING } from '~/models/Constants';
-import { Song } from "~/models/Song"
 import DashboardSection from "~/components/common/cardSection";
 import AlbumCoverEditor from "~/components/common/albumCoverEditor";
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "~/components/catalyst-theme/table";
@@ -16,30 +15,33 @@ import { useNavigate } from "react-router";
 import EditInPlace from "~/components/common/editInPlace";
 import useCatalogStore from "~/stores/useCatalogStore";
 
-export default function AlbumSection({onAdd, handleCreateSong}){
-  const albums = useCatalogStore(state => state.albums || []);
+import Song from "~/models/Song"
+import Album from "~/models/Album"
+
+function uppercaseFirstLetter(val) {
+  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}
+export default function AlbumSection({onAdd, handleCreateSong, album}){
   return (
     <DashboardSection
       title="Albums" 
     >
 {/* onAction={onAdd} actionButton={<PlusCircleIcon className="h-4 w-4" />} */}
-      {albums.map((album) => (
-        <AlbumSongSection
-          handleCreateSong={handleCreateSong}
-          album={album}
-          key={album.localId || album.id}
-        />
-      ))}
+      <AlbumSongSection
+        handleCreateSong={handleCreateSong}
+        album={album}
+        key={album.localId || album.id}
+      />
     </DashboardSection>
   )
 }
 
 const AlbumSongSection = ({ album, handleCreateSong }) => {
   const navigate = useNavigate();
-  const { getSongsForAlbum, updateAlbum } = useCatalogStore.getState();
+  const { getSongsForAlbum, updateAlbum, setWorkingOnSong } = useCatalogStore.getState();
   const [ addingSong, setAddingSong ] = useState(false)
   const [ song, setSong ] = useState(new Song())
-  const songs = getSongsForAlbum(album)
+  const songs = album ? getSongsForAlbum(album) : []
   const onAddSongToAlbum = (opts={}) => {
     const {navigateTo} = opts
     handleCreateSong(song)

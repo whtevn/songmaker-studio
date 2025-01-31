@@ -9,8 +9,8 @@ import { ChevronDownIcon } from '@heroicons/react/16/solid';
 import { Field, Fieldset, Label } from "~/components/catalyst-theme/fieldset";
 import { Input } from "~/components/catalyst-theme/input";
 import { useModal } from '~/context/ModalContext';
-import { Song } from "~/models/Song"
-import { SongSection } from "~/models/SongSection"
+import Song from "~/models/Song"
+import SongSection from "~/models/SongSection"
 import useCatalogStore from "~/stores/useCatalogStore";
 
 import { orderedSectionOptions, colorDefaults } from '~/models/Constants'
@@ -32,8 +32,7 @@ const SongTimeline = ({ songData, songSections }) => {
   };
 
   const handleAddSection = (newSection) => {
-    const section = new SongSection(newSection, songData.localId)
-    console.log(inputLocation)
+    const section = new SongSection({...newSection, songId: songData.localId})
     if (inputLocation !== null) {
       addSongSectionToSongAtIndex(songData, section, inputLocation)
       setInputLocation(inputLocation + 1);

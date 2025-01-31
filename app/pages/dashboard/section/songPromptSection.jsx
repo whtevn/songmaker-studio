@@ -3,15 +3,14 @@ import DashboardSection from "~/components/common/cardSection";
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "~/components/catalyst-theme/table";
 import { Text } from "~/components/catalyst-theme/text";
 import { BadgeButton } from "~/components/catalyst-theme/badge";
-import { Song } from "~/models/Song"
+import Song from "~/models/Song"
 import { PlusCircleIcon } from '@heroicons/react/16/solid';
 import { useNavigate } from "react-router";
 import useCatalogStore from "~/stores/useCatalogStore";
 
 export default function SongPromptSection({ onEdit, onAdd, albumId, handleCreateSong }){
   const prompts = useCatalogStore(state => state.songPrompts);
-  const { addSong, addSongToAlbum, deleteSongPrompt, getAlbum } = useCatalogStore.getState()
-  const album = getAlbum({localId: albumId})
+  const { addSong, addSongToAlbum, deleteSongPrompt } = useCatalogStore.getState()
   const navigate = useNavigate();
   const onAddSongToAlbum = (prompt) => {
     const lyrics = prompt.text;

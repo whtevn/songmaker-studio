@@ -6,8 +6,8 @@ import { Fieldset, Field, Label } from '~/components/catalyst-theme/fieldset'
 import { Listbox, ListboxLabel, ListboxOption } from '~/components/catalyst-theme/listbox'
 import VersionSelector from '../component/versionSelector'
 import Toast from "~/components/common/Toast";
-import { Song } from "~/models/Song"
-import { LyricVersion } from "~/models/LyricVersion"
+import Song from "~/models/Song"
+import LyricVersion from "~/models/LyricVersion"
 
 const placeholderText = `Tap here to write your lyrics 
 

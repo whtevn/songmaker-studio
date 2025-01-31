@@ -16,4 +16,7 @@ export default defineConfig({
     }
   },
   plugins: [reactRouter(), tsconfigPaths()],
+  build: {
+    sourcemap: true
+  }
 });

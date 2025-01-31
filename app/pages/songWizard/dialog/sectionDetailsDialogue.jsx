@@ -9,7 +9,7 @@ import { Fieldset, Field, Label } from "~/components/catalyst-theme/fieldset";
 import { Input } from "~/components/catalyst-theme/input";
 import { Textarea } from "~/components/catalyst-theme/textarea";
 import { Button } from "~/components/catalyst-theme/button";
-import { Song } from "~/models/Song"
+import Song from "~/models/Song"
 import useCatalogStore from "~/stores/useCatalogStore";
 
 const SectionDetailsDialog = ({ isOpen, onClose, section, songData, updateSong }) => {

@@ -11,10 +11,14 @@ import NewPromptDialog from "./dialog/songPromptDialog";
 import { useModal } from "~/context/ModalContext";
 import useCatalogStore from "~/stores/useCatalogStore";
 import useInterfaceStore from "~/stores/useInterfaceStore";
-import { Song } from "~/models/Song"
-import { SongPrompt } from "~/models/SongPrompt"
-import { SongSection } from "~/models/SongSection"
+import Song from "~/models/Song"
+import Album from "~/models/Album"
+import SongPrompt from "~/models/SongPrompt"
+import SongSection from "~/models/SongSection"
 import { INTRO, OUTRO } from "~/models/Constants"
+
+
+
 
 export function Dashboard() {
   const navigate = useNavigate();
@@ -23,15 +27,14 @@ export function Dashboard() {
   const [currentPrompt, setCurrentPrompt] = useState(null);
   const { openModal, activeModal, closeModal } = useModal();
 
-  const selectedAlbumId =  useInterfaceStore(state => state.selectedAlbumId);
+  const album = useCatalogStore(state => state.albums ? state.albums[0] : new Album())
   const { addSongToAlbum, updateSong, addAlbum, updateAlbum, addSongPrompt, updateSongPrompt, addSongSectionToSong } = useCatalogStore.getState();
 
   const handleCreateSong = (songData) => {
     //addSong(songData);
     const songId = songData.localId
-    const intro = new SongSection({ type: INTRO }, songId);
-    const outro = new SongSection({ type: OUTRO }, songId);
-    const album = {localId: selectedAlbumId}
+    const intro = new SongSection({ type: INTRO, songId });
+    const outro = new SongSection({ type: OUTRO, songId });
     addSongToAlbum(album, songData)
     addSongSectionToSong(songData, intro)
     addSongSectionToSong(songData, outro)
@@ -66,6 +69,7 @@ export function Dashboard() {
 
         {/* Albums Section */}
         <AlbumSection
+          album={album}
           onAdd={() => {
             openModal("newAlbum")
           }}
@@ -82,7 +86,7 @@ export function Dashboard() {
             openModal("newPrompt")
           }}
           handleCreateSong={handleCreateSong}
-          albumId={selectedAlbumId}
+          albumId={album.localId}
         />
         <KeyFinderSection />
 

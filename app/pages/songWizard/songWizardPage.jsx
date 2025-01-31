@@ -13,7 +13,7 @@ import SongSectionEditor from "./section/songSectionEditor";
 import SongChartBuilder from "./section/songChartBuilder";
 import LyricWriter from "./section/lyricWriter";
 
-import { Song } from "~/models/Song";
+import Song from "~/models/Song";
 import { orderedSectionOptions , colorDefaults } from "~/models/Constants"
 
 
@@ -22,13 +22,17 @@ export function SongWizard() {
   const modal = useModal();
   const { activeModal, closeModal, activeModalOptions } = modal;
   const { id, tab } = useParams(); // Retrieve song ID and tab from the route
+  useEffect(() => {
+    setWorkingOnSong(id); // Causes re-renders every time `id` changes
+    setActiveTab(tab || "lyrics"); // Causes re-renders every time `tab` changes
+  }, [id, tab]);
 
   const workingOnSong = useCatalogStore((state) => state.workingOnSong)
   const songs = useCatalogStore((state) => state.songs)
   const lyricVersionStore = useCatalogStore((state) => state.lyricVersions || [] )
   const songSectionStore = useCatalogStore((state) => state.songSections || [] )
   const song = songs.find(s => s.localId === workingOnSong)
-  const sectionIds = new Set(song.songSections.map(s => s.localId)); // Create a Set for faster lookup
+  const sectionIds = new Set(song?.songSections.map(s => s.localId) || []); // Create a Set for faster lookup
 
   const lyricVersions = lyricVersionStore
     .filter((v) => v.songId === workingOnSong)
@@ -46,14 +50,7 @@ export function SongWizard() {
   const [tempTitle, setTempTitle] = useState(song?.title || "Untitled Song");
 
   const headerRef = useRef(null)
-  useEffect(() => {
-    if(tab){
-      setActiveTab(tab); // Causes re-renders every time `tab` changes
-    }
-  }, [tab]);
-  useEffect(() => {
-    setWorkingOnSong(id); // Causes re-renders every time `tab` changes
-  }, [id]);
+
 
   const handleCancelTitleChange = () => {
     setIsEditing(false)
