@@ -10,7 +10,7 @@ const SongChartBuilder = ({ songData, songSections }) => {
 
   return (
     <>
-      <div className="rounded-md bg-black border border-gray-700 p-6">
+      <div className="rounded-b-md dark:bg-black border dark:border-gray-700 p-6">
         <Keyboard onNoteClick={ ()=>{} } selectedNotes={ [] } />
         {songSections.map((section, index) => (
           <div key={section.id || index} className="mb-6 text-center">

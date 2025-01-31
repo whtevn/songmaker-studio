@@ -152,7 +152,7 @@ const VersionItem = ({
             <input
               value={tempVersionName}
               onChange={(e) => setTempVersionName(e.target.value)}
-              className="bg-gray-700 border border-slate-500 rounded-md p-1 text-white"
+              className="bg-gray-700 border border-slate-500 rounded-md p-1 dark:text-white"
             />
           )}
         </div>

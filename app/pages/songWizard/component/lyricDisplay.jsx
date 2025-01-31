@@ -6,7 +6,7 @@ const LyricDisplay = ({ text }) => {
   const sections = text.split(/\n{2,}/).map((section) => section.trim()).filter(Boolean);
 
   return (
-    <div className="border border-gray-700 flex flex-row flex-wrap gap-4 mt-4 bg-black w-full p-4 rounded-lg">
+    <div className="border dark:border-gray-700 flex flex-row flex-wrap gap-4 mt-4 dark:bg-black w-full p-4 rounded-lg">
 
       {sections.length > 0
         ? sections.map((section, index) => (

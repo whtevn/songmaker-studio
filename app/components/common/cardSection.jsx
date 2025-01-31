@@ -5,7 +5,7 @@ import { PlusCircleIcon } from '@heroicons/react/16/solid';
 
 const DashboardSection = ({ title, width, children, onAction, actionButton }) => {
   return (
-    <section className={`rounded-lg shadow-md items-center border border-gray-700 bg-black p-4 space-y-2 ${width || "w-full"}`}>
+    <section className={`rounded-lg shadow-md items-center border dark:border-gray-700 dark:bg-black p-4 space-y-2 ${width || "w-full"}`}>
       <Heading className="flex flex-row items-center gap-2 cursor-pointer" onClick={onAction} >{ onAction && actionButton }{title}</Heading>
       <Divider />
       {children}

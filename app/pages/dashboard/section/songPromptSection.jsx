@@ -28,7 +28,7 @@ export default function SongPromptSection({ onEdit, onAdd, albumId, handleCreate
     >
       {prompts?.length > 0
         ? prompts.map((songPrompt, i) => (
-          <div className={`flex flex-row items-center justify-between ${ i % 2 ?  "bg-zinc-900" : "" } p-2`} key={songPrompt.localId || songPrompt.id}>
+          <div className={`flex flex-row items-center justify-between ${ i % 2 ?  "bg-zinc-100 dark:bg-zinc-900" : "" } p-2`} key={songPrompt.localId || songPrompt.id}>
             <Text className="grow cursor-pointer" onClick={()=>onEdit(songPrompt)}>{songPrompt.text}</Text>
 
             <span>

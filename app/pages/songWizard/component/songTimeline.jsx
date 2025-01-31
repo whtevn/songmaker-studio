@@ -47,9 +47,9 @@ const SongTimeline = ({ songData, songSections }) => {
   }
 
   return (
-    <div className="rounded-md bg-black border border-gray-700">
+    <div className="rounded-md dark:bg-black border dark:border-gray-700">
       <div className="p-4 mt-2 flex flex-col">
-        <div className="flex justify-evenly flex-wrap border-b-4 border-gray-900 pb-4" >
+        <div className="flex justify-evenly flex-wrap border-b-2 dark:border-gray-900 pb-4" >
         { sectionOptions.map((option, index) => 
           <Badge key={index} onClick={()=>handleAddSection(option)} color={option.color} className="p-8 m-2 cursor-pointer">{ option.type }</Badge>
         )
