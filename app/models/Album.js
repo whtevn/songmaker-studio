@@ -1,7 +1,6 @@
-import objectFor from '~/utils/storeMaker/create'
-import supabaseModule from '~/utils/storeMaker/supabase'
-import hasManyModule from '~/utils/storeMaker/hasMany'
-export default objectFor({
+import { defineStore } from '~/storeMaker'
+import { supabase, hasMany } from '~/storeMaker/modules'
+export default defineStore({
   type: "Album",
   default: {
     title: "Untitled Album",
@@ -12,5 +11,5 @@ export default objectFor({
     { type: "song", on: "songs", orderable: true },
   ]
 })
-.withModule(supabaseModule)
-.withModule(hasManyModule)
+.withModule(supabase)
+.withModule(hasMany)

@@ -9,10 +9,10 @@ import SongSection from '~/models/SongSection'
 import SongPrompt from '~/models/SongPrompt'
 import LyricVersion from '~/models/LyricVersion'
 
-import { makeStore } from '~/utils/storeMaker'
+import { mergeStores } from '~/storeMaker'
 
 const useStore = create(persist((set, get) => ({
-  ...makeStore(
+  ...mergeStores(
     { set, get },
     Song,
     SongPrompt,

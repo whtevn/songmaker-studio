@@ -1,8 +1,7 @@
-import objectFor from '~/utils/storeMaker/create'
-import supabaseModule from '~/utils/storeMaker/supabase'
-import hasManyModule from '~/utils/storeMaker/hasMany'
+import { defineStore } from '~/storeMaker'
+import { supabase, hasMany } from '~/storeMaker/modules'
 
-const Song = objectFor({
+export default defineStore({
   type: "Song",
   default: {
     title: "Untitled Song",
@@ -18,10 +17,17 @@ const Song = objectFor({
     { type: "songSection", on: "songSections", orderable: true },
     { type: "lyricVersion", on: "lyricVersions", orderable: true },
     { type: "album", on: "albums" },
-  ]
+  ],
+  backend: {
+    toBackend: (song) => ({
+      ...song,
+    }),
+    fromBackend: (song) => ({
+      ...song,
+    })
+  }
 })
-.withModule(supabaseModule)
-.withModule(hasManyModule)
+.withModule(supabase)
+.withModule(hasMany)
 
 
-export default Song

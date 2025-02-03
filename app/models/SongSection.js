@@ -1,5 +1,5 @@
-import objectify from '~/utils/storeMaker/create'
-export default objectify({
+import { defineStore } from '~/storeMaker'
+export default defineStore({
   type: "SongSection",
   default: {
     songId: undefined,

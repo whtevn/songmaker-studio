@@ -1,5 +1,5 @@
-import objectFor from '~/utils/storeMaker/create'
-export default objectFor({
+import { defineStore } from '~/storeMaker'
+export default defineStore({
   type: "SongPrompt",
   default: {
     text: "", // Default to empty text

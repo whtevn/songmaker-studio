@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import crudStore from './crudStore';
+import crudStore from './entityStore';
 
 /**
  * Converts an entity definition into a class with:
