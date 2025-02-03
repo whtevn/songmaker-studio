@@ -19,7 +19,7 @@ const useStore = create(persist((set, get) => ({
     SongSection,
     LyricVersion
   ),
-  ...Album.toStore({get, set}, new Album()),
+  ...Album.toStore({get, set}, [new Album()]),
   workingOnSong: null,
   setWorkingOnSong: (localId) => {
     set((state) => ({

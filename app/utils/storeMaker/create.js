@@ -14,7 +14,7 @@ import crudStore from './crudStore';
  * }
  * @returns {Class} A dynamically created class
  */
-export default function objectify(definitionArg) {
+export default function objectFor(definitionArg) {
   const {
     type = "Unnamed",
     default: defaultFields = {},
@@ -25,6 +25,7 @@ export default function objectify(definitionArg) {
   return class {
     // Attach the raw definition to the class (for static usage)
     static definition = definitionArg;
+    static modules = [];
 
     constructor(data = {}) {
       // localId
@@ -41,13 +42,17 @@ export default function objectify(definitionArg) {
       }
     }
 
+    static withModule(moduleDefinition) {
+      this.modules.push(moduleDefinition);
+      return this;
+    }
+
     // Static method for hooking into your store
     static toStore({set, get}, ...defaultValues) {
       // Pass the definition into your CRUD store setup
       // This is where you’d integrate the "definition" object.
       // Example:
-      return crudStore({set, get}, {...this.definition, defaultValues});
+      return crudStore({set, get}, {...this.definition, defaultValues}, this.modules);
     }
   };
 }
-

@@ -62,6 +62,7 @@ export function Dashboard() {
   };
 
   return (
+    album ? 
     <>
       <div className="space-y-2">
 
@@ -99,7 +100,7 @@ export function Dashboard() {
         <NewPromptDialog isOpen onClose={closeModal} onSave={currentPrompt ? handleUpdatePrompt : handleCreatePrompt} currentSongPrompt={currentPrompt} />
           
       )}
-    </>
+    </> : <h1>loading</h1> 
   );
 }
 
