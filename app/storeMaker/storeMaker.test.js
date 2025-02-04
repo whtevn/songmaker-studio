@@ -7,7 +7,7 @@
  * 3. Orderable children (move child to index, etc.).
  */
 
-import { describe, it, expect, beforeEach } from '@jest/globals'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { create } from 'zustand'
 // If you use zustand/persist, import persist too, e.g.:
 // import { persist } from 'zustand/middleware'
@@ -24,10 +24,6 @@ const BasicEntity = defineStore({
   type: 'BasicEntity',
   default: {
     title: 'Untitled BasicEntity',
-  },
-  backend: {
-    toBackend: (entity) => ({ ...entity }),
-    fromBackend: (raw) => ({ ...raw }),
   },
 })
 
@@ -83,8 +79,8 @@ describe('storeMaker Tests', () => {
       const state = useTestStore.getState()
       // The store is typically shaped like: { BasicEntity: [], ParentEntity: [], ChildEntity: [] } etc.
       // Depending on how mergeStores structures them, confirm the default shape:
-      expect(Array.isArray(state.BasicEntity)).toBe(true)
-      expect(state.BasicEntity).toHaveLength(0)
+      expect(Array.isArray(state.basicEntitys)).toBe(true)
+      expect(state.basicEntitys).toHaveLength(0)
     })
 
     it('should provide CRUD methods (create, update, delete) for BasicEntity', () => {
@@ -94,24 +90,28 @@ describe('storeMaker Tests', () => {
       // The exact method might be something like state.createBasicEntity,
       // or BasicEntity.create, or something else depending on your implementation.
       // Adjust to whatever your code actually generates:
-      const created = state.createBasicEntity({
+      const created = new BasicEntity({
         title: 'My First Entity',
       })
-
+      state.addBasicEntity(created)
+       
+      let updateState = useTestStore.getState()
       // Check the store
-      expect(state.BasicEntity).toHaveLength(1)
-      expect(state.BasicEntity[0].title).toBe('My First Entity')
-      expect(created.localId).toBeDefined() // ensure we have an ID
+      expect(updateState.basicEntitys).toHaveLength(1)
+      expect(updateState.basicEntitys[0].title).toBe('My First Entity')
+      expect(updateState.basicEntitys[0].localId).toBeDefined() // ensure we have an ID
 
       // Update
-      const updated = state.updateBasicEntity(created.localId, {
+      state.updateBasicEntity({
+        localId: created.localId, 
         title: 'My Updated Entity',
       })
-      expect(updated.title).toBe('My Updated Entity')
+      updateState = useTestStore.getState()
+      expect(updateState.basicEntitys[0].title).toBe('My Updated Entity')
 
       // Delete
       state.deleteBasicEntity(created.localId)
-      expect(state.BasicEntity).toHaveLength(0)
+      expect(state.basicEntitys).toHaveLength(0)
     })
   })
 
@@ -120,23 +120,26 @@ describe('storeMaker Tests', () => {
   // ---------------------------------------
   describe('ParentEntity + hasMany (ChildEntity)', () => {
     it('should initialize an array slice for ParentEntity and ChildEntity', () => {
-      const { ParentEntity, ChildEntity } = useTestStore.getState()
-      expect(Array.isArray(ParentEntity)).toBe(true)
-      expect(ParentEntity).toHaveLength(0)
+      const { parentEntitys, childEntitys } = useTestStore.getState()
+      console.log(parentEntitys)
+      expect(Array.isArray(parentEntitys)).toBe(true)
+      expect(parentEntitys).toHaveLength(0)
 
-      expect(Array.isArray(ChildEntity)).toBe(true)
-      expect(ChildEntity).toHaveLength(0)
+      expect(Array.isArray(childEntitys)).toBe(true)
+      expect(childEntitys).toHaveLength(0)
     })
 
     it('should allow creating a ParentEntity, and adding children to it', () => {
       const state = useTestStore.getState()
 
       // Create a parent
-      const parent = state.createParentEntity({
+      const parent = new ParentEntity({
         title: 'Parent #1',
       })
+      state.addParentEntity(parent)
       expect(parent.localId).toBeDefined()
-      expect(state.ParentEntity).toHaveLength(1)
+      expect(useTestStore.getState().parentEntitys).toHaveLength(1)
+      expect(useTestStore.getState().getParentEntitys(parent.localId)).toExist()
 
       // Create some children
       const child1 = state.createChildEntity({ name: 'Child #1' })
@@ -162,15 +165,22 @@ describe('storeMaker Tests', () => {
     it('should remove children from the parent', () => {
       const state = useTestStore.getState()
 
-      const parent = state.createParentEntity({ title: 'Parent #2' })
-      const child1 = state.createChildEntity({ name: 'Child #1' })
-      const child2 = state.createChildEntity({ name: 'Child #2' })
+      const parent = new ParentEntity({
+        title: 'Parent #2',
+      })
+      state.addParentEntity(parent)
+      const child1 = new ChildEntity({
+        name: 'Child #1',
+      })
+      const child2 = new ChildEntity({
+        name: 'Child #2',
+      })
 
-      state.addChildToParentEntity(parent.localId, child1.localId)
-      state.addChildToParentEntity(parent.localId, child2.localId)
+      state.addChildEntityToParentEntity(parent, child1)
+      state.addChildEntityToParentEntity(parent, child2)
 
       // Now remove child2
-      state.removeChildFromParentEntity(parent.localId, child2.localId)
+      state.removeChildEntityFromParentEntity(parent.localId, child2.localId)
 
       const updatedParent = state.getParentEntity(parent.localId)
       expect(updatedParent.childEntities).toContain(child1.localId)
@@ -180,15 +190,15 @@ describe('storeMaker Tests', () => {
     it('should reorder children (orderable items)', () => {
       const state = useTestStore.getState()
 
-      const parent = state.createParentEntity({ title: 'Parent #3' })
-      const childA = state.createChildEntity({ name: 'A' })
-      const childB = state.createChildEntity({ name: 'B' })
-      const childC = state.createChildEntity({ name: 'C' })
+      const parent = new ParentEntity({ title: 'Parent #3' })
+      const childA = new ChildEntity({ name: 'A' })
+      const childB = new ChildEntity({ name: 'B' })
+      const childC = new ChildEntity({ name: 'C' })
 
       // Add them in [A, B, C]
-      state.addChildToParentEntity(parent.localId, childA.localId)
-      state.addChildToParentEntity(parent.localId, childB.localId)
-      state.addChildToParentEntity(parent.localId, childC.localId)
+      state.addChildToParentEntity(parent, childA)
+      state.addChildToParentEntity(parent, childB)
+      state.addChildToParentEntity(parent, childC)
 
       // Let's say we want to move childC to index 1 (between A and B)
       // The store might provide something like:
