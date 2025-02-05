@@ -149,30 +149,38 @@ const moduleActions = ({type: parentType, objectName: capitalizedParentType}, {t
 export default function hasManyModule(definition) {
   const { type = "Entity", has_many = [] } = definition;
   const { objectName } = definition;
-  const storeMethods = {};
-  const useHooksOn = {
-    add: [],
-    update: [],
-    delete: [],
-  }
 
   // these maps should be reduces on has_many.keys
-  const store = ({set, get}) => {
-    return Object.keys(has_many).reduce(
-      (store, index) => {
-        const relationship = has_many[index]
-        const storeBase = moduleFunctions({set, get}, definition, relationship)
-        console.log({definition, relationship, index})
-        const module = moduleActions(definition, relationship)
-        const relationshipStore = Object.keys(module).reduce(
-          (store, key) => ({
-            ...store,
-            [module[key].name]: storeBase[key] 
-          }), {}) 
-        return {...store, ...relationshipStore}
-      }, {}
-    )
-  }
+  const store = ({set, get}) => Object.keys(has_many).reduce(
+    ( store , index) => {
+      const relationship = has_many[index]
+      const storeBase = moduleFunctions({set, get}, definition, relationship)
+      const module = moduleActions(definition, relationship)
+      const relationshipStore = Object.keys(module).reduce(
+        (store, key) => ({
+          ...store,
+          [module[key].name]: storeBase[key] 
+        }), {}) 
+      return {...store, ...relationshipStore}
+    }, { }
+  )
+  const useHooksOn = Object.keys(has_many).reduce(
+    ( useHooksOn , index) => {
+      const relationship = has_many[index]
+      const actions = moduleActions(definition, relationship)
+      return Object.keys(actions).reduce((useHooksOn, key) => {
+        const definition = actions[key]
+        if(!definition.hook) return useHooksOn
+
+        const name = definition.name
+        const stackName = definition.hook
+        const stack = useHooksOn[stackName]
+
+        return { ...useHooksOn, [`${stackName}`]: [...stack, name] }
+      }, useHooksOn)
+    }, 
+    { add: [], update: [], delete: [] }
+  )
 
   return {
     store,
