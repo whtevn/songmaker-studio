@@ -1,5 +1,11 @@
 import { nanoid } from "nanoid";
 import crudStore from './entityStore';
+function lowercaseFirstLetter(val) {
+  return val.charAt(0).toLowerCase() + val.slice(1);
+}
+function uppercaseFirstLetter(val) {
+  return val.charAt(0).toUpperCase() + val.slice(1);
+}
 
 /**
  * Converts an entity definition into a class with:
@@ -24,7 +30,11 @@ export default function objectFor(definitionArg) {
 
   return class {
     // Attach the raw definition to the class (for static usage)
-    static definition = definitionArg;
+    static definition = {
+      ...definitionArg,
+      entityKey: lowercaseFirstLetter(type) + "s",
+      objectName: uppercaseFirstLetter(type)
+    };
     static modules = [];
 
     constructor(data = {}) {

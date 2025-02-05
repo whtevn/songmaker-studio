@@ -7,16 +7,22 @@ export default function genericSupabaseModule(definition) {
   const entityKey = entityType.toLowerCase() + "s"; // e.g. "songs"
 
   return {
-    hooks: {
+    hooks: ({set, get}) => ({
       add: (item) => {
-        // e.g., mark item as dirty
         item.dirty = true;
+        set((state) => ({
+          dirtyObjects: [...new Set([...state.dirtyObjects, [typeof item, item.localId]])],
+        }));
       },
       update: (item) => {
         item.dirty = true;
+        set((state) => ({
+          dirtyObjects: [...new Set([...state.dirtyObjects, item.localId])],
+        }));
       },
-    },
+    }),
     store: ({set, get}) => ({
+      dirtyObjects: [],
       async [`fetch${entityType}s`]() {
         const { data, error } = await supabase
           .from(entityKey)
