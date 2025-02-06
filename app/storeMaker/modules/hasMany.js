@@ -121,7 +121,6 @@ const moduleActions = ({type: parentType, objectName: capitalizedParentType}, {t
   const capitalizedChildType = uppercaseFirstLetter(childType);
   const capitalizedPluralChildType = uppercaseFirstLetter(on);
   return {
-    children: [],
     getChildrenForParent: {
       name: `get${capitalizedPluralChildType}For${capitalizedParentType}`
     },
