@@ -8,24 +8,13 @@ export default function genericSupabaseModule(definition) {
   return {
     hooks: ({set, get}) => ({
       add: (...args) => {
-          /*
-        set((state) => ({
-          dirtyObjects: [...new Set([...state.dirtyObjects, [typeof item, item.localId]])],
-        }));
-        */
-        console.log(args)
         const updatedArgs = args.map(item => item.localId 
           ? { ...item, dirty: true }
           : item
         )
         return updatedArgs
       },
-      update: (item) => {
-        /*
-        set((state) => ({
-          dirtyObjects: [...new Set([...state.dirtyObjects, item.localId])],
-        }));
-        */
+      update: (...args) => {
         const updatedArgs = args.map(item => item.localId 
           ? { ...item, dirty: true }
           : item
