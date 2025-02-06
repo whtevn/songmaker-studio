@@ -133,14 +133,12 @@ export default function crudStore({ set, get }, entity = {}, modules = []) {
  */
 
 function integrateHooks({ useHooksOn, hooks, finalStore }) {
-  console.log({useHooksOn})
   // Create a shallow copy so we don't mutate the original finalStore.
   const integratedStore = { ...finalStore };
 
   // Iterate over each operation type: "add", "update", "delete"
   Object.keys(useHooksOn).forEach((opType) => {
     const hookFn = hooks[opType];
-    console.log({hookFn})
     // Only wrap if a hook function exists.
     if (hookFn.length > 0) {
       // For every store function name in the array for this operation type:
@@ -157,7 +155,6 @@ function integrateHooks({ useHooksOn, hooks, finalStore }) {
             // Then run the original store function.
             return runFun(...updatedArgs(...args));
           };
-          console.log(integratedStore[fnName])
         }
       });
     }

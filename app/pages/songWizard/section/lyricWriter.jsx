@@ -30,7 +30,6 @@ const LyricWriter = ({ headerRef, updateSong, addLyricVersionToSong, lyrics, lyr
     if (lyrics && !foundVersion) {
       // TODO: songId should be { id: song.id, localId: song.localId }?
       const lyricVersion = new LyricVersion({ lyrics, songId: song.localId, name: `Version #${song.lyricVersionTally+1}` })
-      console.log(song)
       addLyricVersionToSong(song, lyricVersion)
       updateSong({...song, lyricVersionTally: song.lyricVersionTally + 1 })
     }
