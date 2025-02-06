@@ -26,7 +26,12 @@ const useStore = create(persist((set, get) => ({
       "workingOnSong": localId
     }))
   }
-}), { name: "artistCatalogStore" }));
+}), {
+  name: "artistCatalogStore",
+  partialize: (state) => Object.fromEntries(
+    Object.entries(state).filter(([key]) => !['dirty', 'workingOnSong'].includes(key)),
+  ),
+}));
 
 console.log(useStore.getState())
 

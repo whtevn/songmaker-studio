@@ -5,7 +5,6 @@ function lowercaseFirstLetter(val) {
 }
 
 const moduleFunctions = ({set, get}, { type: parentType, entityKey }, {on: childPlural, type: childSingular, orderable}) => ({
-  children: [],
   getChildrenForParent: (ownerObj) => {
     if (!ownerObj[childPlural]) return [];
     // For each localId link in ownerObj[on], find the matching item in state
@@ -166,8 +165,17 @@ export default function hasManyModule(definition) {
   )
   const useHooksOn = Object.keys(has_many).reduce(
     ( useHooksOn , index) => {
+      // retrieve the relationship from the has many array
       const relationship = has_many[index]
+      // export a set of actions for the relationship (e.g. addChildToParent)
       const actions = moduleActions(definition, relationship)
+      // use those actions to build the list of items to use hooks on
+      // based on the hook definition in the action
+      // actions look like this: 
+      // addChildToParent: {
+      //   name: `add${capitalizedChildType}To${capitalizedParentType}`,
+      //   hook: "add"
+      // },
       return Object.keys(actions).reduce((useHooksOn, key) => {
         const definition = actions[key]
         if(!definition.hook) return useHooksOn
@@ -175,6 +183,8 @@ export default function hasManyModule(definition) {
         const name = definition.name
         const stackName = definition.hook
         const stack = useHooksOn[stackName]
+
+
 
         return { ...useHooksOn, [`${stackName}`]: [...stack, name] }
       }, useHooksOn)

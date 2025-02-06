@@ -8,6 +8,7 @@ export default function genericSupabaseModule(definition) {
   return {
     hooks: ({set, get}) => ({
       add: (...args) => {
+        if(!get().dirty) set({ dirty: true })
         const updatedArgs = args.map(item => item.localId 
           ? { ...item, dirty: true }
           : item
@@ -15,15 +16,15 @@ export default function genericSupabaseModule(definition) {
         return updatedArgs
       },
       update: (...args) => {
-        const updatedArgs = args.map(item => item.localId 
-          ? { ...item, dirty: true }
-          : item
+        if(!get().dirty) set({ dirty: true })
+        const updatedArgs = args.map(item => item.localId && !item.dirty
+            ? { ...item, dirty: true }
+            : item
         )
         return updatedArgs
       },
     }),
     store: ({set, get}) => ({
-      dirtyObjects: [],
       async [`fetch${entityType}s`]() {
         const { data, error } = await supabase
           .from(entityKey)
