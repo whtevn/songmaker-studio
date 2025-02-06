@@ -32,8 +32,8 @@ export default function objectFor(definitionArg) {
     // Attach the raw definition to the class (for static usage)
     static definition = {
       ...definitionArg,
-      entityKey: lowercaseFirstLetter(type) + "s",
-      objectName: uppercaseFirstLetter(type)
+      entityKey: lowercaseFirstLetter(definitionArg.type) + "s",
+      objectName: uppercaseFirstLetter(definitionArg.type)
     };
     static modules = [];
 

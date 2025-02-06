@@ -2,23 +2,35 @@
 import { supabase } from "~/utils/supabaseClient";
 
 export default function genericSupabaseModule(definition) {
-  console.log(definition)
   const entityType = definition.type;           // e.g. "Song"
   const entityKey = entityType.toLowerCase() + "s"; // e.g. "songs"
 
   return {
     hooks: ({set, get}) => ({
-      add: (item) => {
-        item.dirty = true;
+      add: (...args) => {
+          /*
         set((state) => ({
           dirtyObjects: [...new Set([...state.dirtyObjects, [typeof item, item.localId]])],
         }));
+        */
+        console.log(args)
+        const updatedArgs = args.map(item => item.localId 
+          ? { ...item, dirty: true }
+          : item
+        )
+        return updatedArgs
       },
       update: (item) => {
-        item.dirty = true;
+        /*
         set((state) => ({
           dirtyObjects: [...new Set([...state.dirtyObjects, item.localId])],
         }));
+        */
+        const updatedArgs = args.map(item => item.localId 
+          ? { ...item, dirty: true }
+          : item
+        )
+        return updatedArgs
       },
     }),
     store: ({set, get}) => ({
