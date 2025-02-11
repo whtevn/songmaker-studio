@@ -9,7 +9,7 @@ export default defineStore({
     tempo: 120,
     measures: 0,
     timeSignature: "4/4",
-    key: { root: "C", mode: "Ionian" },
+    key: { root: "C", mode: "ionian" },
     lyrics: "",
     lyricVersionTally: 0,
   },
