@@ -7,7 +7,7 @@ function lowercaseFirstLetter(val) {
 const moduleFunctions = ({set, get}, { type: parentType, entityKey }, {on: childPlural, type: childSingular, orderable}) => ({
   getChildrenForParent: (ownerObj) => {
     if (!ownerObj[childPlural]) return [];
-    // For each localId link in ownerObj[on], find the matching item in state
+    // For each localId link in ownerObj[childPlural], find the matching item in state
     return ownerObj[childPlural]
       .map((link) => get()[childPlural]?.find((child) => child.localId === link.localId))
       .filter(Boolean);
@@ -81,18 +81,18 @@ const moduleFunctions = ({set, get}, { type: parentType, entityKey }, {on: child
         throw new Error(`${objectName} not found.`);
       }
 
-      foundOwner[on] = foundOwner[on] || [];
-      const oldIndex = foundOwner[on].findIndex((link) => link.localId === childItem.localId);
+      foundOwner[childPlural] = foundOwner[childPlural] || [];
+      const oldIndex = foundOwner[childPlural].findIndex((link) => link.localId === childItem.localId);
       if (oldIndex < 0) {
         throw new Error(`${childType} not found in ${objectName}.`);
       }
 
       // Remove from old index, insert at new
-      const [removed] = foundOwner[on].splice(oldIndex, 1);
-      foundOwner[on].splice(targetIndex, 0, removed);
+      const [removed] = foundOwner[childPlural].splice(oldIndex, 1);
+      foundOwner[childPlural].splice(targetIndex, 0, removed);
 
       // Reassign order
-      foundOwner[on] = foundOwner[on].map((link, i) => ({ ...link, order: i }));
+      foundOwner[childPlural] = foundOwner[childPlural].map((link, i) => ({ ...link, order: i }));
 
       return {
         [entityKey]: [...owners],
@@ -107,7 +107,7 @@ const moduleFunctions = ({set, get}, { type: parentType, entityKey }, {on: child
         throw new Error(`${objectName} not found.`);
       }
 
-      foundOwner[on] = foundOwner[on]?.filter((link) => link.localId !== childItem.localId);
+      foundOwner[childPlural] = foundOwner[childPlural]?.filter((link) => link.localId !== childItem.localId);
 
       return {
         [entityKey]: [...owners],
