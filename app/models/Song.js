@@ -16,15 +16,29 @@ export default defineStore({
   has_many: [
     { type: "songSection", on: "songSections", orderable: true },
     { type: "lyricVersion", on: "lyricVersions", orderable: true },
-    { type: "album", on: "albums" },
+    { type: "chordProgression", on: "chordProgressions", orderable: true },
   ],
-  backend: {
-    toBackend: (song) => ({
-      ...song,
-    }),
-    fromBackend: (song) => ({
-      ...song,
-    })
+  supabase: {
+    toDb: (songData) => {
+      const {key, lyricVersionTally, songSections, lyricVersions, timeSignature, ...song} = songData;
+      return {
+        ...song,
+        keyroot: song.key?.root,
+        keymode: song.key?.mode,
+        timesignature: song.timeSignature,
+        lyricversiontally: song.lyricVersionTally,
+        songsections: song.songSections?.map(s => s.localId) || [],
+        lyricversions: song.lyricVersions?.map(s => s.localId) || [],
+      }
+    },
+    fromDb: (song) => {
+      return {
+        ...song,
+
+        songSections: song.songSections?.map((s,i) => ({localId: s.localId, order: i})) || [],
+        lyricVersions: song.lyricVersions?.map((s,i) => ({localId: s.localId, order: i})) || [],
+      }
+    },
   }
 })
 .withModule(supabase)

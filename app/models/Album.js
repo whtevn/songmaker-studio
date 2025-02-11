@@ -9,7 +9,21 @@ export default defineStore({
   },
   has_many: [
     { type: "song", on: "songs", orderable: true },
-  ]
+  ],
+  supabase: {
+    toDb: (album) => {
+      return {
+        ...album,
+        songs: album.songs.map(s => s.localId)
+      }
+    },
+    fromDb: (album) => {
+      return {
+        ...album,
+        songs: album.songs.map((s,i) => ({localId: s.localId, order: i})) }
+    },
+  }
 })
 .withModule(supabase)
 .withModule(hasMany)
+    

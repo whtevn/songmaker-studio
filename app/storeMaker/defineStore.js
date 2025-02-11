@@ -33,13 +33,15 @@ export default function objectFor(definitionArg) {
     static definition = {
       ...definitionArg,
       entityKey: lowercaseFirstLetter(definitionArg.type) + "s",
-      objectName: uppercaseFirstLetter(definitionArg.type)
+      objectName: uppercaseFirstLetter(definitionArg.type),
+      canonical: defaultFields 
     };
+    static objectVerifier = {...defaultFields}
     static modules = [];
 
     constructor(data = {}) {
       // localId
-      this.localId = data.localId || nanoid();
+      this.localId = data.localId || nanoid(21);
 
       // Merge defaults
       Object.assign(this, defaultFields, data);

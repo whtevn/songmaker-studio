@@ -12,17 +12,20 @@ const composeHooks = hooksArray => {
   });
 };
 
-const combineUseHooksOn = (hooks1, hooks2) => ({
-  add: [...(hooks1.add || []), ...(hooks2.add || [])],
-  update: [...(hooks1.update || []), ...(hooks2.update || [])],
-  delete: [...(hooks1.delete || []), ...(hooks2.delete || [])]
-});
+const combineUseHooksOn = (hooks1, hooks2) => {
+  const allKeys = new Set([...Object.keys(hooks1), ...Object.keys(hooks2)]);
+
+  return [...allKeys].reduce((acc, key) => {
+    acc[key] = [...(hooks1[key] || []), ...(hooks2[key] || [])];
+    return acc;
+  }, {});
+};
 
 /**
  * Creates store methods for a single entity definition:
  * plus merges in any modules' hooks & extra store methods.
  */
-export default function crudStore({ set, get }, entity = {}, modules = []) {
+export default function crudStore({ set, get }, entity = {}, modules = [], extendDefinition=()=>{}) {
   const {
     type = "entity",
     default: defaultData = {},
@@ -40,7 +43,7 @@ export default function crudStore({ set, get }, entity = {}, modules = []) {
       const newItem = {
         ...defaultData,
         ...item,
-        localId: item.localId || nanoid(),
+        localId: item.localId,
       };
       set((state) => ({
         [entityKey]: [...state[entityKey], newItem],
@@ -92,7 +95,7 @@ export default function crudStore({ set, get }, entity = {}, modules = []) {
   // the hooks after the modules have been gathered
 
   for (const modFun of modules) {
-    const mod = modFun(entity)
+    const mod = modFun(entity, extendDefinition)
     const { hooks: moduleHooksFun, store, useHooksOn: moduleUseHooksOn } = mod || {};
 
     if(moduleUseHooksOn){
@@ -101,15 +104,11 @@ export default function crudStore({ set, get }, entity = {}, modules = []) {
 
     if (moduleHooksFun) {
       const moduleHooks = moduleHooksFun({set, get})
-      if(moduleHooks.add){
-        hooks.add = [...hooks.add, moduleHooks.add]
-      }
-      if(moduleHooks.update){
-        hooks.update = [...hooks.update, moduleHooks.update]
-      }
-      if(moduleHooks.delete){
-        hooks.delete = [...hooks.delete, moduleHooks.delete]
-      }
+      Object.keys(moduleHooks).forEach(key => {
+        if (moduleHooks[key]) {
+          hooks[key] = [...(hooks[key] || []), moduleHooks[key]];
+        }
+      });
     }
 
     // If the module has new store methods, attach them
@@ -119,7 +118,6 @@ export default function crudStore({ set, get }, entity = {}, modules = []) {
     }
   }
 
-  
   
   // TODO integrate hooks here, instead of above
   // integrateHooks method needs to be rewritten

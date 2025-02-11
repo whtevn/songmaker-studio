@@ -15,6 +15,7 @@ const DraggableCard = ({
   inputLocation,
   onClick,
   onApplyLyrics,
+  renderCard,
 }) => {
   const ref = React.useRef(null);
 
@@ -79,24 +80,26 @@ const DraggableCard = ({
       )}
 
       {/* Card */}
-      <div
-        className="relative"
-        onClick={onClick}
-      >
+      { renderCard ? renderCard(card, index) : 
         <div
-          className={`flex-grow-0 text-center text-${card.color}-700 bg-${card.color}-200 rounded-md p-4 m-2 shadow-md cursor-pointer`}
-          data-id={card.localId}
+          className="relative"
+          onClick={onClick}
         >
-          <p>{card.type}</p>
-        </div>
-        {card.lyrics && (
-          <span
-            className={`absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-${card.color}-500 text-white rounded-full p-1`}
+          <div
+            className={`flex-grow-0 text-center text-${card.color}-700 bg-${card.color}-200 rounded-md p-4 m-2 shadow-md cursor-pointer`}
+            data-id={card.localId}
           >
-            <CheckCircleIcon className="h-4 w-4" />
-          </span>
-        )}
-      </div>
+            <p>{card.type}</p>
+          </div>
+          {card.lyrics && (
+            <span
+              className={`absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-${card.color}-500 text-white rounded-full p-1`}
+            >
+              <CheckCircleIcon className="h-4 w-4" />
+            </span>
+          )}
+        </div>
+      }
     </div>
 
   );
@@ -108,6 +111,7 @@ const StateDiagram = ({
   setCards,
   inputLocation,
   setInputLocation,
+  renderCard,
   onCardClick,
 }) => {
   const moveCard = useCallback(setCards, [setCards]);
@@ -120,6 +124,7 @@ const StateDiagram = ({
           card={card}
           index={index}
           moveCard={moveCard}
+          renderCard={renderCard}
           setInputLocation={setInputLocation}
           inputLocation={inputLocation}
           onClick={() => onCardClick(card)}
@@ -138,10 +143,12 @@ const StateDiagramWrapper = ({
   setInputLocation,
   onCardClick,
   onApplyLyrics,
+  renderCard,
 }) => (
     <StateDiagram
       cards={cards}
       setCards={setCards}
+      renderCard={renderCard}
       inputLocation={inputLocation}
       setInputLocation={setInputLocation}
       onCardClick={onCardClick}

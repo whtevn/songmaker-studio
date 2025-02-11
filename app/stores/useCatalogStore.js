@@ -25,11 +25,41 @@ const useStore = create(persist((set, get) => ({
     set((state) => ({
       "workingOnSong": localId
     }))
+  },
+  saveAllDirtyObjects: async () => {
+    const {
+      saveDirtyAlbums,
+      saveDirtySongs,
+      saveDirtySongPrompts,
+      saveDirtySongSections,
+      saveDirtyLyricVersions,
+    } = get()
+
+    try {
+      const result = await Promise.all([
+        saveDirtyAlbums(),
+        saveDirtySongs(),
+        saveDirtySongPrompts(),
+        saveDirtySongSections(),
+        saveDirtyLyricVersions(),
+      ])
+      set((state) => ({
+        dirty: false
+      }))
+    }catch(e){
+      console.error(e)
+    }
+      /*
+    .then(() => 
+    )
+
+    .catch((e) => console.log("ERROR", e))
+    */
   }
 }), {
   name: "artistCatalogStore",
   partialize: (state) => Object.fromEntries(
-    Object.entries(state).filter(([key]) => !['dirty', 'workingOnSong'].includes(key)),
+    Object.entries(state).filter(([key]) => !['workingOnSong'].includes(key)),
   ),
 }));
 

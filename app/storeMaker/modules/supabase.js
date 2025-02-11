@@ -1,9 +1,33 @@
 // genericSupabaseModule.js
 import { supabase } from "~/utils/supabaseClient";
 
-export default function genericSupabaseModule(definition) {
+
+export default function supabaseModule(definition) {
   const entityType = definition.type;           // e.g. "Song"
   const entityKey = entityType.toLowerCase() + "s"; // e.g. "songs"
+  const translate = {
+    toDb: (i) => {
+      const { dirty, ...cleaned } = i;
+      console.log(cleaned)
+      return definition.supabase?.toDb 
+        ? definition.supabase.toDb(cleaned)
+        : cleaned
+    },
+    fromDb: (i) => {
+      const cleaned = {...i, dirty: false};
+      return definition.supabase?.fromDb 
+        ? definition.supabase.fromDb(cleaned)
+        : cleaned
+    },
+  };
+
+  const limitToDefinition = (instance) => 
+    Object.keys(instance)
+      .filter(key => key in definition)
+      .reduce((acc, key) => {
+        acc[key] = instance[key];
+        return acc;
+      }, {});
 
   return {
     hooks: ({set, get}) => ({
@@ -30,10 +54,9 @@ export default function genericSupabaseModule(definition) {
           .from(entityKey)
           .select("*");
         if (error) {
-          console.error("Supabase fetch error:", error);
           return;
         }
-        set({ [entityKey]: data });
+        set({ [entityKey]: data.map(fromDb) });
       },
 
       async [`subscribeTo${entityType}s`]() {
@@ -41,7 +64,7 @@ export default function genericSupabaseModule(definition) {
           .from(entityKey)
           .on("INSERT", (payload) => {
             set((state) => ({
-              [entityKey]: [...state[entityKey], payload.new],
+              [entityKey]: [...state[entityKey], fromDb(payload.new)],
             }));
           })
           .subscribe();
@@ -51,16 +74,26 @@ export default function genericSupabaseModule(definition) {
       async [`save${entityType}`](item) {
         const { data, error } = await supabase
           .from(entityKey)
-          .upsert(item);
-        if (error) console.error("Supabase upsert error:", error);
+          .upsert(translate.toDb(item));
+        if (error) {
+          throw(error)
+        }
+
       },
 
       // Save multiple items
       async [`save${entityType}s`](items) {
         const { data, error } = await supabase
           .from(entityKey)
-          .upsert(items);
-        if (error) console.error("Supabase upsert error:", error);
+          .upsert(translate.toDb(items));
+        if (error) {
+          throw(error)
+        }
+      },
+
+      async [`getDirty${entityType}s`]() {
+        const allItems = get()[entityKey] || [];
+        return allItems.filter((it) => it.dirty);
       },
 
       // Save all dirty items
@@ -69,10 +102,13 @@ export default function genericSupabaseModule(definition) {
         const dirty = allItems.filter((it) => it.dirty);
         if (!dirty.length) return;
 
+        console.log({dirty, mapped: dirty.map(translate.toDb)})
         const { data, error } = await supabase
           .from(entityKey)
-          .upsert(dirty);
-        if (error) console.error("Supabase upsert error:", error);
+          .upsert(dirty.map(translate.toDb));
+        if (error) {
+          throw(error)
+        }
         else {
           // Mark them as no longer dirty
           set((state) => {
@@ -90,3 +126,6 @@ export default function genericSupabaseModule(definition) {
   };
 }
 
+ function generateSupabaseModule(definition) {
+  return supabaseModule
+}

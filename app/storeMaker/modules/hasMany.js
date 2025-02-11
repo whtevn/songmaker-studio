@@ -23,7 +23,7 @@ const moduleFunctions = ({set, get}, { type: parentType, entityKey }, {on: child
       foundOwner[childPlural] = foundOwner[childPlural] || [];
       // Prepare the new link object
       const newLink = {
-        localId: childItem.localId || nanoid(),
+        localId: childItem.localId,
         ...(orderable && { order: foundOwner[childPlural].length }),
       };
       // Append
@@ -50,26 +50,26 @@ const moduleFunctions = ({set, get}, { type: parentType, entityKey }, {on: child
         throw new Error(`${objectName} not found.`);
       }
 
-      foundOwner[on] = foundOwner[on] || [];
+      foundOwner[childPlural] = foundOwner[childPlural] || [];
       const newLink = {
-        localId: childItem.localId || nanoid(),
+        localId: childItem.localId,
         ...(orderable && { order: index }),
       };
 
       // Insert at specified index
-      foundOwner[on].splice(index, 0, newLink);
+      foundOwner[childPlural].splice(index, 0, newLink);
       // Reassign order to keep them consistent
-      foundOwner[on] = foundOwner[on].map((link, i) => ({ ...link, order: i }));
+      foundOwner[childPlural] = foundOwner[childPlural].map((link, i) => ({ ...link, order: i }));
 
       // Add childItem if missing
-      state[on] = state[on] || [];
-      if (!state[on].some((x) => x.localId === childItem.localId)) {
-        state[on].push(childItem);
+      state[childPlural] = state[childPlural] || [];
+      if (!state[childPlural].some((x) => x.localId === childItem.localId)) {
+        state[childPlural].push(childItem);
       }
 
       return {
         [entityKey]: [...owners],
-        [on]: [...state[on]],
+        [childPlural]: [...state[childPlural]],
       };
     });
   },

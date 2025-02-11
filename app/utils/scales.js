@@ -1,5 +1,6 @@
 const SHARP = "♯";
 const FLAT = "♭";
+const DIMINISHED = "°";
 const WHOLE_STEP = 2;
 const HALF_STEP = 1;
 const A4_FREQUENCY = 440; // Standard pitch for A4
@@ -21,12 +22,12 @@ const notes = [
 ];
 
 const modes = [
-  { label: "ionian", description: "Major scale" },
+  { label: "ionian", description: "Major scale", name: "major" },
   { label: "dorian", description: "Minor scale with a raised 6th" },
   { label: "phrygian", description: "Minor scale with a lowered 2nd" },
   { label: "lydian", description: "Major scale with a raised 4th" },
   { label: "mixolydian", description: "Major scale with a lowered 7th" },
-  { label: "aeolian", description: "Natural minor scale" },
+  { label: "aeolian", description: "Natural minor scale", name: "minor" },
   { label: "locrian", description: "Minor scale with a lowered 2nd and 5th" },
 ];
 
@@ -39,6 +40,17 @@ const chordProgression = [
   { mode: "aeolian", type: "minor", shortName: "min" },
   { mode: "locrian", type: "diminished", shortName: "dim" },
 ];
+
+const romanNumerals = [
+  "i",
+  "ii",
+  "iii",
+  "iv",
+  "v",
+  "vi",
+  "vii"
+]
+
 
 const intervals = {
   root: 0,
@@ -66,6 +78,19 @@ const chordExtensions = [
   { id: "9", semitones: 15, label: "Major 9th" },
 ];
 
+function generateTriad(key, formulaName, notes, chordFormulas, NOTES_PER_OCTAVE) {
+  const rootIndex = notes.findIndex(note => note.labels.includes(key));
+  if (rootIndex === -1) throw new Error(`Invalid key: ${key}`);
+
+  const formula = chordFormulas[formulaName];
+  if (!formula) throw new Error(`Invalid chord type: ${formulaName}`);
+
+  return formula.map(interval => {
+    const noteIndex = (rootIndex + interval) % NOTES_PER_OCTAVE;
+    return notes[noteIndex].labels[0]; // Return the first label for simplicity
+  });
+}
+
 const ionianFormula = [WHOLE_STEP, WHOLE_STEP, HALF_STEP, WHOLE_STEP, WHOLE_STEP, WHOLE_STEP, HALF_STEP];
 
 function findNoteByLabel(label) {
@@ -78,6 +103,12 @@ function findNoteByLabel(label) {
 function shiftArray(startIndex, array) {
   const shiftAmount = startIndex % array.length;
   return array.slice(shiftAmount).concat(array.slice(0, shiftAmount));
+}
+
+function chordProgressionFor(mode, chordProgression, modes){
+  const modeIndex = modes.findIndex((m) => m.label === mode);
+  const shiftedProgression = shiftArray(modeIndex, chordProgression);
+  return shiftedProgression
 }
 
 function generateScale(startLabel, modeLabel) {
@@ -99,6 +130,37 @@ function generateScale(startLabel, modeLabel) {
   });
 
   return scale;
+}
+
+function generateScaleWithInfo(key, mode){
+  const progression = chordProgressionFor(mode, chordProgression, modes)
+  const scale = generateScale(key, mode) 
+  return scale.map((key, index) => {
+    const note = key[0]
+    const type = progression[index].type
+    return {
+      note,
+      type,
+      index,
+      numeral: formatForType(romanNumerals[index], type),
+      shortName: progression[index].shortName,
+      chord: generateTriad(note, type, notes, chordFormulas, NOTES_PER_OCTAVE),
+    }
+  })
+}
+
+function formatForType(name, type){
+  switch(type) {
+    case "major":
+      return name.toUpperCase()
+    case "minor":
+      // code block
+      return name.toLowerCase()
+    case "diminished":
+      return `${name.toLowerCase()}${DIMINISHED}`
+    default:
+      // code block
+  }
 }
 
 function isValidScale(scale) {
@@ -217,9 +279,6 @@ function normalizeScaleData(note, scaleObj, normalizedNotes, scaleNotes, givenNo
   return { ...scale, rendered, allNotes }
 
 }
-
-
-
 
 function getTriad(root, modeLabel, notesWithScales) {
   const rootNote = notesWithScales.find((note) =>
@@ -516,6 +575,7 @@ export const notesWithScales = generateAllScales();
 
 const backendLibrary = {
   notes,
+  romanNumerals,
   notesWithScales,
   chordProgression,
   modes,
@@ -530,7 +590,10 @@ const backendLibrary = {
   intervals,
   chordFormulas,
   generateScale,
-  identifyChord: (chordnNotes) =>
+  generateScaleWithInfo,
+  chordProgressionFor: (mode) => chordProgressionFor(mode, chordProgression, modes),
+  generateTriad: (key, formulaName) => generateTriad(key, formulaName, notes, chordFormulas, NOTES_PER_OCTAVE),
+  identifyChord: (chordNotes) =>
     identifyChord(notes, chordFormulas, chordExtensions, chordNotes),
   generateChord: (root, options = { extend: [], type: "major" }) =>
     generateChord(notes, chordFormulas, chordExtensions, root, options = { extend: [], type: "major" }),
@@ -539,7 +602,6 @@ const backendLibrary = {
   getChordProgression: (root, modeLabel) =>
     getChordProgression(root, modeLabel, notesWithScales, chordProgression),
   getTriad: (root, modeLabel) => getTriad(root, modeLabel, notesWithScales),
-  getScale: (root, modeLabel) => getScale(root, modeLabel, notesWithScales),
   findScalesContainingNotes: (givenNotes, options = {}) =>
     findScalesContainingNotes(givenNotes, notesWithScales, chordProgression, options),
 };

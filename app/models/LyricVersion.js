@@ -1,4 +1,5 @@
 import { defineStore } from '~/storeMaker'
+import { supabase } from '~/storeMaker/modules'
 export default defineStore({
   type: "LyricVersion",
   default: {
@@ -8,3 +9,4 @@ export default defineStore({
     timestamp: ()=>Date.now(),
   }
 })
+.withModule(supabase)
