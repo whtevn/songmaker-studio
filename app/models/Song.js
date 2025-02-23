@@ -1,6 +1,8 @@
 import { defineStore } from '~/storeMaker'
 import { supabase, hasMany } from '~/storeMaker/modules'
+import scale from '~/utils/scales'
 
+const { chordProgression } = scale
 export default defineStore({
   type: "Song",
   default: {
@@ -12,6 +14,9 @@ export default defineStore({
     key: { root: "C", mode: "ionian" },
     lyrics: "",
     lyricVersionTally: 0,
+    chordBank: chordProgression.map(c => [
+      { quality: c.type }
+    ])
   },
   has_many: [
     { type: "songSection", on: "songSections", orderable: true },

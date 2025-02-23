@@ -22,9 +22,6 @@ import ScaleUtil from "~/utils/scales"
 
 const SongChartBuilder = ({ songData, songSections }) => {
   //const workingOnSong = useCatalogStore((state) => state.workingOnSong)
-  const updateSongKey = (update) => {
-    updateSong({...songData, key: { ...songData.key, ...update } })
-  }
   const { addChordProgressionToSong, updateChordProgression, getAllSongProgressions, updateSong } = useCatalogStore.getState();
 
   const { notes, modes, generateScaleWithInfo } = ScaleUtil;
@@ -34,6 +31,10 @@ const SongChartBuilder = ({ songData, songSections }) => {
 
   const updateSelectedCards = (k,v) => {
     console.log({k,v})
+  }
+
+  const updateSongKey = (update) => {
+    updateSong({...songData, key: { ...songData.key, ...update } })
   }
 
   return (
@@ -130,42 +131,61 @@ const ChordProgressionAdder = ({scale, updateSelectedCards}) => {
 const SelectableLyrics = ({section, scale}) => {
   const lyrics = section.lyrics;
   const lyricSet = lyrics.split("\n");
-  const chordChard = section.chordChard || [];
-  const [ selectedLine, setSelectedLine ] = useState(null);
-  const [ selectedWord, setSelectedWord ] = useState(null);
-  const [ selectedChord, setSelectedChord ] = useState(null);
+  const [ tmpChord, setTmpChord ] = useState({})
+  const { updateSongSection } = useCatalogStore.getState()
 
-  const chooseText = (i) => {
-    setSelectedLine(i);
-    setSelectedWord(null);
+  const selectedLine = tmpChord.line;
+  const selectedWord = tmpChord.word;
+  const selectedChord = tmpChord.chord;
+
+  const chooseText = (line) => {
+    setTmpChord({line});
   };
 
-  const updateChordChart = ({word, chord}) => {
-    if(word) setSelectedWord(word)
-    if(chord) setSelectedWord(chord)
-    if(selectedWord && selectedChord){
-      // selected chord needs to be turned into an actual chord { index, mode, extensions }
-      chordChart.push({line: selectedLine, word: selectedWord, chordRootIndex: selectedChord})
+  const updateChordChart = (update) => {
+    const originalChart = section.chordChart || []
+    const updatedChord = {...tmpChord, ...update}
+    const { word, chord, line } = updatedChord
+    if( word != undefined && chord != undefined ){
+      console.log("WHAAAT")
+      updateSongSection({ ...section, chordChart: [...originalChart, updatedChord] })
+      setTmpChord( { } )
+    } else {
+      setTmpChord(updatedChord)
     }
   }
 
   return <div className="cursor-pointer">
     {lyricSet.map((l, i) => 
-      <>
+      <div key={`set${i}`}>
         { selectedLine === i ?
           <>
-            { lyricSet[i].split(" ").map((w, i) => <BadgeButton onClick={()=>setSelectedWord(i)} color={i === selectedWord ? "green" : "slate"} >{w}</BadgeButton>) }
+            { lyricSet[i].split(" ").map((w, i) => <BadgeButton onClick={()=>updateChordChart({word: i})} color={i === selectedWord ? "green" : "slate"} key={i}>{w}</BadgeButton>) }
             <div className="flex flex-row justify-evenly p-4">
               { scale.map((chord, i) => 
-                <BadgeButton key={i} color={selectedChord === i ? "blue" : "slate"} onClick={()=>setSelectedChord(i)} >{chord.note} {chord.shortName}</BadgeButton>) }
+                <BadgeButton key={`chord${i}`} color={selectedChord?.index === i ? "blue" : "slate"} onClick={()=>updateChordChart({chord})} >{chord.note} {chord.shortName}</BadgeButton>) }
             </div>
           </>
-          : <Text key={`lyrics${i}`}  onClick={()=>chooseText(i)} >{l}</Text>
+          : <>
+          <Text key={`lyrics${i}`}  onClick={()=>chooseText(i)} className="flex flex-row gap-2">
+            {l.split(" ").map((w,k) => {
+
+              const chord = section.chordChart?.filter(({line, word}) => line === i && word === k).map(({chord}) => chord?.note)[0]
+              return (
+                <span key={`${i}${k}`} className="flex flex-col justify-end">
+                  <span>{ chord }</span>
+                  <span>{`${w}`}</span>
+                </span>
+              )
+            })}
+          </Text>
+          </>
         }
-      </>
+      </div>
     )}
   </div>
 }
 
 export default SongChartBuilder;
+
 

@@ -8,6 +8,7 @@ import Song from '~/models/Song'
 import SongSection from '~/models/SongSection'
 import SongPrompt from '~/models/SongPrompt'
 import LyricVersion from '~/models/LyricVersion'
+import ChordProgression from '~/models/ChordProgression'
 
 import { mergeStores } from '~/storeMaker'
 
@@ -17,7 +18,8 @@ const useStore = create(persist((set, get) => ({
     Song,
     SongPrompt,
     SongSection,
-    LyricVersion
+    LyricVersion,
+    ChordProgression,
   ),
   ...Album.toStore({get, set}, new Album()),
   workingOnSong: null,

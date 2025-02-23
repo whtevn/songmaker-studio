@@ -5,6 +5,53 @@ const WHOLE_STEP = 2;
 const HALF_STEP = 1;
 const A4_FREQUENCY = 440; // Standard pitch for A4
 const NOTES_PER_OCTAVE = 12;
+const intervals = {
+  root: 0,
+  major2nd: WHOLE_STEP,
+  major3rd: WHOLE_STEP * 2,
+  perfect4th: WHOLE_STEP * 2 + HALF_STEP,
+  perfect5th: WHOLE_STEP * 3 + HALF_STEP,
+  minor3rd: WHOLE_STEP + HALF_STEP,
+  diminished5th: WHOLE_STEP * 3,
+  diminished7th: WHOLE_STEP * 4 + HALF_STEP,
+  augmented5th: WHOLE_STEP * 4 
+};
+
+const chordFormulas = {
+  major: [intervals.root, intervals.major3rd, intervals.perfect5th],
+  minor: [intervals.root, intervals.minor3rd, intervals.perfect5th],
+  diminished: [intervals.root, intervals.minor3rd, intervals.diminished5th],
+  augmented: [intervals.root, intervals.major3rd, intervals.augmented5th],
+  sus2: [intervals.root, intervals.major2nd, intervals.perfect5th],
+  sus4: [intervals.root, intervals.perfect4th, intervals.perfect5th]
+};
+const CHORD_QUALITY = {
+  MAJOR: {
+    name: "major",
+    mode: "ionian",
+    steps: [chordFormulas.major],
+  },
+  MINOR: {
+    name: "minor",
+    mode: "aeolian",
+    symbol: "m",
+    steps: [chordFormulas.minor],
+  },
+  DIMINISHED: {
+    name: "diminished",
+    mode: "locrian",
+    symbol: "°",
+    steps: [chordFormulas.diminished],
+  },
+  AUGMENTED: {
+    name: "augmented",
+    mode: "lydian",
+    symbol: "+",
+    steps: [chordFormulas.augmented],
+  }
+}
+
+
 
 const notes = [
   { labels: ["C", `B${SHARP}`], natural: true },
@@ -22,24 +69,36 @@ const notes = [
 ];
 
 const modes = [
-  { label: "ionian", description: "Major scale", name: "major" },
+  { label: "ionian", description: "Major scale", quality: "major" },
   { label: "dorian", description: "Minor scale with a raised 6th" },
   { label: "phrygian", description: "Minor scale with a lowered 2nd" },
-  { label: "lydian", description: "Major scale with a raised 4th" },
+  { label: "lydian", description: "Major scale with a raised 4th", quality: "augmented" },
   { label: "mixolydian", description: "Major scale with a lowered 7th" },
-  { label: "aeolian", description: "Natural minor scale", name: "minor" },
-  { label: "locrian", description: "Minor scale with a lowered 2nd and 5th" },
+  { label: "aeolian", description: "Natural minor scale", quality: "minor" },
+  { label: "locrian", description: "Minor scale with a lowered 2nd and 5th", quality: "diminished" },
 ];
 
 const chordProgression = [
-  { mode: "ionian", type: "major", shortName: "maj" },
-  { mode: "aeolian", type: "minor", shortName: "min" },
-  { mode: "aeolian", type: "minor", shortName: "min" },
-  { mode: "ionian", type: "major", shortName: "maj" },
-  { mode: "ionian", type: "major", shortName: "maj" },
-  { mode: "aeolian", type: "minor", shortName: "min" },
-  { mode: "locrian", type: "diminished", shortName: "dim" },
+  { mode: "ionian", type: CHORD_QUALITY.MAJOR.name },
+  { mode: "aeolian", type: CHORD_QUALITY.MINOR.name },
+  { mode: "aeolian", type: CHORD_QUALITY.MINOR.name },
+  { mode: "ionian", type: CHORD_QUALITY.MAJOR.name },
+  { mode: "ionian", type: CHORD_QUALITY.MAJOR.name },
+  { mode: "aeolian", type: CHORD_QUALITY.MINOR.name },
+  { mode: "locrian", type: CHORD_QUALITY.DIMINISHED.name },
 ];
+
+const chordProgressionIndicator = {
+  "major": "",
+  "minor": "m",
+  "diminished": DIMINISHED,
+}
+
+const chordProgressionShortName = {
+  "major": "maj",
+  "minor": "min",
+  "diminished": "dim",
+}
 
 const romanNumerals = [
   "i",
@@ -51,25 +110,16 @@ const romanNumerals = [
   "vii"
 ]
 
+const secondaryDominantResolutionStrength = [
+  -1, 
+  2,
+  2,
+  1,
+  3,
+  2,
+  -1
+]
 
-const intervals = {
-  root: 0,
-  major2nd: WHOLE_STEP,
-  major3rd: WHOLE_STEP * 2,
-  perfect4th: WHOLE_STEP * 2 + HALF_STEP,
-  perfect5th: WHOLE_STEP * 3 + HALF_STEP,
-  minor3rd: WHOLE_STEP + HALF_STEP,
-  diminished5th: WHOLE_STEP * 3,
-  diminished7th: WHOLE_STEP * 4 + HALF_STEP,
-};
-
-const chordFormulas = {
-  major: [intervals.root, intervals.major3rd, intervals.perfect5th],
-  minor: [intervals.root, intervals.minor3rd, intervals.perfect5th],
-  diminished: [intervals.root, intervals.minor3rd, intervals.diminished5th],
-  sus2: [intervals.root, intervals.major2nd, intervals.perfect5th],
-  sus4: [intervals.root, intervals.perfect4th, intervals.perfect5th],
-};
 
 const chordExtensions = [
   { id: "6", semitones: 10, label: "Major 6th" },
@@ -138,9 +188,11 @@ function generateScaleWithInfo(key, mode){
   return scale.map((key, index) => {
     const note = key[0]
     const type = progression[index].type
+    const mode = progression[index].mode
     return {
       note,
       type,
+      mode,
       index,
       numeral: formatForType(romanNumerals[index], type),
       shortName: progression[index].shortName,
@@ -232,7 +284,7 @@ function mapNoteToDegree(note, scaleNotes, scaleObj, chordProgression, notesWith
     note: matchedNote,
     degree,
     chord,
-    name: `${chordRoot} ${progressionData.shortName} (${degree})`, // E.g., "C maj" or "G min"
+    name: `${chordRoot} ${progressionData.type.substring(0,3)} (${degree})`, // E.g., "C maj" or "G min"
   };
 }
 
@@ -571,6 +623,10 @@ function generateChord(notes, chordFormulas, chordExtensions, root, options = { 
   return chordNotes;
 }
 
+function generateDegreeForScale(key, modeLabel, degree){
+  return generateScaleWithInfo(key, modeLabel)[degree]
+}
+
 export const notesWithScales = generateAllScales();
 
 const backendLibrary = {
@@ -591,6 +647,9 @@ const backendLibrary = {
   chordFormulas,
   generateScale,
   generateScaleWithInfo,
+  generateDegreeForScale,
+  chordProgressionIndicator,
+  chordProgressionShortName,
   chordProgressionFor: (mode) => chordProgressionFor(mode, chordProgression, modes),
   generateTriad: (key, formulaName) => generateTriad(key, formulaName, notes, chordFormulas, NOTES_PER_OCTAVE),
   identifyChord: (chordNotes) =>

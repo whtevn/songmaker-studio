@@ -10,7 +10,7 @@ import { useModal } from "~/context/ModalContext";
 import useCatalogStore from "~/stores/useCatalogStore";
 import SectionDetailsDialog from "./dialog/sectionDetailsDialogue";
 import SongSectionEditor from "./section/songSectionEditor";
-import SongChartBuilder from "./section/songChartBuilder";
+import SongChartBuilder from "./section/SongChartBuilder/index";
 import LyricWriter from "./section/lyricWriter";
 
 import Song from "~/models/Song";
@@ -34,14 +34,25 @@ export function SongWizard() {
   const song = songs.find(s => s.localId === workingOnSong)
   const sectionIds = new Set(song?.songSections.map(s => s.localId) || []); // Create a Set for faster lookup
 
-  const lyricVersions = lyricVersionStore
-    .filter((v) => v.songId === workingOnSong)
-    .sort((a, b) => b.timestamp - a.timestamp); 
+  const lyricVersions = useMemo(() =>
+    [...lyricVersionStore] // Clone to avoid in-place sorting issues
+      .filter((v) => v.songId === workingOnSong)
+      .sort((a, b) => b.timestamp - a.timestamp),
+    [lyricVersionStore, workingOnSong]
+  );
 
-  const songSections = songSectionStore
-    .filter(v => sectionIds.has(v.localId)) 
-    .map((section) => ({...section, color: colorDefaults[section.type], ...song.songSections.find(s => s.localId === section.localId)}))
-    .sort((a, b) => a.order - b.order); 
+  const songSections = useMemo(() =>
+    songSectionStore
+      .filter(v => sectionIds.has(v.localId))
+      .map((section) => ({
+        ...section,
+        color: colorDefaults[section.type],
+        ...song?.songSections.find(s => s.localId === section.localId) // Use optional chaining for safety
+      }))
+      .sort((a, b) => a.order - b.order),
+    [songSectionStore, sectionIds, song]
+  );
+
 
   const { updateSong, addLyricVersionToSong, setWorkingOnSong } = useCatalogStore.getState();
 

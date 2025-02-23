@@ -80,10 +80,11 @@ const DraggableCard = ({
       )}
 
       {/* Card */}
-      { renderCard ? renderCard(card, index) : 
+        { renderCard ? <span key={index}>{renderCard(card, index)}</span> : 
         <div
           className="relative"
           onClick={onClick}
+          key={index}
         >
           <div
             className={`flex-grow-0 text-center text-${card.color}-700 bg-${card.color}-200 rounded-md p-4 m-2 shadow-md cursor-pointer`}
