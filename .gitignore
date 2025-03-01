@@ -8,3 +8,40 @@
 .env*
 
 tfout
+# Node.js
+node_modules/
+.pnp.*
+.yarn/*
+!.yarn/rc
+!.yarn/releases
+!.yarn/sdks
+
+# Yarn v2 and v3
+.yarn/cache
+.yarn/global
+.yarn/versions
+
+# Yarn v4 specific (if you have features like PnP or workspaces)
+.pnp.cjs
+.pnp.loader.mjs
+
+# Logs
+logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+
+# Vim files
+*~
+*.swp
+*.swo
+*.vim~
+*.swm
+*.bak
+
