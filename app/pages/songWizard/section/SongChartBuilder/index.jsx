@@ -3,6 +3,7 @@ import ScaleUtil from "~/utils/scales"
 import SongKeyManager from "./SongKeyManager.jsx"
 import SongKeyViewer from "./SongKeyViewer.jsx"
 import ChordProgressionManager from "./ChordProgressionManager.jsx"
+import SubstitutionManager from "./SubstitutionManager.jsx"
 import SectionViewer from "./SectionViewer.jsx"
 import { InterfaceModeProvider } from "./context";
 
@@ -16,6 +17,7 @@ export default ({ songData, songSections }) => {
         <div className="sticky top-0 pt-4 dark:bg-black bg-white border-b py-2">
           <SongKeyManager scale={scale} songData={songData} />
           <SongKeyViewer scale={scale} />
+          <SubstitutionManager scale={scale} />
         </div>
 
         {songSections.map((section, index) => 

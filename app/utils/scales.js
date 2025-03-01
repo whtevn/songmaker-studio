@@ -1,6 +1,7 @@
 const SHARP = "♯";
 const FLAT = "♭";
 const DIMINISHED = "°";
+const DOMINANT = "7";
 const WHOLE_STEP = 2;
 const HALF_STEP = 1;
 const A4_FREQUENCY = 440; // Standard pitch for A4
@@ -12,9 +13,11 @@ const intervals = {
   perfect4th: WHOLE_STEP * 2 + HALF_STEP,
   perfect5th: WHOLE_STEP * 3 + HALF_STEP,
   minor3rd: WHOLE_STEP + HALF_STEP,
+  minor7th: WHOLE_STEP * 5,  // Minor 7th (dominant 7th uses this)
+  major7th: WHOLE_STEP * 5 + HALF_STEP,
   diminished5th: WHOLE_STEP * 3,
   diminished7th: WHOLE_STEP * 4 + HALF_STEP,
-  augmented5th: WHOLE_STEP * 4 
+  augmented5th: WHOLE_STEP * 4
 };
 
 const chordFormulas = {
@@ -23,33 +26,57 @@ const chordFormulas = {
   diminished: [intervals.root, intervals.minor3rd, intervals.diminished5th],
   augmented: [intervals.root, intervals.major3rd, intervals.augmented5th],
   sus2: [intervals.root, intervals.major2nd, intervals.perfect5th],
-  sus4: [intervals.root, intervals.perfect4th, intervals.perfect5th]
+  sus4: [intervals.root, intervals.perfect4th, intervals.perfect5th],
+  dominant7: [intervals.root, intervals.major3rd, intervals.perfect5th, intervals.minor7th], 
+  dominant9: [intervals.root, intervals.major3rd, intervals.perfect5th, intervals.minor7th, intervals.major2nd], 
+  dominant11: [intervals.root, intervals.major3rd, intervals.perfect5th, intervals.minor7th, intervals.major2nd, intervals.perfect4th], 
+  dominant13: [intervals.root, intervals.major3rd, intervals.perfect5th, intervals.minor7th, intervals.major2nd, intervals.perfect4th, intervals.major6th] 
+
 };
 const CHORD_QUALITY = {
   MAJOR: {
     name: "major",
     mode: "ionian",
-    steps: [chordFormulas.major],
+    steps: chordFormulas.major,
   },
   MINOR: {
     name: "minor",
     mode: "aeolian",
     symbol: "m",
-    steps: [chordFormulas.minor],
+    steps: chordFormulas.minor,
   },
   DIMINISHED: {
     name: "diminished",
-    mode: "locrian",
+    mode: "locrian", // Phrygian could also work
     symbol: "°",
-    steps: [chordFormulas.diminished],
+    steps: chordFormulas.diminished,
   },
   AUGMENTED: {
     name: "augmented",
-    mode: "lydian",
+    mode: "lydian augmented", // More accurate
     symbol: "+",
-    steps: [chordFormulas.augmented],
+    steps: chordFormulas.augmented,
+  },
+  DOMINANT: {
+    name: "dominant",
+    mode: "mixolydian",
+    symbol: "7",
+    steps: chordFormulas.dominant7,
+  },
+  DOMINANT9: {
+    name: "dominant 9",
+    mode: "mixolydian",
+    symbol: "9",
+    steps: chordFormulas.dominant9,
+  },
+  DOMINANT13: {
+    name: "dominant 13",
+    mode: "mixolydian",
+    symbol: "13",
+    steps: chordFormulas.dominant13,
   }
-}
+};
+
 
 
 
@@ -68,6 +95,24 @@ const notes = [
   { labels: ["B", `C${FLAT}`], natural: true },
 ];
 
+function getNoteIndex(note) {
+  return notes.findIndex(n => n.labels.includes(note));
+}
+
+function compareNotes(note1, note2) {
+  const index1 = getNoteIndex(note1);
+  const index2 = getNoteIndex(note2);
+
+  if (index1 === -1 || index2 === -1) return 0; // Safety fallback
+
+  // Handle wrap-around cases where last note moves to first (e.g., B → C)
+  if (index1 === notes.length - 1 && index2 === 0) return 1; // B → C should be +1
+  if (index1 === 0 && index2 === notes.length - 1) return -1; // C → B should be -1
+
+  return Math.sign(index2 - index1); // -1 for flat, 1 for sharp, 0 for same note
+}
+
+
 const modes = [
   { label: "ionian", description: "Major scale", quality: "major" },
   { label: "dorian", description: "Minor scale with a raised 6th" },
@@ -79,13 +124,13 @@ const modes = [
 ];
 
 const chordProgression = [
-  { mode: "ionian", type: CHORD_QUALITY.MAJOR.name },
-  { mode: "aeolian", type: CHORD_QUALITY.MINOR.name },
-  { mode: "aeolian", type: CHORD_QUALITY.MINOR.name },
-  { mode: "ionian", type: CHORD_QUALITY.MAJOR.name },
-  { mode: "ionian", type: CHORD_QUALITY.MAJOR.name },
-  { mode: "aeolian", type: CHORD_QUALITY.MINOR.name },
-  { mode: "locrian", type: CHORD_QUALITY.DIMINISHED.name },
+  { mode: "ionian", type: CHORD_QUALITY.MAJOR.name, quality: CHORD_QUALITY.MAJOR.name },
+  { mode: "aeolian", type: CHORD_QUALITY.MINOR.name, quality: CHORD_QUALITY.MINOR.name },
+  { mode: "aeolian", type: CHORD_QUALITY.MINOR.name, quality: CHORD_QUALITY.MINOR.name },
+  { mode: "ionian", type: CHORD_QUALITY.MAJOR.name, quality: CHORD_QUALITY.MAJOR.name },
+  { mode: "ionian", type: CHORD_QUALITY.MAJOR.name, quality: CHORD_QUALITY.MAJOR.name },
+  { mode: "aeolian", type: CHORD_QUALITY.MINOR.name, quality: CHORD_QUALITY.MINOR.name },
+  { mode: "locrian", type: CHORD_QUALITY.DIMINISHED.name, quality: CHORD_QUALITY.DIMINISHED.name },
 ];
 
 const chordProgressionIndicator = {
@@ -122,11 +167,14 @@ const secondaryDominantResolutionStrength = [
 
 
 const chordExtensions = [
-  { id: "6", semitones: 10, label: "Major 6th" },
-  { id: "m7", semitones: 11, label: "Minor 7th" },
-  { id: "M7", semitones: 12, label: "Major 7th" },
-  { id: "9", semitones: 15, label: "Major 9th" },
+  { id: "6", semitones: 9, label: "Major 6th" }, 
+  { id: "m7", semitones: 10, label: "Minor 7th" },
+  { id: "M7", semitones: 11, label: "Major 7th" },
+  { id: "9", semitones: 14, label: "Major 9th" },
+  { id: "11", semitones: 17, label: "Perfect 11th" },
+  { id: "13", semitones: 21, label: "Major 13th" },
 ];
+
 
 function generateTriad(key, formulaName, notes, chordFormulas, NOTES_PER_OCTAVE) {
   const rootIndex = notes.findIndex(note => note.labels.includes(key));
@@ -140,6 +188,26 @@ function generateTriad(key, formulaName, notes, chordFormulas, NOTES_PER_OCTAVE)
     return notes[noteIndex].labels[0]; // Return the first label for simplicity
   });
 }
+
+function generateTriadWithOctave(key, formulaName, notes, chordFormulas, NOTES_PER_OCTAVE) {
+  const BASE_SCALE = "CDEFGAB"; // Natural notes to track cycles
+  let currentOctave = 4; // Default starting octave
+  let lastNoteIndex = -1; // Tracks position in BASE_SCALE
+
+  return generateTriad(key, formulaName, notes, chordFormulas, NOTES_PER_OCTAVE).map(note => {
+    const noteIndex = BASE_SCALE.indexOf(note.slice(0,1)); // Get position in base scale
+
+    if (lastNoteIndex !== -1 && noteIndex < lastNoteIndex) {
+      // If we wrapped around (e.g., from B to C), increase octave
+      currentOctave++;
+    }
+
+    lastNoteIndex = noteIndex; // Update last note position
+    return { note, octave: currentOctave };
+  });
+}
+
+
 
 const ionianFormula = [WHOLE_STEP, WHOLE_STEP, HALF_STEP, WHOLE_STEP, WHOLE_STEP, WHOLE_STEP, HALF_STEP];
 
@@ -184,22 +252,78 @@ function generateScale(startLabel, modeLabel) {
 
 function generateScaleWithInfo(key, mode){
   const progression = chordProgressionFor(mode, chordProgression, modes)
+  /*
+   *
+   * [ { "mode": "ionian", "type": "major", "quality": "major" }, { "mode": "aeolian", "type": "minor", "quality": "minor" }, { "mode": "aeolian", "type": "minor", "quality": "minor" }, { "mode": "ionian", "type": "major", "quality": "major" }, { "mode": "ionian", "type": "major", "quality": "major" }, { "mode": "aeolian", "type": "minor", "quality": "minor" }, { "mode": "locrian", "type": "diminished", "quality": "diminished" } ]
+   *
+   */
+  
   const scale = generateScale(key, mode) 
   return scale.map((key, index) => {
     const note = key[0]
-    const type = progression[index].type
+    const quality = progression[index].quality
     const mode = progression[index].mode
+    const degree = index+1
     return {
       note,
-      type,
+      quality,
       mode,
       index,
-      numeral: formatForType(romanNumerals[index], type),
-      shortName: progression[index].shortName,
-      chord: generateTriad(note, type, notes, chordFormulas, NOTES_PER_OCTAVE),
+      degree,
+      numeral: formatForType(romanNumerals[index], quality),
     }
   })
 }
+
+function getParallelNashvilleNumber(scale, {note, degree, numeral}, mode) {
+
+  // Generate the parallel scale (e.g., C Dorian)
+  const parallelScale = generateScaleWithInfo(scale[0].note, mode);
+
+  // Find the degree of the chordRoot in the parallel scale
+  const parallelDegree = parallelScale.find(note => note.degree === degree);
+
+  switch(compareNotes(note, parallelDegree.note)){
+    case -1: 
+      return {...parallelDegree, numeral: `${FLAT}${parallelDegree.numeral}`}
+    case 1: 
+      return {...parallelDegree, numeral: `${SHARP}${parallelDegree.numeral}`}
+    default: 
+      return parallelDegree
+  }
+}
+
+
+export function getSecondaryDominant(chord, type = "V7") {
+  if (!chord || !chord.numeral) return null;
+
+  // Generate the major scale where the given chord would be the tonic
+  const targetScale = generateScaleWithInfo(chord.note, "major");
+
+  // Find the V7 chord (5th degree of the generated scale)
+  const dominantChord = targetScale.find(n => n.degree === 5);
+  if (!dominantChord) return null;
+
+  // Map chord type to extensions using chordExtensions array
+  const extensionMap = {
+    V7: [],
+    V9: ["9"],
+    V11: ["9", "11"], // 11th includes 9th
+    V13: ["9", "11", "13"], // 13th includes 9th and 11th
+  };
+
+  return {
+    note: dominantChord.note,
+    quality: "dominant",
+    mode: "mixolydian",
+    index: dominantChord.index,
+    degree: dominantChord.degree,
+    numeral: `${type}/${chord.numeral}`,
+    extensions: extensionMap[type].map(extId => chordExtensions.find(e => e.id === extId))
+  };
+}
+
+
 
 function formatForType(name, type){
   switch(type) {
@@ -650,8 +774,11 @@ const backendLibrary = {
   generateDegreeForScale,
   chordProgressionIndicator,
   chordProgressionShortName,
+  getParallelNashvilleNumber,
+  relativeChordDefinitions: CHORD_QUALITY,
   chordProgressionFor: (mode) => chordProgressionFor(mode, chordProgression, modes),
   generateTriad: (key, formulaName) => generateTriad(key, formulaName, notes, chordFormulas, NOTES_PER_OCTAVE),
+  generateTriadWithOctave: (key, formulaName) => generateTriadWithOctave(key, formulaName, notes, chordFormulas, NOTES_PER_OCTAVE),
   identifyChord: (chordNotes) =>
     identifyChord(notes, chordFormulas, chordExtensions, chordNotes),
   generateChord: (root, options = { extend: [], type: "major" }) =>

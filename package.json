@@ -24,6 +24,7 @@
     "framer-motion": "^11.15.0",
     "heroicons": "^2.2.0",
     "isbot": "^5.1.17",
+    "lodash": "^4.17.21",
     "nanoid": "^5.0.9",
     "playwright": "^1.50.0",
     "pluralize": "^8.0.0",
