@@ -9,7 +9,7 @@ export default ({ scale }) => {
         { scale.map((chord, index) => 
           <BadgeButton key={index} color={index === selectedChord?.index ? "blue" : "slate"} onClick={()=>handleScaleDegreeClick(chord)}>
             <div className="flex flex-col">
-              <span>{chord.numeral}</span>
+              <span>{chord.nashville}</span>
               <span>{chord.note}{chordProgressionIndicator[chord.quality]}</span>
             </div>
           </BadgeButton>

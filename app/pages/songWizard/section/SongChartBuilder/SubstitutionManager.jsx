@@ -8,13 +8,15 @@ import _ from "lodash";
 
 export default ({ scale }) => {
   const { selectedChord } = useInterfaceMode();
-  const { chordExtensions, modes, getParallelNashvilleNumber, generateTriadWithOctave, relativeChordDefinitions } = ScaleUtil;
+  const { chordExtensions, modes, getParallelNashvilleNumber, generateTriadWithOctave, constructChordWithOctave, relativeChordDefinitions, getNashvilleNumber } = ScaleUtil;
 
   const [selectedSubstitution, setSelectedSubstitution] = useState(null);
   const [selectedMode, setSelectedMode] = useState(null);
   const [secondaryDominantExtension, setSecondaryDominantExtension] = useState(null);
   const [selectedExtensions, setSelectedExtensions] = useState([]);
   const [selectedChords, setSelectedChords] = useState([]); // Array to store additional chords
+
+  console.log(scale)
 
   if (!selectedChord) return null;
 
@@ -38,7 +40,26 @@ export default ({ scale }) => {
     const newChord = {
       chord: generateTriadWithOctave(parallelChordData.note, parallelChordData.quality),
       label: `${parallelChordData.note} ${parallelChordData.quality}`,
-      nashville: parallelChordData.numeral,
+      nashville: parallelChordData.nashville,
+    };
+
+    // Add to selectedChords array, ensuring no duplicates
+    setSelectedChords((prevChords) =>
+      prevChords.some((chord) => chord.label === newChord.label) ? prevChords : [...prevChords, newChord]
+    );
+  };
+
+  const handleRelativeSelection = (chordType) => {
+	  console.log(selectedChord, chordType)
+
+    const relativeSelection = constructChordWithOctave(scale, { ...selectedChord, quality: chordType.quality })
+	
+    console.log(relativeSelection)
+
+    const newChord = {
+      chord: relativeSelection,
+      label: `${selectedChord.note} ${chordType.name}`,
+      nashville: getNashvilleNumber(chordType)
     };
 
     // Add to selectedChords array, ensuring no duplicates
@@ -48,8 +69,8 @@ export default ({ scale }) => {
   };
 
   // Reset selectedChords when substitution changes away from "Parallel"
-  if (selectedSubstitution !== "Parallel" && selectedChords.length > 0) {
-    setSelectedChords([]);
+  if (selectedSubstitution !== "Relative" && selectedChords.length > 0) {
+    //setSelectedChords([]);
   }
 
   return (
@@ -91,7 +112,7 @@ export default ({ scale }) => {
           {selectedChord.quality !== "diminished" && (
             <DropdownItem
               onClick={() => {
-                setSelectedSubstitution(`V7/${selectedChord.numeral}`);
+                setSelectedSubstitution(`V7/${selectedChord.nashville}`);
                 setSecondaryDominantExtension(null);
                 setSelectedChords([]); // Reset when changing substitution
               }}
@@ -134,6 +155,22 @@ export default ({ scale }) => {
         </Dropdown>
       )}
 
+      {/* Parallel Mode Selection */}
+      {selectedSubstitution === "Relative" && (
+        <Dropdown>
+          <DropdownButton outline>
+            {selectedMode ? selectedMode.label : "Select Mode"}
+          </DropdownButton>
+          <DropdownMenu>
+            {Object.keys(relativeChordDefinitions).map((key) => {
+		const chordType = relativeChordDefinitions[key]
+             	return <DropdownItem key={chordType.name} onClick={() => handleRelativeSelection(chordType)}>
+                {chordType.name}
+              </DropdownItem>
+            })}
+          </DropdownMenu>
+        </Dropdown>
+      )}
       {/* Chord Extensions */}
       {false &&
         chordExtensions
@@ -152,7 +189,7 @@ export default ({ scale }) => {
       <div className="bg-white">
         <ChordViewer
           chords={[
-            { chord: selectedChordTriad, label: `${selectedChord.note} ${selectedChord.quality}`, nashville: selectedChord.numeral },
+            { chord: selectedChordTriad, label: `${selectedChord.note} ${selectedChord.quality}`, nashville: selectedChord.nashville },
             ...selectedChords
           ]}
         />

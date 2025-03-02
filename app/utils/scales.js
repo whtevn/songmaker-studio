@@ -8,16 +8,17 @@ const A4_FREQUENCY = 440; // Standard pitch for A4
 const NOTES_PER_OCTAVE = 12;
 const intervals = {
   root: 0,
-  major2nd: WHOLE_STEP,
-  major3rd: WHOLE_STEP * 2,
-  perfect4th: WHOLE_STEP * 2 + HALF_STEP,
-  perfect5th: WHOLE_STEP * 3 + HALF_STEP,
-  minor3rd: WHOLE_STEP + HALF_STEP,
-  minor7th: WHOLE_STEP * 5,  // Minor 7th (dominant 7th uses this)
-  major7th: WHOLE_STEP * 5 + HALF_STEP,
-  diminished5th: WHOLE_STEP * 3,
-  diminished7th: WHOLE_STEP * 4 + HALF_STEP,
-  augmented5th: WHOLE_STEP * 4
+  major2nd: 2,
+  major3rd: 4,
+  perfect4th: 5,
+  perfect5th: 7,
+  minor3rd: 3,
+  minor7th: 10,  // Minor 7th (dominant 7th uses this)
+  major7th: 11,
+  diminished5th: 6,
+  diminished7th: 9, // Corrected (same as major6th)
+  augmented5th: 8,
+  major6th: 9 // Added for completeness
 };
 
 const chordFormulas = {
@@ -27,50 +28,57 @@ const chordFormulas = {
   augmented: [intervals.root, intervals.major3rd, intervals.augmented5th],
   sus2: [intervals.root, intervals.major2nd, intervals.perfect5th],
   sus4: [intervals.root, intervals.perfect4th, intervals.perfect5th],
-  dominant7: [intervals.root, intervals.major3rd, intervals.perfect5th, intervals.minor7th], 
-  dominant9: [intervals.root, intervals.major3rd, intervals.perfect5th, intervals.minor7th, intervals.major2nd], 
-  dominant11: [intervals.root, intervals.major3rd, intervals.perfect5th, intervals.minor7th, intervals.major2nd, intervals.perfect4th], 
-  dominant13: [intervals.root, intervals.major3rd, intervals.perfect5th, intervals.minor7th, intervals.major2nd, intervals.perfect4th, intervals.major6th] 
-
+  dominant7: [intervals.root, intervals.major3rd, intervals.perfect5th, intervals.minor7th],
+  dominant9: [intervals.root, intervals.major3rd, intervals.perfect5th, intervals.minor7th, intervals.major2nd],
+  dominant11: [intervals.root, intervals.major3rd, intervals.perfect5th, intervals.minor7th, intervals.major2nd, intervals.perfect4th],
+  dominant13: [intervals.root, intervals.major3rd, intervals.perfect5th, intervals.minor7th, intervals.major2nd, intervals.perfect4th, intervals.major6th]
 };
+
 const CHORD_QUALITY = {
   MAJOR: {
     name: "major",
+    quality: "major",
     mode: "ionian",
     steps: chordFormulas.major,
   },
   MINOR: {
     name: "minor",
+    quality: "minor",
     mode: "aeolian",
     symbol: "m",
     steps: chordFormulas.minor,
   },
   DIMINISHED: {
     name: "diminished",
+    quality: "diminished",
     mode: "locrian", // Phrygian could also work
     symbol: "°",
     steps: chordFormulas.diminished,
   },
   AUGMENTED: {
     name: "augmented",
+    quality: "augmented",
     mode: "lydian augmented", // More accurate
     symbol: "+",
     steps: chordFormulas.augmented,
   },
   DOMINANT: {
     name: "dominant",
+    quality: "dominant",
     mode: "mixolydian",
     symbol: "7",
     steps: chordFormulas.dominant7,
   },
   DOMINANT9: {
     name: "dominant 9",
+    quality: "dominant 9",
     mode: "mixolydian",
     symbol: "9",
     steps: chordFormulas.dominant9,
   },
   DOMINANT13: {
     name: "dominant 13",
+    quality: "dominant 13",
     mode: "mixolydian",
     symbol: "13",
     steps: chordFormulas.dominant13,
@@ -175,6 +183,13 @@ const chordExtensions = [
   { id: "13", semitones: 21, label: "Major 13th" },
 ];
 
+const chordAlterations = [
+  { id: "b9", semitones: 13, label: "Flat 9th" },
+  { id: "#9", semitones: 15, label: "Sharp 9th" },
+  { id: "#11", semitones: 18, label: "Sharp 11th" },
+  { id: "b13", semitones: 20, label: "Flat 13th" },
+];
+
 
 function generateTriad(key, formulaName, notes, chordFormulas, NOTES_PER_OCTAVE) {
   const rootIndex = notes.findIndex(note => note.labels.includes(key));
@@ -270,12 +285,12 @@ function generateScaleWithInfo(key, mode){
       mode,
       index,
       degree,
-      numeral: formatForType(romanNumerals[index], quality),
+      nashville: formatForType(romanNumerals[index], quality),
     }
   })
 }
 
-function getParallelNashvilleNumber(scale, {note, degree, numeral}, mode) {
+function getParallelNashvilleNumber(scale, {note, degree, nashville}, mode) {
 
   // Generate the parallel scale (e.g., C Dorian)
   const parallelScale = generateScaleWithInfo(scale[0].note, mode);
@@ -285,9 +300,9 @@ function getParallelNashvilleNumber(scale, {note, degree, numeral}, mode) {
 
   switch(compareNotes(note, parallelDegree.note)){
     case -1: 
-      return {...parallelDegree, numeral: `${FLAT}${parallelDegree.numeral}`}
+      return {...parallelDegree, nashville: `${FLAT}${parallelDegree.nashville}`}
     case 1: 
-      return {...parallelDegree, numeral: `${SHARP}${parallelDegree.numeral}`}
+      return {...parallelDegree, nashville: `${SHARP}${parallelDegree.nashville}`}
     default: 
       return parallelDegree
   }
@@ -295,7 +310,7 @@ function getParallelNashvilleNumber(scale, {note, degree, numeral}, mode) {
 
 
 export function getSecondaryDominant(chord, type = "V7") {
-  if (!chord || !chord.numeral) return null;
+  if (!chord || !chord.nashville) return null;
 
   // Generate the major scale where the given chord would be the tonic
   const targetScale = generateScaleWithInfo(chord.note, "major");
@@ -318,24 +333,30 @@ export function getSecondaryDominant(chord, type = "V7") {
     mode: "mixolydian",
     index: dominantChord.index,
     degree: dominantChord.degree,
-    numeral: `${type}/${chord.numeral}`,
+    nashville: `${type}/${chord.nashville}`,
     extensions: extensionMap[type].map(extId => chordExtensions.find(e => e.id === extId))
   };
 }
 
 
+function getNashvilleNumber(chord) {
+  let numeral = formatForType(romanNumerals[chord.index], chord.quality);
+  //if (chord.degreeModification) numeral = `${chord.degreeModification}${numeral}`;
+
+  let extensions = chord.extensions ? chord.extensions.join("") : "";
+  let alterations = chord.alterations ? chord.alterations.join("") : "";
+
+  return `${numeral}${extensions}${alterations}`;
+}
 
 function formatForType(name, type){
   switch(type) {
     case "major":
       return name.toUpperCase()
     case "minor":
-      // code block
       return name.toLowerCase()
     case "diminished":
       return `${name.toLowerCase()}${DIMINISHED}`
-    default:
-      // code block
   }
 }
 
@@ -753,6 +774,57 @@ function generateDegreeForScale(key, modeLabel, degree){
 
 export const notesWithScales = generateAllScales();
 
+
+function constructChord(scale, chord) {
+  const chordQuality = CHORD_QUALITY[chord.quality.toUpperCase()]
+  const root = scale.find(note => note.degree === chord.degree);
+  if (!root) throw new Error(`Invalid degree: ${chord.degree}`);
+
+  let chordNotes = chordQuality.steps.map(interval => {
+    const noteIndex = (root.index + interval) % scale.length;
+    return scale[noteIndex].note;
+  });
+
+  if (chord.extensions) {
+    chord.extensions.forEach(ext => {
+      const extension = chordExtensions.find(e => e.id === ext);
+      if (extension) {
+        const extIndex = (root.index + extension.semitones) % scale.length;
+        chordNotes.push(scale[extIndex].note);
+      }
+    });
+  }
+
+  if (chord.alterations) {
+    chord.alterations.forEach(alt => {
+      const alteration = chordAlterations.find(a => a.id === alt);
+      if (alteration) {
+        const altIndex = (root.index + alteration.semitones) % scale.length;
+        chordNotes = chordNotes.map(note =>
+          scale[altIndex].note === note ? `${note}${alt[0]}` : note
+        );
+      }
+    });
+  }
+
+  return chordNotes;
+}
+
+function constructChordWithOctave(scale, chord) {
+  let currentOctave = 4;
+  let lastIndex = -1;
+
+  return constructChord(scale, chord).map(note => {
+    const noteIndex = scale.findIndex(n => n.note === note);
+    if (lastIndex !== -1 && noteIndex < lastIndex) {
+      currentOctave++;
+    }
+    lastIndex = noteIndex;
+    console.log(chord)
+    return { note, octave: currentOctave };
+  });
+}
+
 const backendLibrary = {
   notes,
   romanNumerals,
@@ -775,10 +847,13 @@ const backendLibrary = {
   chordProgressionIndicator,
   chordProgressionShortName,
   getParallelNashvilleNumber,
+  getNashvilleNumber,
   relativeChordDefinitions: CHORD_QUALITY,
   chordProgressionFor: (mode) => chordProgressionFor(mode, chordProgression, modes),
   generateTriad: (key, formulaName) => generateTriad(key, formulaName, notes, chordFormulas, NOTES_PER_OCTAVE),
   generateTriadWithOctave: (key, formulaName) => generateTriadWithOctave(key, formulaName, notes, chordFormulas, NOTES_PER_OCTAVE),
+  constructChord: (key, chordQuality) => constructChord(key, chordQuality, notes, NOTES_PER_OCTAVE),
+  constructChordWithOctave: (scale, chord) => constructChordWithOctave(scale, chord, notes, NOTES_PER_OCTAVE),
   identifyChord: (chordNotes) =>
     identifyChord(notes, chordFormulas, chordExtensions, chordNotes),
   generateChord: (root, options = { extend: [], type: "major" }) =>
