@@ -6,7 +6,7 @@ export const WHOLE_STEP = 2;
 export const HALF_STEP = 1;
 export const A4_FREQUENCY = 440; // Standard pitch for A4
 export const NOTES_PER_OCTAVE = 12;
-export const ENHARMONIC_SPELLING = [ "C", "D", "E", "F", "G", "A", "B" ];
+export const ENHARMONIC_SPELLING = [ "A", "B", "C", "D", "E", "F", "G" ];
 
 export const diatonicScale = [WHOLE_STEP, WHOLE_STEP, HALF_STEP, WHOLE_STEP, WHOLE_STEP, WHOLE_STEP, HALF_STEP]
 

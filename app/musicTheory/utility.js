@@ -35,7 +35,7 @@ export function constructChord(scale, chordDefinition) {
 
   return chordDefinition.quality.steps.map(steps => {
     const note = notes[(rootNoteIndex + steps) % notes.length]; // Ensure within bounds
-    const octave = startingKeyIndex + steps < 7 ? baseOctave : baseOctave+1 
+    const octave = startingKeyIndex + chordDefinition.degree-1 + steps < enharmonicSpelling.length ? baseOctave : baseOctave+1 
 
     // Find if this note exists in the scale and use that enharmonic spelling
     const matchingScaleNote = scale.find(scaleNote =>
