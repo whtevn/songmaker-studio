@@ -11,6 +11,9 @@ import {
 import {
   chooseEnharmonic,
   findEnharmonicSpelling,
+  degreeToChordName,
+  degreeToNumeralNotation,
+  degreeToNashvilleNotation,
   shiftArray,
   findNoteIndexByName,
   constructChord,
@@ -36,34 +39,40 @@ export function constructScale(tonic, modeName){
     const name = index === 0 ? thisNote.enharmonics[0] : chooseEnharmonic(thisNote, enharmonicSpelling[index]);
     const octave = startingKeyIndex + index < 7 ? 4 : 5;
     const frequency = noteToFrequency({ name, octave });
+    const enharmonics = thisNote.enharmonics
+    const romanNumeral = degreeToNumeralNotation({degree}, quality)
+    const nashville = degreeToNashvilleNotation({degree}, quality)
+    const chordName = degreeToChordName(name, quality)
 
     const newNote = {
       render: {
         name,
         octave,
         frequency,
-        enharmonics: thisNote.enharmonics
+        enharmonics,
+        romanNumeral,
+        chordName,
+        nashville,
       },
       quality,
-      degree: index + 1,
+      degree,
     };
     return { noteIndex: ((noteIndex + step) % NOTES_PER_OCTAVE), scale: [...scale, newNote], index: index + 1 };
   }, { noteIndex: foundNoteIndex, scale: [], index: 0 }).scale;
 
-  return result.map(note => ({ ...note, chord: constructChord(result, note) }));
+  return {tonic, modeName, notes: result.map(note => ({ ...note, chord: constructChord(result, note) }))};
 }
 
 export function constructSecondaryChord(scale, degree, secondaryDegree) {
   const scaleDegree = scale[degree];
-  return constructScale(scaleDegree.render.name, scaleDegree.quality.name).find(note => note.degree === secondaryDegree);
+  return constructScale(scaleDegree.render.name, scaleDegree.quality.name).notes.find(note => note.degree === secondaryDegree);
 }
 
 export function constructParallelChord(scale, degree, modeName) {
   const scaleDegree = scale.find(s => s.degree === degree)
-  const chord = constructScale(scale[0].render.name, modeName).find(note => note.degree === degree).chord
+  const chord = constructScale(scale[0].render.name, modeName).notes.find(note => note.degree === degree).chord
 
 
-  console.log({foundnotes: chord.notes[0].render.name, original: scaleDegree.render.name})
   let degreeModifier = '';
   const compared = compareNotes(scaleDegree, chord.notes[0])
   if(compared === -1) degreeModifier = FLAT
@@ -94,4 +103,34 @@ export function constructAllScales() {
   });
 }
 
+export const playChord = (notes, audioContext, startTime, adsr = { attack: 0.1, decay: 0.2, sustain: 0.5, release: 0.3 }) => {
+  notes.forEach(({ frequency, velocity }) => {
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
 
+    const { attack, decay, sustain, release } = adsr;
+    const noteLength = attack + decay + release; // Total duration of the note
+
+    const maxGain = velocity * 0.2; // Scale velocity (0-1) to a max gain range
+    const sustainLevel = sustain * maxGain; // Scale sustain relative to velocity
+
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(frequency, startTime);
+
+    // Apply ADSR envelope with velocity
+    gainNode.gain.setValueAtTime(0.0, startTime); // Start silent
+    gainNode.gain.linearRampToValueAtTime(maxGain, startTime + attack); // Attack phase (rises)
+    gainNode.gain.linearRampToValueAtTime(sustainLevel, startTime + attack + decay); // Decay to sustain level
+    gainNode.gain.setValueAtTime(sustainLevel, startTime + noteLength - release); // Hold sustain
+    gainNode.gain.linearRampToValueAtTime(0.001, startTime + noteLength); // Release phase (fade out)
+
+    oscillator.connect(gainNode).connect(audioContext.destination);
+    oscillator.start(startTime);
+    oscillator.stop(startTime + noteLength);
+  });
+};
+
+
+
+
+export { SHARP, FLAT }

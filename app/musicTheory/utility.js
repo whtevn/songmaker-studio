@@ -1,6 +1,8 @@
 /* UTILITY FUNCTION */
 import {
   notes,
+  romanNumerals,
+  DIMINISHED,
   ENHARMONIC_SPELLING,
   CHORD_QUALITY,
   SHARP,
@@ -32,20 +34,46 @@ export function findNoteIndexByName(label) {
 }
 
 export function constructChord(scale, chordDefinition) {
-  const rootNoteIndex = notes.findIndex(note => note.enharmonics === chordDefinition.render.enharmonics);
-  const baseOctave = chordDefinition.render.octave;
-  const { startingKeyIndex, enharmonicSpelling } = findEnharmonicSpelling(scale[0].render.name);
-  const scaleNote = scale.find(note => note.degree === chordDefinition.degree)
+  console.log(chordDefinition.degree)
+  console.log(chordDefinition)
+  const baseOctave = chordDefinition.render.octave; // Ensure the root stays in its given octave
+  const NOTES_PER_OCTAVE = 12;
 
-  const result = {
+  const rootNoteIndex = notes.findIndex(note =>
+    note.enharmonics.includes(chordDefinition.render.name)
+  );
+
+  if (rootNoteIndex === -1) {
+    console.error("Root note not found:", chordDefinition.render.name);
+    return null;
+  }
+
+
+  const render = {
     degree: chordDefinition.degree,
-    notes: chordDefinition.quality.steps.map(steps => {
-      const note = notes[(rootNoteIndex + steps) % notes.length]; // Ensure within bounds
-      const octave = startingKeyIndex + chordDefinition.degree - 1 + steps < enharmonicSpelling.length ? baseOctave : baseOctave + 1;
+    notes: chordDefinition.quality.steps.map((steps, index) => {
+      let noteIndex = (rootNoteIndex + steps) % notes.length;
+      let note = notes[noteIndex];
+
+      // Root note should always stay in its original octave
+      let octave = baseOctave;
+
+      // Increase octave **only** for notes above the root
+      if (index > 0 && noteIndex < rootNoteIndex) {
+        octave += 1;
+      }
+
+      console.log({ note, octave, rootNoteIndex, steps });
+
+      // Find best enharmonic spelling within the scale
       const matchingScaleNote = scale.find(scaleNote =>
-        note.enharmonics.some(enh => scaleNote.render.name === enh)
+        note.enharmonics.includes(scaleNote.render.name)
       );
-      const name = matchingScaleNote ? matchingScaleNote.render.name : accidentalConsistency(scale, note.enharmonics);
+
+      const name = matchingScaleNote
+        ? matchingScaleNote.render.name
+        : accidentalConsistency(scale, note.enharmonics);
+
       const frequency = noteToFrequency({ name, octave });
 
       return {
@@ -53,25 +81,18 @@ export function constructChord(scale, chordDefinition) {
           name,
           octave,
           frequency,
-          enharmonics: note.enharmonics
+          enharmonics: note.enharmonics,
         },
-        quality: chordDefinition.quality,
-        degree: chordDefinition.degree,
       };
-    })
-  }
+    }),
+  };
 
-  let degreeModifier;
-
-  switch(compareNotes(scaleNote, result.notes[0])){
-    case -1: 
-      degreeModifier = FLAT
-    case 1: 
-      degreeModifier = SHARP
-  }
-
-  return { ...result, degreeModifier }
+  return render;
 }
+
+
+
+
 
 export function accidentalConsistency(scale, enharmonics) {
   const naturalNote = enharmonics.find(note => note.length === 1);
@@ -101,7 +122,6 @@ export function noteToFrequency(note){
 export function compareNotes(note1, note2) {
   const index1 = findNoteIndexByName(note1.render.name)
   const index2 = findNoteIndexByName(note2.render.name)
-  console.log({index1, index2})
 
   if (index1 === -1 || index2 === -1) return 0; // Safety fallback
 
@@ -110,4 +130,38 @@ export function compareNotes(note1, note2) {
   if (index1 === 0 && index2 === notes.length - 1) return -1; // C → B should be -1
 
   return Math.sign(index2 - index1); // -1 for flat, 1 for sharp, 0 for same note
+}
+
+export function degreeToChordName(name, quality){
+  switch(quality.name) {
+    case "major":
+      return `${name}`
+    case "minor":
+      return  `${name}m`
+    case "diminished":
+      return `${name}dim`
+  }
+}
+
+export function degreeToNumeralNotation({degree, degreeModifier}, quality){
+  const name = romanNumerals[degree-1]
+  switch(quality.name) {
+    case "major":
+      return name.toUpperCase()
+    case "minor":
+      return name.toLowerCase()
+    case "diminished":
+      return `${name.toLowerCase()}${DIMINISHED}`
+  }
+}
+
+export function degreeToNashvilleNotation({degree, degreeModifier}, quality){
+  switch(quality.name) {
+    case "major":
+      return `${degree}`
+    case "minor":
+      return  `${degree}m`
+    case "diminished":
+      return `${degree}dim`
+  }
 }

@@ -7,16 +7,17 @@ export const interfaceModeOptions = {
   chordProgression: "chordProgression"
 };
 
-export const InterfaceModeContext = createContext();
+export const SongChartBuilderContext = createContext();
 
 /**
  * Provider component that holds interfaceMode state,
  * plus any functions that need to be shared across components.
  */
-export function InterfaceModeProvider({ children }) {
+export function SongChartBuilderProvider({ children }) {
   // Our mode state, defaulting to "song"
-  const [interfaceMode, setInterfaceMode] = useState(interfaceModeOptions.song);
+  const [interfaceMode, setSongChartBuilder] = useState(interfaceModeOptions.song);
   const { getSongSection, updateSongSection, applyChordToSection } = useCatalogStore.getState();
+  const [audioContext, setAudioContext] = useState(new (window.AudioContext || window.webkitAudioContext)());
 
   // Example of some data that might change when a click event happens
   // (e.g., "selectedChord" or something relevant to chord progression)
@@ -41,8 +42,12 @@ export function InterfaceModeProvider({ children }) {
 
   const handleScaleDegreeClick = (chordInfo) => {
     setSelectedChord(chordInfo);
+    console.log(chordInfo)
     if (interfaceMode === interfaceModeOptions.song) {
       applyChordToSong({ chord: chordInfo, word: selectedWord })
+    }
+    if (interfaceMode === interfaceModeOptions.progression) {
+      addChordToChordProgression({ chord: chordInfo, word: selectedWord })
     }
   };
 
@@ -53,10 +58,10 @@ export function InterfaceModeProvider({ children }) {
     }
   };
 
-  const handleSetInterfaceMode = (mode) => {
+  const handleSetSongChartBuilder = (mode) => {
     setSelectedWord(null)
     setSelectedChord(null)
-    setInterfaceMode(mode)
+    setSongChartBuilder(mode)
   }
 
   // The value we’re exposing to the entire subtree via the context
@@ -64,22 +69,23 @@ export function InterfaceModeProvider({ children }) {
     interfaceMode,
     selectedChord,
     selectedWord,
-    handleSetInterfaceMode,
+    handleSetSongChartBuilder,
     handleScaleDegreeClick,
-    handleSectionWordClick
+    handleSectionWordClick,
+    audioContext,
   };
 
   return (
-    <InterfaceModeContext.Provider value={providerValue}>
+    <SongChartBuilderContext.Provider value={providerValue}>
       {children}
-    </InterfaceModeContext.Provider>
+    </SongChartBuilderContext.Provider>
   );
 }
 
 /**
  * Custom hook so consuming components can easily get context data.
  */
-export function useInterfaceMode() {
-  return useContext(InterfaceModeContext);
+export function useSongChartBuilder() {
+  return useContext(SongChartBuilderContext);
 }
 

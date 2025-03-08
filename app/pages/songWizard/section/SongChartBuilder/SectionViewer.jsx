@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useInterfaceMode } from "./context";
+import { useSongChartBuilder } from "./context";
 import scales from "~/utils/scales";
 const { chordProgressionIndicator } = scales
 /**
@@ -93,7 +93,7 @@ function LyricLine({ line, lineIndex, onAssignRoot, trailingNotes = [], selected
 export default function SectionViewer({ section, onAssignRoot }) {
   const lyricLines = section.lyrics ? section.lyrics.split("\n") : [];
   const [selected, setSelected] = useState(null);
-  const { selectedWord, handleSectionWordClick } = useInterfaceMode()
+  const { selectedWord, handleSectionWordClick } = useSongChartBuilder()
 
   return (
     <div className="p-3 mb-4">

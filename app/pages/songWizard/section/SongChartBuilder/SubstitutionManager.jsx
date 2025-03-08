@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useInterfaceMode } from "./context";
+import { useSongChartBuilder } from "./context";
 import { BadgeButton } from "~/components/catalyst-theme/badge";
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from "~/components/catalyst-theme/dropdown";
 import ScaleUtil from "~/utils/scales";
@@ -7,7 +7,7 @@ import ChordViewer from "./ChordViewer";
 import _ from "lodash";
 
 export default ({ scale }) => {
-  const { selectedChord } = useInterfaceMode();
+  const { selectedChord } = useSongChartBuilder();
   const { chordExtensions, modes, getParallelNashvilleNumber, generateTriadWithOctave, constructChordWithOctave, relativeChordDefinitions, getNashvilleNumber } = ScaleUtil;
 
   const [selectedSubstitution, setSelectedSubstitution] = useState(null);

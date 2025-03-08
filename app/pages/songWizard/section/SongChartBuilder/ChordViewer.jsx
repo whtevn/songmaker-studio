@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import { Renderer, Stave, StaveNote, Formatter, Voice, Accidental, Annotation } from "vexflow";
-import ScaleUtil from "~/utils/scales";
+import { SHARP, FLAT } from "~/musicTheory";
 
 const ChordRender = ({ chords }) => {
+  console.log(chords);
   const containerRef = useRef(null);
-  const { SHARP, FLAT } = ScaleUtil;
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -29,34 +29,33 @@ const ChordRender = ({ chords }) => {
     const stave = new Stave(10, 40, containerWidth - 20);
     stave.addClef("treble").setContext(context).draw();
 
-    const staveNotes = chords.map(({ chord, label, nashville }) => {
+    const staveNotes = chords.map(({ render, chord }) => {
       const staveNote = new StaveNote({
-        keys: chord.map((n) => `${n.note.slice(0,1).toLowerCase()}/${n.octave}`),
+        keys: chord.notes.map((n) => `${n.render.name.charAt(0).toLowerCase()}/${n.render.octave}`),
         duration: "q",
       });
 
       // Add accidentals
-      chord.forEach((note, i) => {
-        const accidental = note.note.includes(FLAT) ? "b" : note.note.includes(SHARP) ? "#" : null;
+      chord.notes.forEach((note, i) => {
+        const accidental = note.render.name.includes(FLAT) ? "b" : note.render.name.includes(SHARP) ? "#" : null;
         if (accidental) staveNote.addModifier(new Accidental(accidental), i);
       });
 
-
       // Add second annotation (Nashville Number)
-      if (nashville) {
+      if (render.nashville) {
         staveNote.addModifier(
-          new Annotation(nashville)
+          new Annotation(render.nashville)
             .setVerticalJustification(Annotation.VerticalJustify.BOTTOM)
             .setFont("Arial", 10)
-            .setYShift(15), // Moves second line lower
+            .setYShift(15),
           0
         );
       }
-      
-      // Add first annotation (label)
-      if (label) {
+
+      // Add first annotation (chord name)
+      if (render.chordName) {
         staveNote.addModifier(
-          new Annotation(label)
+          new Annotation(render.chordName)
             .setVerticalJustification(Annotation.VerticalJustify.BOTTOM)
             .setFont("Arial", 12),
           0
