@@ -1,5 +1,9 @@
 import React, { createContext, useContext, useState } from "react";
 import useCatalogStore from "~/stores/useCatalogStore";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { TouchBackend } from "react-dnd-touch-backend";
+import { isMobile } from "react-device-detect";
+import { DndProvider } from 'react-dnd'
 
 // Our interface mode options:
 export const interfaceModeOptions = {
@@ -16,11 +20,12 @@ export const SongChartBuilderContext = createContext();
 export function SongChartBuilderProvider({ children }) {
   // Our mode state, defaulting to "song"
   const [interfaceMode, setSongChartBuilder] = useState(interfaceModeOptions.song);
-  const { getSongSection, updateSongSection, applyChordToSection } = useCatalogStore.getState();
+  const { getSongSection, updateSongSection, applyChordToSection, addChordtoChordProgression  } = useCatalogStore.getState();
   const [audioContext, setAudioContext] = useState(new (window.AudioContext || window.webkitAudioContext)());
 
   // Example of some data that might change when a click event happens
   // (e.g., "selectedChord" or something relevant to chord progression)
+  const [selectedChordProgression, setSelectedChordProgression] = useState(null);
   const [selectedChord, setSelectedChord] = useState(null);
   const [selectedWord, setSelectedWord] = useState(null);
 
@@ -47,7 +52,7 @@ export function SongChartBuilderProvider({ children }) {
       applyChordToSong({ chord: chordInfo, word: selectedWord })
     }
     if (interfaceMode === interfaceModeOptions.progression) {
-      addChordToChordProgression({ chord: chordInfo, word: selectedWord })
+      addChordtoChordProgression(chordProgression, chord)
     }
   };
 
@@ -77,7 +82,12 @@ export function SongChartBuilderProvider({ children }) {
 
   return (
     <SongChartBuilderContext.Provider value={providerValue}>
-      {children}
+      <DndProvider
+        backend={isMobile ? TouchBackend : HTML5Backend}
+        options={{ enableMouseEvents: true }} // For better compatibility
+      >
+        {children}
+      </DndProvider>
     </SongChartBuilderContext.Provider>
   );
 }
